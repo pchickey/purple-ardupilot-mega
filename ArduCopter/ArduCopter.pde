@@ -59,6 +59,9 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 #include <AP_Compass.h>     // ArduPilot Mega Magnetometer Library
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
 #include <AP_IMU.h>         // ArduPilot Mega IMU Library
+#include <AP_IMU_MPU6000.h>             // Experimental MPU6000 IMU library
+#include <AP_TimerProcess.h>            // TimerProcess is the scheduler for MPU6000 reads.
+#include <AP_TimerAperiodicProcess.h>   // TimerAperiodicProcess is the scheduler for ADC reads.
 #include <AP_DCM.h>         // ArduPilot Mega DCM Library
 #include <APM_PI.h>            	// PI library
 #include <RC_Channel.h>     // RC Channel Library
@@ -125,7 +128,10 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
 #if HIL_MODE == HIL_MODE_DISABLED
 
 	// real sensors
+    #if CONFIG_ADC == ENABLED
 	AP_ADC_ADS7844          adc;
+    #endif
+
 	APM_BMP085_Class        barometer;
     AP_Compass_HMC5843      compass(Parameters::k_param_compass);
 
@@ -183,7 +189,13 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
 #if HIL_MODE != HIL_MODE_ATTITUDE
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
-		AP_IMU_Oilpan imu(&adc, Parameters::k_param_IMU_calibration);
+        #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
+		AP_IMU_MPU6000 imu(Parameters::k_param_IMU_calibration);
+		AP_TimerProcess timer_scheduler;
+        #else
+        AP_IMU_Oilpan  imu(&adc, Parameters::k_param_IMU_calibration);
+		AP_TimerAperiodicProcess timer_scheduler;
+        #endif
 	#else
 		// hil imu
 		AP_IMU_Shim imu;
@@ -203,11 +215,12 @@ GCS_MAVLINK	gcs3(Parameters::k_param_streamrates_port3);
 ////////////////////////////////////////////////////////////////////////////////
 //
 ModeFilter sonar_mode_filter;
-
+#if CONFIG_SONAR == ENABLED
 #if SONAR_TYPE == MAX_SONAR_XL
 	AP_RangeFinder_MaxsonarXL sonar(&adc, &sonar_mode_filter);//(SONAR_PORT, &adc);
 #else
     #error Unrecognised SONAR_TYPE setting.
+#endif
 #endif
 
 // agmatthews USERHOOKS
@@ -756,9 +769,12 @@ static void fifty_hz_loop()
 
 	// Read Sonar
 	// ----------
+    # if CONFIG_SONAR == ENABLED
 	if(g.sonar_enabled){
 		sonar_alt = sonar.read();
 	}
+    #endif
+
 	// agmatthews - USERHOOKS
 	#ifdef USERHOOK_50HZLOOP
 	  USERHOOK_50HZLOOP

@@ -45,6 +45,23 @@
 # define FRAME_ORIENTATION		PLUS_FRAME
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+// IMU Selection
+//
+#ifndef CONFIG_IMU_TYPE
+# define CONFIG_IMU_TYPE CONFIG_IMU_OILPAN
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// ADC Enable - used to eliminate for systems which don't have ADC.
+//
+#ifndef CONFIG_ADC
+# if CONFIG_IMU_TYPE == CONFIG_IMU_OILPAN
+#   define CONFIG_ADC ENABLED
+# else
+#   define CONFIG_ADC DISABLED
+# endif
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PWM control
@@ -65,6 +82,23 @@
 #ifndef SONAR_TYPE
 # define SONAR_TYPE		MAX_SONAR_XL
 #endif
+
+// It seems that MAX_SONAR_XL depends on an ADC. For systems without an
+// ADC, we need to disable the sonar
+#if SONAR_TYPE == MAX_SONAR_XL
+# if CONFIG_ADC == DISABLED
+#   if defined(CONFIG_SONAR)
+#      warning "MAX_SONAR_XL requires a valid ADC. This system does not have an ADC enabled."
+#      undef CONFIG_SONAR
+#   endif
+#   define CONFIG_SONAR DISABLED
+#  endif
+#endif
+
+#ifndef CONFIG_SONAR
+# define CONFIG_SONAR ENABLED
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Acrobatics

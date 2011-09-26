@@ -41,32 +41,34 @@ public:
 	///                 COLD_START performs calibration of both the accelerometer and gyro.
 	///                 WARM_START loads accelerometer and gyro calibration from a previous cold start.
 	///
-	virtual void		init(Start_style style = COLD_START, void (*callback)(unsigned long t) = delay);
+	virtual void		init( Start_style style = COLD_START,
+                              void (*delay_cb)(unsigned long t) = delay,
+                              AP_PeriodicProcess *scheduler = NULL );
 
 	virtual void		save();
-	virtual void		init_accel(void (*callback)(unsigned long t) = delay);
-	virtual void		init_gyro(void (*callback)(unsigned long t) = delay);
+	virtual void		init_accel(void (*delay_cb)(unsigned long t) = delay);
+	virtual void		init_gyro(void (*delay_cb)(unsigned long t) = delay);
 	virtual bool		update(void);
 
 	// for jason
-	float		gx()				{ return _sensor_cal[0]; }
-	float		gy()				{ return _sensor_cal[1]; }
-	float		gz()				{ return _sensor_cal[2]; }
-	float		ax()				{ return _sensor_cal[3]; }
-	float		ay()				{ return _sensor_cal[4]; }
-	float		az()				{ return _sensor_cal[5]; }
+	virtual float		gx()				{ return _sensor_cal[0]; }
+	virtual float		gy()				{ return _sensor_cal[1]; }
+	virtual float		gz()				{ return _sensor_cal[2]; }
+	virtual float		ax()				{ return _sensor_cal[3]; }
+	virtual float		ay()				{ return _sensor_cal[4]; }
+	virtual float		az()				{ return _sensor_cal[5]; }
 
-	void		ax(const float v)		{ _sensor_cal[3] = v; }
-	void		ay(const float v)		{ _sensor_cal[4] = v; }
-	void		az(const float v)		{ _sensor_cal[5] = v; }
+	virtual void		ax(const float v)		{ _sensor_cal[3] = v; }
+	virtual void		ay(const float v)		{ _sensor_cal[4] = v; }
+	virtual void		az(const float v)		{ _sensor_cal[5] = v; }
 
 
 private:
     AP_ADC              *_adc;          ///< ADC that we use for reading sensors
     AP_VarA<float,6>    _sensor_cal;    ///< Calibrated sensor offsets
 
-    virtual void        _init_accel(void (*callback)(unsigned long t));  ///< no-save implementation
-    virtual void        _init_gyro(void (*callback)(unsigned long t));   ///< no-save implementation
+    virtual void        _init_accel(void (*delay_cb)(unsigned long t));  ///< no-save implementation
+    virtual void        _init_gyro(void (*delay_cb)(unsigned long t));   ///< no-save implementation
 
     float				_sensor_in(uint8_t channel, uint16_t adc_value, int temperature);
     float 		        _sensor_compensation(uint8_t channel, int temp) const;

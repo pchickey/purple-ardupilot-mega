@@ -186,10 +186,11 @@ static void init_ardupilot()
 	init_camera();
 
 	#if HIL_MODE != HIL_MODE_ATTITUDE
+        #if CONFIG_ADC == ENABLED
 		// begin filtering the ADC Gyros
 		adc.filter_result = true;
-
 		adc.Init();	 		// APM ADC library initialization
+        #endif
 		barometer.Init();	// APM Abs Pressure sensor initialization
 	#endif
 
@@ -306,7 +307,7 @@ static void startup_ground(void)
 	#if HIL_MODE != HIL_MODE_ATTITUDE
 		// Warm up and read Gyro offsets
 		// -----------------------------
-		imu.init_gyro(mavlink_delay);
+		imu.init(IMU::COLD_START, mavlink_delay, &timer_scheduler);
 		#if CLI_ENABLED == ENABLED
 			report_imu();
 		#endif
@@ -568,3 +569,14 @@ static uint32_t map_baudrate(int8_t rate, uint32_t default_baud)
     //Serial.println_P(PSTR("Invalid SERIAL3_BAUD"));
     return default_baud;
 }
+
+
+ISR (TIMER2_OVF_vect)
+{
+    #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
+    AP_TimerProcess::run();
+    #else
+    AP_TimerAperiodicProcess::run();
+    #endif
+}
+

@@ -345,4 +345,8 @@ enum gcs_severity {
 // mark a function as not to be inlined
 #define NOINLINE __attribute__((noinline))
 
+// IMU selection
+#define CONFIG_IMU_OILPAN 1
+#define CONFIG_IMU_MPU6000 2
+
 #endif // _DEFINES_H

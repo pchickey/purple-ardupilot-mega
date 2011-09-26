@@ -8,6 +8,7 @@
 #define IMU_h
 
 #include "../AP_Math/AP_Math.h"
+#include "../AP_PeriodicProcess/AP_PeriodicProcess.h"
 #include <inttypes.h>
 
 class IMU
@@ -35,7 +36,9 @@ public:
 	///
 	/// @param style	The initialisation startup style.
 	///
-	virtual void	init(Start_style style, void (*callback)(unsigned long t)) = 0;
+	virtual void	init( Start_style style,
+                          void (*delay_cb)(unsigned long t),
+                          AP_PeriodicProcess * scheduler )= 0;
 
 	/// Perform cold startup initialisation for just the accelerometers.
 	///
@@ -89,6 +92,15 @@ public:
 	///       are using ADCs, etc.
 	///
 	uint8_t 	adc_constraints;
+
+	virtual float		gx(void);
+	virtual float		gy(void);
+	virtual float		gz(void);
+	virtual float		ax(void);
+	virtual float		ay(void);
+	virtual void		ax(const float v);
+	virtual void		ay(const float v);
+	virtual void		az(const float v);
 
 protected:
 	/// Most recent accelerometer reading obtained by ::update
