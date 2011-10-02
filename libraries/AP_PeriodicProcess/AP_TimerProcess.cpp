@@ -4,8 +4,8 @@
 extern "C" {
 #include <inttypes.h>
 #include <stdint.h>
-#include <avr/interrupt.h>
 #include "WConstants.h"
+#include "manage_timer2.h"
 }
 
 int AP_TimerProcess::_period;
@@ -26,6 +26,8 @@ void AP_TimerProcess::init(void)
 	TCNT2  = 0;                 // Set count to zero, so it goes off right away.
 	TIFR2  = _BV(TOV2);	        // clear pending interrupts;
 	TIMSK2 = _BV(TOIE2);        // enable the overflow interrupt
+
+    register_timer2_cb(AP_TimerProcess::run);  // Register this class against timer2.
 }
 
 void AP_TimerProcess::register_process(void (*proc)(void) )

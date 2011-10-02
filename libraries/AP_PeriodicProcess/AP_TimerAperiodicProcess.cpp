@@ -4,8 +4,8 @@
 extern "C" {
 #include <inttypes.h>
 #include <stdint.h>
-#include <avr/interrupt.h>
 #include "WConstants.h"
+#include "manage_timer2.h"
 }
 // TCNT2 values for various interrupt rates,
 // assuming 256 prescaler. Note that these values
@@ -16,6 +16,19 @@ extern "C" {
 #define TCNT2_1302_HZ  (256-48)
 
 uint8_t AP_TimerAperiodicProcess::_timer_offset;
+
+void AP_TimerAperiodicProcess::init(void)
+{
+	// Enable Timer2 Overflow interrupt to trigger process.
+	TIMSK2 = 0;                 // Disable interrupts
+	TCCR2A = 0;                 // normal counting mode
+	TCCR2B = _BV(CS21) | _BV(CS22);	// Set prescaler of clk/256
+	TCNT2  = 0;                 // Set count to zero, so it goes off right away.
+	TIFR2  = _BV(TOV2);	        // clear pending interrupts;
+	TIMSK2 = _BV(TOIE2);        // enable the overflow interrupt
+
+    register_timer2_cb(AP_TimerAperiodicProcess::run);  // Register this class against timer2.
+}
 
 void AP_TimerAperiodicProcess::run(void)
 {

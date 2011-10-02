@@ -60,6 +60,8 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
 #include <AP_IMU.h>         // ArduPilot Mega IMU Library
 #include <AP_IMU_MPU6000.h>             // Experimental MPU6000 IMU library
+#include <AP_PeriodicProcess.h>         // Parent header of Timer and TimerAperiodic
+                                        // (only included for makefile libpath to work)
 #include <AP_TimerProcess.h>            // TimerProcess is the scheduler for MPU6000 reads.
 #include <AP_TimerAperiodicProcess.h>   // TimerAperiodicProcess is the scheduler for ADC reads.
 #include <AP_DCM.h>         // ArduPilot Mega DCM Library

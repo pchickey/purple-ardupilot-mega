@@ -9,6 +9,7 @@
 class AP_TimerAperiodicProcess : public AP_TimerProcess
 {
     public:
+        void init();
         static void run(void);
     private:
         static uint8_t _timer_offset;

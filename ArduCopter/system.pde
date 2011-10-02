@@ -570,13 +570,3 @@ static uint32_t map_baudrate(int8_t rate, uint32_t default_baud)
     return default_baud;
 }
 
-
-ISR (TIMER2_OVF_vect)
-{
-    #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-    AP_TimerProcess::run();
-    #else
-    AP_TimerAperiodicProcess::run();
-    #endif
-}
-
