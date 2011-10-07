@@ -185,6 +185,8 @@ static void init_ardupilot()
 	init_rc_out();		// sets up the timer libs
 	init_camera();
 
+  timer_scheduler.init();
+
 	#if HIL_MODE != HIL_MODE_ATTITUDE
         #if CONFIG_ADC == ENABLED
 		// begin filtering the ADC Gyros
