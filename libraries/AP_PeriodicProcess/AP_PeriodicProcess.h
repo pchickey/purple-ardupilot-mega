@@ -6,8 +6,7 @@ class AP_PeriodicProcess
 {
     public:
         AP_PeriodicProcess() {};
-        virtual void Init() {};
-        virtual void register_process(void (* proc)(void));
+        virtual void register_process(void (* proc)(void)) = 0;
 };
 
 #endif // __AP_PERIODICPROCESS_H__
