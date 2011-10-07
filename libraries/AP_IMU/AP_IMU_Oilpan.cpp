@@ -31,6 +31,8 @@
 const uint8_t AP_IMU_Oilpan::_sensors[6]        = { 1, 2, 0, 4, 5, 6};	// Channel assignments on the APM oilpan
 const int8_t  AP_IMU_Oilpan::_sensor_signs[6]	= {	1,-1,-1, 1,-1,-1};  // Channel orientation vs. normal
 
+const float AP_IMU_Oilpan::_adc_constraint = 900;
+
 // Temp compensation curve constants
 // These must be produced by measuring data and curve fitting
 // [X/Y/Z gyro][A/B/C or 0 order/1st order/2nd order constants]
