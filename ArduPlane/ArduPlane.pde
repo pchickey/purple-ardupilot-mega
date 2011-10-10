@@ -32,6 +32,7 @@ version 2.1 of the License, or (at your option) any later version.
 #include <SPI.h>			// Arduino SPI lib
 #include <DataFlash.h>      // ArduPilot Mega Flash Memory Library
 #include <AP_ADC.h>         // ArduPilot Mega Analog to Digital Converter Library
+#include <AP_AnalogSource.h>// ArduPilot Mega polymorphic analog getter
 #include <APM_BMP085.h>     // ArduPilot Mega BMP085 Library
 #include <AP_Compass.h>     // ArduPilot Mega Magnetometer Library
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
@@ -174,12 +175,19 @@ GCS_MAVLINK	gcs3(Parameters::k_param_streamrates_port3);
 //
 ModeFilter sonar_mode_filter;
 
+#if CONFIG_SONAR_SOURCE == SONAR_SOURCE_ADC
+AP_AnalogSource_ADC pitot_analog_source( &adc,
+                        CONFIG_SONAR_SOURCE_ADC_CHANNEL, 0.25);
+#elif CONFIG_SONAR_SOURCE == SONAR_SOURCE_ANALOG_PIN
+AP_AnalogSource_Arduino pitot_analog_source(CONFIG_SONAR_SOURCE_ANALOG_PIN);
+#endif
+
 #if SONAR_TYPE == MAX_SONAR_XL
-	AP_RangeFinder_MaxsonarXL sonar(&adc, &sonar_mode_filter);//(SONAR_PORT, &adc);
+	AP_RangeFinder_MaxsonarXL sonar(&pitot_analog_source, &sonar_mode_filter);
 #elif SONAR_TYPE == MAX_SONAR_LV
 	// XXX honestly I think these output the same values
 	// If someone knows, can they confirm it?
-	AP_RangeFinder_MaxsonarXL sonar(&adc, &sonar_mode_filter);//(SONAR_PORT, &adc);
+	AP_RangeFinder_MaxsonarXL sonar(&pitot_analog_source, &sonar_mode_filter);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

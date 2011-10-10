@@ -30,6 +30,9 @@
 #define SONAR 0
 #define BARO 1
 
+#define SONAR_SOURCE_ADC 1
+#define SONAR_SOURCE_ANALOG_PIN 2
+
 #define T6 1000000
 #define T7 10000000
 
