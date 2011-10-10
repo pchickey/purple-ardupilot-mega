@@ -4,4 +4,5 @@
 /// @brief      Catch-all header that defines all supported IMU classes.
 
 #include "AP_IMU_Oilpan.h"
+#include "AP_IMU_MPU6000.h"
 #include "AP_IMU_Shim.h"
