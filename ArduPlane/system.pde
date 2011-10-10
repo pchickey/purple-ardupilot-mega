@@ -82,6 +82,7 @@ static void init_ardupilot()
 						 "\n\nFree RAM: %u\n"),
                     memcheck_available_memory());
 
+  timer_scheduler.init();
 	//
 	// Check the EEPROM format version before loading any parameters from EEPROM.
 	//
@@ -137,7 +138,9 @@ static void init_ardupilot()
 
 
 #if HIL_MODE != HIL_MODE_ATTITUDE
-	adc.Init();	 		// APM ADC library initialization
+  #if CONFIG_ADC == ENABLED
+	adc.Init(&timer_scheduler);	 		// APM ADC library initialization
+  #endif
 	barometer.Init();	// APM Abs Pressure sensor initialization
 
 	if (g.compass_enabled==true) {
@@ -220,7 +223,7 @@ static void init_ardupilot()
 		//----------------
 		//read_EEPROM_airstart_critical();
 #if HIL_MODE != HIL_MODE_ATTITUDE
-		imu.init(IMU::WARM_START);
+		imu.init(IMU::WARM_START, mavlink_delay, &timer_scheduler);
 		dcm.set_centripetal(1);
 #endif
 
@@ -428,7 +431,7 @@ static void startup_IMU_ground(void)
     gcs_send_text_P(SEVERITY_MEDIUM, PSTR("Beginning IMU calibration; do not move plane"));
 	mavlink_delay(1000);
 
-	imu.init(IMU::COLD_START, mavlink_delay);
+	imu.init(IMU::COLD_START, mavlink_delay, &timer_scheduler);
 	dcm.set_centripetal(1);
 
 	// read Baro pressure at ground

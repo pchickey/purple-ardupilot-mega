@@ -33,6 +33,7 @@ version 2.1 of the License, or (at your option) any later version.
 #include <DataFlash.h>      // ArduPilot Mega Flash Memory Library
 #include <AP_ADC.h>         // ArduPilot Mega Analog to Digital Converter Library
 #include <AP_AnalogSource.h>// ArduPilot Mega polymorphic analog getter
+#include <AP_PeriodicProcess.h> // ArduPilot Mega TimerProcess and TimerAperiodicProcess
 #include <APM_BMP085.h>     // ArduPilot Mega BMP085 Library
 #include <AP_Compass.h>     // ArduPilot Mega Magnetometer Library
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
@@ -153,7 +154,13 @@ AP_IMU_Shim             imu; // never used
 #if HIL_MODE != HIL_MODE_ATTITUDE
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
+    #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
+    AP_IMU_MPU6000 imu(Parameters::k_param_IMU_calibration);
+    AP_TimerProcess timer_scheduler;
+    #else
 		AP_IMU_Oilpan imu(&adc, Parameters::k_param_IMU_calibration);
+    AP_TimerAperiodicProcess timer_scheduler; 
+    #endif
 	#else
 		// hil imu
 		AP_IMU_Shim imu;
