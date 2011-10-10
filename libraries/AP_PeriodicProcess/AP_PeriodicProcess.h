@@ -1,13 +1,10 @@
 
-#ifndef __AP_PERIODICPROCESS_H__
-#define __AP_PERIODICPROCESS_H__
+#ifndef __AP_PERIODIC_PROCESS_H__
+#define __AP_PERIODIC_PROCESS_H__
 
-class AP_PeriodicProcess
-{
-    public:
-        AP_PeriodicProcess() {};
-        virtual void register_process(void (* proc)(void)) = 0;
-};
+#include "PeriodicProcess.h"
+#include "AP_TimerProcess.h"
+#include "AP_TimerAperiodicProcess.h"
 
-#endif // __AP_PERIODICPROCESS_H__
+#endif // __AP_PERIODIC_PROCESS_H__
 

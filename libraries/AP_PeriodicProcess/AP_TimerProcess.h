@@ -2,7 +2,7 @@
 #ifndef __AP_TIMERPROCESS_H__
 #define __AP_TIMERPROCESS_H__
 
-#include "AP_PeriodicProcess.h"
+#include "PeriodicProcess.h"
 
 /* XXX this value is a total guess, will look up. */
 #define TIMERPROCESS_PER_DEFAULT (256)
