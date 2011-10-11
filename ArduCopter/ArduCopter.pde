@@ -193,7 +193,8 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
         #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-		AP_IMU_MPU6000 imu(Parameters::k_param_IMU_calibration);
+		AP_IMU_MPU6000 imu(Parameters::k_param_IMU_calibration,
+                       CONFIG_MPU6000_CHIP_SELECT_PIN);
 		AP_TimerProcess timer_scheduler;
         #else
         AP_IMU_Oilpan  imu(&adc, Parameters::k_param_IMU_calibration);
