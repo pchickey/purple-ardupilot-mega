@@ -12,12 +12,11 @@
 class AP_IMU_MPU6000 : public IMU
 {
 public:
-        AP_IMU_MPU6000( AP_Var::Key );
+        AP_IMU_MPU6000( AP_Var::Key, int cs_pin );
         virtual void init( Start_style style,
                           void (*delay_cb) (unsigned long),
                           AP_PeriodicProcess *scheduler );
         virtual bool update(void);
-        static void read(void);
         virtual void init_accel(void (*delay_cb)(unsigned long t) = delay);
         virtual float gx(void) { return _sensor_cal[0]; }
         virtual float gy(void) { return _sensor_cal[1]; }
@@ -31,11 +30,20 @@ public:
 
         virtual void init_gyro(void (*delay_cb)(unsigned long t) = delay);
         virtual void save(void);
-
+        /* AP_IMU_MPU6000 is de-facto a singleton. We use ::read as a
+         * static method to simplify registering it as a callback.
+         */
+        static void read(void);
 private:
-        AP_VarA<uint32_t,6>     _sensor_cal;
-        static uint16_t                _data[6];
+        static uint8_t register_read(uint8_t reg);
+        static void    register_write(uint8_t reg, uint8_t val);
 
+        AP_VarA<uint32_t,6>     _sensor_cal;
+        /* ::read uses these bits of data, so they need to be static. */
+        static uint16_t         _data[7];
+        static int              _cs_pin;
+
+        void hardware_init();
 };
 
 #endif // __AP_IMU_MPU6000_H__
