@@ -79,35 +79,39 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Sonar
+// Pitot
 //
 
-#ifndef SONAR_ENABLED
-# define SONAR_ENABLED         	DISABLED
+#ifndef PITOT_ENABLED
+# define PITOT_ENABLED         	DISABLED
 #endif
 
-#ifndef CONFIG_SONAR_SOURCE
-# define CONFIG_SONAR_SOURCE SONAR_SOURCE_ADC
+#ifndef CONFIG_PITOT_SOURCE
+# define CONFIG_PITOT_SOURCE PITOT_SOURCE_ADC
 #endif
 
-#if CONFIG_SONAR_SOURCE == SONAR_SOURCE_ADC
-# ifndef CONFIG_SONAR_SOURCE_ADC_CHANNEL
-#  define CONFIG_SONAR_SOURCE_ADC_CHANNEL 7
+#if CONFIG_PITOT_SOURCE == PITOT_SOURCE_ADC
+# ifndef CONFIG_PITOT_SOURCE_ADC_CHANNEL
+#  define CONFIG_PITOT_SOURCE_ADC_CHANNEL 7
 # endif
-#elif CONFIG_SONAR_SOURCE == SONAR_SOURCE_ANALOG_PIN
-# ifndef CONFIG_SONAR_SOURCE_ANALOG_PIN
-#  define CONFIG_SONAR_SOURCE_ANALOG_PIN AN4
+#elif CONFIG_PITOT_SOURCE == PITOT_SOURCE_ANALOG_PIN
+# ifndef CONFIG_PITOT_SOURCE_ANALOG_PIN
+#  define CONFIG_PITOT_SOURCE_ANALOG_PIN AN4
 # endif
 #else
-# warning Invalid value for CONFIG_SONAR_SOURCE, disabling sonar
-# undef SONAR_ENABLED
-# define SONAR_ENABLED DISABLED
+# warning Invalid value for CONFIG_PITOT_SOURCE, disabling sonar
+# undef PITOT_ENABLED
+# define PITOT_ENABLED DISABLED
 #endif
 
 #ifndef SONAR_TYPE
 # define SONAR_TYPE             MAX_SONAR_LV	// MAX_SONAR_XL,  
 #endif
 
+/* In ArduPlane PITOT usually takes the place of SONAR, but some bits
+ * still depend on SONAR.
+ */
+#define SONAR_ENABLED PITOT_ENABLED
 
 //////////////////////////////////////////////////////////////////////////////
 // HIL_MODE                                 OPTIONAL

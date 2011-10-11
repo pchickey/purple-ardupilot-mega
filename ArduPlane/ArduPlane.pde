@@ -178,16 +178,16 @@ GCS_MAVLINK	gcs0(Parameters::k_param_streamrates_port0);
 GCS_MAVLINK	gcs3(Parameters::k_param_streamrates_port3);
 
 ////////////////////////////////////////////////////////////////////////////////
-// SONAR selection
+// PITOT selection
 ////////////////////////////////////////////////////////////////////////////////
 //
 ModeFilter sonar_mode_filter;
 
-#if CONFIG_SONAR_SOURCE == SONAR_SOURCE_ADC
+#if CONFIG_PITOT_SOURCE == PITOT_SOURCE_ADC
 AP_AnalogSource_ADC pitot_analog_source( &adc,
-                        CONFIG_SONAR_SOURCE_ADC_CHANNEL, 0.25);
-#elif CONFIG_SONAR_SOURCE == SONAR_SOURCE_ANALOG_PIN
-AP_AnalogSource_Arduino pitot_analog_source(CONFIG_SONAR_SOURCE_ANALOG_PIN);
+                        CONFIG_PITOT_SOURCE_ADC_CHANNEL, 0.25);
+#elif CONFIG_PITOT_SOURCE == PITOT_SOURCE_ANALOG_PIN
+AP_AnalogSource_Arduino pitot_analog_source(CONFIG_PITOT_SOURCE_ANALOG_PIN);
 #endif
 
 #if SONAR_TYPE == MAX_SONAR_XL
