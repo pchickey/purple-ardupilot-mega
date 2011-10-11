@@ -222,14 +222,14 @@ ModeFilter sonar_mode_filter;
 #if CONFIG_SONAR == ENABLED
 
 #if CONFIG_SONAR_SOURCE == SONAR_SOURCE_ADC
-AP_AnalogSource_ADC pitot_analog_source( &adc,
+AP_AnalogSource_ADC sonar_analog_source( &adc,
                         CONFIG_SONAR_SOURCE_ADC_CHANNEL, 0.25);
 #elif CONFIG_SONAR_SOURCE == SONAR_SOURCE_ANALOG_PIN
-AP_AnalogSource_Arduino pitot_analog_source(CONFIG_SONAR_SOURCE_ANALOG_PIN);
+AP_AnalogSource_Arduino sonar_analog_source(CONFIG_SONAR_SOURCE_ANALOG_PIN);
 #endif
 
 #if SONAR_TYPE == MAX_SONAR_XL
-	AP_RangeFinder_MaxsonarXL sonar(&pitot_analog_source, &sonar_mode_filter);
+	AP_RangeFinder_MaxsonarXL sonar(&sonar_analog_source, &sonar_mode_filter);
 #else
     #error Unrecognised SONAR_TYPE setting.
 #endif
