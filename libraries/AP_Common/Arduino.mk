@@ -227,6 +227,9 @@ endif
 #
 DEFINES			=	-DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERS) $(EXTRAFLAGS)
 OPTFLAGS		=	-Os -Wformat -Wall -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wformat=2 -Wno-reorder
+					# The following warnings pop up all the time due to the pde
+					# preprocessor. They tend to be more noise than useful warnings.
+OPTFLAGS        +=  -Wno-unused-variable -Wno-unused-function
 DEPFLAGS		=	-MD -MT $@
 
 # XXX warning options TBD
