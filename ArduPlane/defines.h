@@ -233,4 +233,7 @@ enum gcs_severity {
 #define CONFIG_IMU_OILPAN 1
 #define CONFIG_IMU_MPU6000 2
 
+#define APM_HARDWARE_APM1  1
+#define APM_HARDWARE_PURPLE 2
+
 #endif // _DEFINES_H
