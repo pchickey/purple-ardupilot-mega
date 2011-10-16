@@ -183,7 +183,14 @@ uint8_t APM_RC_APM1::GetState(void)
   return(radio_status);
 }
 
+
 // InstantPWM implementation
+void APM_RC_APM1::Force_Out(void)
+{
+    Force_Out0_Out1();
+    Force_Out2_Out3();
+    Force_Out6_Out7();
+}
 // This function forces the PWM output (reset PWM) on Out0 and Out1 (Timer5). For quadcopters use
 void APM_RC_APM1::Force_Out0_Out1(void)
 {

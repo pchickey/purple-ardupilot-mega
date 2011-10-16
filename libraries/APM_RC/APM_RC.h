@@ -25,10 +25,8 @@ class APM_RC_Class
 	virtual void OutputCh(uint8_t ch, uint16_t pwm) = 0;
 	virtual uint16_t InputCh(uint8_t ch) = 0;
 	virtual uint8_t GetState() = 0;
-	virtual void Force_Out0_Out1(void) = 0;
-	virtual void Force_Out2_Out3(void) = 0;
-	virtual void Force_Out6_Out7(void) = 0;
 	virtual void clearOverride(void) = 0;
+    virtual void Force_Out() = 0;
 };
 
 #endif

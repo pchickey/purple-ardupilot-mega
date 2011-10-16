@@ -145,7 +145,6 @@ static void heli_move_swash(int roll_out, int pitch_out, int coll_out, int yaw_o
 		APM_RC.Force_Out0_Out1();
 		APM_RC.Force_Out2_Out3();
 		#endif
-
 		// reset the averaging
 		heli_servo_out_count = 0;
 		heli_servo_out[0] = 0;

@@ -17,11 +17,13 @@ class APM_RC_APM1 : public APM_RC_Class
 	uint8_t GetState();
 	bool setHIL(int16_t v[NUM_CHANNELS]);
 	void clearOverride(void);
+    void Force_Out(void);
+
+  private:
 	void Force_Out0_Out1(void);
 	void Force_Out2_Out3(void);
 	void Force_Out6_Out7(void);
 
-  private:
     static void _timer4_capt_cb(void);
 	int16_t _HIL_override[NUM_CHANNELS];
 };
