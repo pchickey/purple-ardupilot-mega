@@ -1,5 +1,5 @@
 /*
-	APM_RC.cpp - Radio Control Library for Ardupilot Mega. Arduino
+	APM_RC_APM1.cpp - Radio Control Library for Ardupilot Mega. Arduino
 	Code by Jordi Muñoz and Jose Julio. DIYDrones.com
 
 	This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 		             Automatically resets when we call InputCh to read channels
 
 */
-#include "APM_RC.h"
+#include "APM_RC_APM1.h"
 
 #include <avr/interrupt.h>
 #include "WProgram.h"
@@ -36,7 +36,7 @@ volatile uint8_t radio_status=0;
 /****************************************************
    Input Capture Interrupt ICP4 => PPM signal read
  ****************************************************/
-ISR(TIMER4_CAPT_vect)
+void APM_RC_APM1::_timer4_capt_cb(void)
 {
   static uint16_t ICR4_old;
   static uint8_t PPM_Counter=0;
@@ -70,13 +70,16 @@ ISR(TIMER4_CAPT_vect)
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-APM_RC_Class::APM_RC_Class()
+APM_RC_APM1::APM_RC_APM1()
 {
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-void APM_RC_Class::Init(void)
+void APM_RC_APM1::Init( Arduino_Mega_ISR_Registry * isr_reg )
 {
+
+  isr_reg->register_signal(ISR_REGISTRY_TIMER4_CAPT, _timer4_capt_cb );
+
   // Init PWM Timer 1
   pinMode(11,OUTPUT); //OUT9 (PB5/OC1A)
   pinMode(12,OUTPUT); //OUT2 (PB6/OC1B)
@@ -132,7 +135,7 @@ void APM_RC_Class::Init(void)
   TIMSK4 |= (1<<ICIE4); // Enable Input Capture interrupt. Timer interrupt mask
 }
 
-void APM_RC_Class::OutputCh(uint8_t ch, uint16_t pwm)
+void APM_RC_APM1::OutputCh(uint8_t ch, uint16_t pwm)
 {
   pwm=constrain(pwm,MIN_PULSEWIDTH,MAX_PULSEWIDTH);
   pwm<<=1;   // pwm*2;
@@ -153,7 +156,7 @@ void APM_RC_Class::OutputCh(uint8_t ch, uint16_t pwm)
   }
 }
 
-uint16_t APM_RC_Class::InputCh(uint8_t ch)
+uint16_t APM_RC_APM1::InputCh(uint8_t ch)
 {
   uint16_t result;
 
@@ -175,26 +178,26 @@ uint16_t APM_RC_Class::InputCh(uint8_t ch)
   return(result);
 }
 
-uint8_t APM_RC_Class::GetState(void)
+uint8_t APM_RC_APM1::GetState(void)
 {
   return(radio_status);
 }
 
 // InstantPWM implementation
 // This function forces the PWM output (reset PWM) on Out0 and Out1 (Timer5). For quadcopters use
-void APM_RC_Class::Force_Out0_Out1(void)
+void APM_RC_APM1::Force_Out0_Out1(void)
 {
   if (TCNT5>5000)  // We take care that there are not a pulse in the output
     TCNT5=39990;   // This forces the PWM output to reset in 5us (10 counts of 0.5us). The counter resets at 40000
 }
 // This function forces the PWM output (reset PWM) on Out2 and Out3 (Timer1). For quadcopters use
-void APM_RC_Class::Force_Out2_Out3(void)
+void APM_RC_APM1::Force_Out2_Out3(void)
 {
   if (TCNT1>5000)
     TCNT1=39990;
 }
 // This function forces the PWM output (reset PWM) on Out6 and Out7 (Timer3). For quadcopters use
-void APM_RC_Class::Force_Out6_Out7(void)
+void APM_RC_APM1::Force_Out6_Out7(void)
 {
   if (TCNT3>5000)
     TCNT3=39990;
@@ -203,7 +206,7 @@ void APM_RC_Class::Force_Out6_Out7(void)
 // allow HIL override of RC values
 // A value of -1 means no change
 // A value of 0 means no override, use the real RC values
-bool APM_RC_Class::setHIL(int16_t v[NUM_CHANNELS])
+bool APM_RC_APM1::setHIL(int16_t v[NUM_CHANNELS])
 {
 	uint8_t sum = 0;
 	for (uint8_t i=0; i<NUM_CHANNELS; i++) {
@@ -222,15 +225,12 @@ bool APM_RC_Class::setHIL(int16_t v[NUM_CHANNELS])
 	}
 }
 
-void APM_RC_Class::clearOverride(void)
+void APM_RC_APM1::clearOverride(void)
 {
 	for (uint8_t i=0; i<NUM_CHANNELS; i++) {
 		_HIL_override[i] = 0;
 	}
 }
 
-
-// make one instance for the user to use
-APM_RC_Class APM_RC;
 
 #endif // defined(ATMega1280)
