@@ -82,7 +82,17 @@ static void init_ardupilot()
 						 "\n\nFree RAM: %u\n"),
                     memcheck_available_memory());
 
-  timer_scheduler.init();
+	//
+	// Initialize the ISR registry.
+	//
+    isr_registry.init();
+
+    //
+	// Initialize the timer scheduler to use the ISR registry.
+	//
+
+    timer_scheduler.init( & isr_registry );
+
 	//
 	// Check the EEPROM format version before loading any parameters from EEPROM.
 	//
@@ -173,6 +183,8 @@ static void init_ardupilot()
 	mavlink_system.type = MAV_FIXED_WING;
 
 	rc_override_active = APM_RC.setHIL(rc_override);		// Set initial values for no override
+
+    RC_Channel::set_apm_rc( &APM_RC ); // Provide reference to RC outputs.
 	init_rc_in();		// sets up rc channels from radio
 	init_rc_out();		// sets up the timer libs
 

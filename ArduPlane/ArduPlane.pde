@@ -26,7 +26,9 @@ version 2.1 of the License, or (at your option) any later version.
 // Libraries
 #include <FastSerial.h>
 #include <AP_Common.h>
+#include <Arduino_Mega_ISR_Registry.h>
 #include <APM_RC.h>         // ArduPilot Mega RC Library
+# include <APM_RC_APM1.h>   // RC library for APM1 hardware
 #include <AP_GPS.h>         // ArduPilot GPS library
 #include <Wire.h>			// Arduino I2C lib
 #include <SPI.h>			// Arduino SPI lib
@@ -66,6 +68,17 @@ version 2.1 of the License, or (at your option) any later version.
 FastSerialPort0(Serial);        // FTDI/console
 FastSerialPort1(Serial1);       // GPS port
 FastSerialPort3(Serial3);       // Telemetry port
+
+////////////////////////////////////////////////////////////////////////////////
+// ISR Registry
+////////////////////////////////////////////////////////////////////////////////
+Arduino_Mega_ISR_Registry isr_registry;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// APM_RC_Class Instance
+////////////////////////////////////////////////////////////////////////////////
+    APM_RC_APM1 APM_RC;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
