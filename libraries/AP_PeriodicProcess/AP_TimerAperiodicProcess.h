@@ -4,12 +4,13 @@
 
 #include <stdint.h>
 
+#include "../Arduino_Mega_ISR_Registry/Arduino_Mega_ISR_Registry.h"
 #include "AP_TimerProcess.h"
 
 class AP_TimerAperiodicProcess : public AP_TimerProcess
 {
     public:
-        void init();
+        void init( Arduino_Mega_ISR_Registry * isr_reg );
         static void run(void);
     private:
         static uint8_t _timer_offset;

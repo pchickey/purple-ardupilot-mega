@@ -5,7 +5,6 @@ extern "C" {
 #include <inttypes.h>
 #include <stdint.h>
 #include "WConstants.h"
-#include "manage_timer2.h"
 }
 
 int AP_TimerProcess::_period;
@@ -17,7 +16,7 @@ AP_TimerProcess::AP_TimerProcess(int period)
     _proc = NULL;
 }
 
-void AP_TimerProcess::init(void)
+void AP_TimerProcess::init( Arduino_Mega_ISR_Registry * isr_reg )
 {
 	// Enable Timer2 Overflow interrupt to trigger process.
 	TIMSK2 = 0;                 // Disable interrupts
@@ -27,7 +26,7 @@ void AP_TimerProcess::init(void)
 	TIFR2  = _BV(TOV2);	        // clear pending interrupts;
 	TIMSK2 = _BV(TOIE2);        // enable the overflow interrupt
 
-    register_timer2_cb(AP_TimerProcess::run);  // Register this class against timer2.
+    isr_reg->register_signal( ISR_REGISTRY_TIMER2_OVF, AP_TimerProcess::run);
 }
 
 void AP_TimerProcess::register_process(void (*proc)(void) )

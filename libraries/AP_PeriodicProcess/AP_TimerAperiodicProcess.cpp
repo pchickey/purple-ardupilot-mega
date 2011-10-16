@@ -5,7 +5,6 @@ extern "C" {
 #include <inttypes.h>
 #include <stdint.h>
 #include "WConstants.h"
-#include "manage_timer2.h"
 }
 // TCNT2 values for various interrupt rates,
 // assuming 256 prescaler. Note that these values
@@ -17,7 +16,7 @@ extern "C" {
 
 uint8_t AP_TimerAperiodicProcess::_timer_offset;
 
-void AP_TimerAperiodicProcess::init(void)
+void AP_TimerAperiodicProcess::init( Arduino_Mega_ISR_Registry * isr_reg )
 {
 	// Enable Timer2 Overflow interrupt to trigger process.
 	TIMSK2 = 0;                 // Disable interrupts
@@ -27,7 +26,7 @@ void AP_TimerAperiodicProcess::init(void)
 	TIFR2  = _BV(TOV2);	        // clear pending interrupts;
 	TIMSK2 = _BV(TOIE2);        // enable the overflow interrupt
 
-    register_timer2_cb(AP_TimerAperiodicProcess::run);  // Register this class against timer2.
+    isr_reg->register_signal(ISR_REGISTRY_TIMER2_OVF, AP_TimerAperiodicProcess::run);
 }
 
 void AP_TimerAperiodicProcess::run(void)
