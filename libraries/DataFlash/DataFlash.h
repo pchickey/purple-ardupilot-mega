@@ -31,5 +31,6 @@ class DataFlash_Class
 };
 
 #include "DataFlash_APM1.h"
+#include "DataFlash_Purple.h"
 
 #endif
