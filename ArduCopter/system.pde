@@ -85,6 +85,10 @@ static void init_ardupilot()
 						 "\n\nFree RAM: %u\n"),
                     memcheck_available_memory());
 
+	//
+	// Initialize the isr_registry.
+	//
+    isr_registry.init();
 
 	//
 	// Check the EEPROM format version before loading any parameters from EEPROM.
@@ -181,11 +185,12 @@ static void init_ardupilot()
 		heli_init_swash();  // heli initialisation
 	#endif
 
+    RC_Channel::set_apm_rc(&APM_RC);
 	init_rc_in();		// sets up rc channels from radio
 	init_rc_out();		// sets up the timer libs
 	init_camera();
 
-  timer_scheduler.init();
+  timer_scheduler.init( &isr_registry );
 
 	#if HIL_MODE != HIL_MODE_ATTITUDE
         #if CONFIG_ADC == ENABLED

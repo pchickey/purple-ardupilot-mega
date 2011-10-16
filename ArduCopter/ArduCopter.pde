@@ -49,7 +49,9 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 // Libraries
 #include <FastSerial.h>
 #include <AP_Common.h>
+#include <Arduino_Mega_ISR_Registry.h>
 #include <APM_RC.h>         // ArduPilot Mega RC Library
+# include <APM_RC_APM1.h>   // RC library for APM1 hardware
 #include <AP_GPS.h>         // ArduPilot GPS library
 #include <Wire.h>			// Arduino I2C lib
 #include <SPI.h>			// Arduino SPI lib
@@ -95,6 +97,7 @@ FastSerialPort0(Serial);        // FTDI/console
 FastSerialPort1(Serial1);       // GPS port
 FastSerialPort3(Serial3);       // Telemetry port
 
+Arduino_Mega_ISR_Registry isr_registry;
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,6 +111,7 @@ static Parameters      g;
 // prototypes
 static void update_events(void);
 
+    APM_RC_APM1 APM_RC;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Sensors
