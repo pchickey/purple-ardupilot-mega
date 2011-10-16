@@ -1,5 +1,5 @@
 /*
-	DataFlash.cpp - DataFlash log library for AT45DB161
+	DataFlash_APM1.cpp - DataFlash log library for AT45DB161
 	Code by Jordi Muñoz and Jose Julio. DIYDrones.com
 	This code works with boards based on ATMega168/328 and ATMega1280/2560 using SPI port
 
@@ -31,8 +31,43 @@
 			
 */
 
-#include "DataFlash.h"
+#include "DataFlash_APM1.h"
 #include <SPI.h>
+
+// arduino mega SPI pins
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+	#define DF_DATAOUT 51        // MOSI
+	#define DF_DATAIN  50        // MISO 
+	#define DF_SPICLOCK  52      // SCK
+	#define DF_SLAVESELECT 53    // SS     (PB0)
+    #define DF_RESET 31          // RESET  (PC6)
+#else  // normal arduino SPI pins...
+	#define DF_DATAOUT 11     //MOSI
+	#define DF_DATAIN  12     //MISO 
+	#define DF_SPICLOCK  13   //SCK
+	#define DF_SLAVESELECT 10 //SS
+#endif
+
+// AT45DB161D Commands (from Datasheet)
+#define DF_TRANSFER_PAGE_TO_BUFFER_1   0x53
+#define DF_TRANSFER_PAGE_TO_BUFFER_2   0x55
+#define DF_STATUS_REGISTER_READ   0xD7
+#define DF_READ_MANUFACTURER_AND_DEVICE_ID   0x9F
+#define DF_PAGE_READ   0xD2
+#define DF_BUFFER_1_READ   0xD4
+#define DF_BUFFER_2_READ   0xD6
+#define DF_BUFFER_1_WRITE   0x84
+#define DF_BUFFER_2_WRITE   0x87
+#define DF_BUFFER_1_TO_PAGE_WITH_ERASE   0x83
+#define DF_BUFFER_2_TO_PAGE_WITH_ERASE   0x86
+#define DF_PAGE_ERASE   0x81
+#define DF_BLOCK_ERASE   0x50
+#define DF_SECTOR_ERASE   0x7C
+#define DF_CHIP_ERASE_0   0xC7
+#define DF_CHIP_ERASE_1   0x94
+#define DF_CHIP_ERASE_2   0x80
+#define DF_CHIP_ERASE_3   0x9A
+
 
 #define OVERWRITE_DATA 0 // 0: When reach the end page stop, 1: Start overwritten from page 1
 
@@ -49,12 +84,12 @@ void dataflash_CS_active()
 }
 
 // Constructors ////////////////////////////////////////////////////////////////
-DataFlash_Class::DataFlash_Class()
+DataFlash_APM1::DataFlash_APM1()
 {
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-void DataFlash_Class::Init(void)
+void DataFlash_APM1::Init(void)
 {
   pinMode(DF_DATAOUT, OUTPUT);
   pinMode(DF_DATAIN, INPUT);
@@ -83,7 +118,7 @@ void DataFlash_Class::Init(void)
 }
 
 // This function is mainly to test the device
-void DataFlash_Class::ReadManufacturerID()
+void DataFlash_APM1::ReadManufacturerID()
 {
   dataflash_CS_active();     // activate dataflash command decoder
  
@@ -99,7 +134,7 @@ void DataFlash_Class::ReadManufacturerID()
 }
 
 // Read the status register
-byte DataFlash_Class::ReadStatusReg()
+byte DataFlash_APM1::ReadStatusReg()
 { 
   byte tmp;
 
@@ -116,26 +151,26 @@ byte DataFlash_Class::ReadStatusReg()
 
 // Read the status of the DataFlash
 inline
-byte DataFlash_Class::ReadStatus()
+byte DataFlash_APM1::ReadStatus()
 { 
   return(ReadStatusReg()&0x80);  // We only want to extract the READY/BUSY bit
 }
 
 
 inline
-unsigned int DataFlash_Class::PageSize()
+unsigned int DataFlash_APM1::PageSize()
 { 
   return(528-((ReadStatusReg()&0x01)<<4));  // if first bit 1 trhen 512 else 528 bytes
 }
 
 
 // Wait until DataFlash is in ready state...
-void DataFlash_Class::WaitReady()
+void DataFlash_APM1::WaitReady()
 {
   while(!ReadStatus());
 }
 
-void DataFlash_Class::PageToBuffer(unsigned char BufferNum, unsigned int PageAdr)
+void DataFlash_APM1::PageToBuffer(unsigned char BufferNum, unsigned int PageAdr)
 {
   dataflash_CS_active();     // activate dataflash command decoder
   
@@ -161,7 +196,7 @@ void DataFlash_Class::PageToBuffer(unsigned char BufferNum, unsigned int PageAdr
   dataflash_CS_inactive();
 }
 
-void DataFlash_Class::BufferToPage (unsigned char BufferNum, unsigned int PageAdr, unsigned char wait)
+void DataFlash_APM1::BufferToPage (unsigned char BufferNum, unsigned int PageAdr, unsigned char wait)
 {
   dataflash_CS_active();     // activate dataflash command decoder
   
@@ -189,7 +224,7 @@ void DataFlash_Class::BufferToPage (unsigned char BufferNum, unsigned int PageAd
   dataflash_CS_inactive();	//deactivate dataflash command decoder	
 }
 
-void DataFlash_Class::BufferWrite (unsigned char BufferNum, unsigned int IntPageAdr, unsigned char Data)
+void DataFlash_APM1::BufferWrite (unsigned char BufferNum, unsigned int IntPageAdr, unsigned char Data)
 {
   dataflash_CS_active();     // activate dataflash command decoder
   
@@ -205,7 +240,7 @@ void DataFlash_Class::BufferWrite (unsigned char BufferNum, unsigned int IntPage
   dataflash_CS_inactive();   // disable dataflash command decoder
 }
   
-unsigned char DataFlash_Class::BufferRead (unsigned char BufferNum, unsigned int IntPageAdr)
+unsigned char DataFlash_APM1::BufferRead (unsigned char BufferNum, unsigned int IntPageAdr)
 {
   byte tmp;
 
@@ -227,7 +262,7 @@ unsigned char DataFlash_Class::BufferRead (unsigned char BufferNum, unsigned int
 }
 // *** END OF INTERNAL FUNCTIONS ***
 
-void DataFlash_Class::PageErase (unsigned int PageAdr)
+void DataFlash_APM1::PageErase (unsigned int PageAdr)
 {
   dataflash_CS_active();     // activate dataflash command decoder
   SPI.transfer(DF_PAGE_ERASE);   // Command
@@ -249,7 +284,7 @@ void DataFlash_Class::PageErase (unsigned int PageAdr)
 }
 
 
-void DataFlash_Class::ChipErase ()
+void DataFlash_APM1::ChipErase ()
 {
 
   dataflash_CS_active();     // activate dataflash command decoder
@@ -267,7 +302,7 @@ void DataFlash_Class::ChipErase ()
 }
 
 // *** DATAFLASH PUBLIC FUNCTIONS ***
-void DataFlash_Class::StartWrite(int PageAdr)
+void DataFlash_APM1::StartWrite(int PageAdr)
 {
   df_BufferNum=1;
   df_BufferIdx=0;
@@ -276,7 +311,7 @@ void DataFlash_Class::StartWrite(int PageAdr)
   WaitReady();
 }
 
-void DataFlash_Class::FinishWrite(void)
+void DataFlash_APM1::FinishWrite(void)
 {
 	df_BufferIdx=0;
 	BufferToPage(df_BufferNum,df_PageAdr,0);  // Write Buffer to memory, NO WAIT
@@ -299,7 +334,7 @@ void DataFlash_Class::FinishWrite(void)
 }
 	
 
-void DataFlash_Class::WriteByte(byte data)
+void DataFlash_APM1::WriteByte(byte data)
 {
   if (!df_Stop_Write)
     {
@@ -329,13 +364,13 @@ void DataFlash_Class::WriteByte(byte data)
     }
 }
 
-void DataFlash_Class::WriteInt(int data)
+void DataFlash_APM1::WriteInt(int data)
 {
   WriteByte(data>>8);   // High byte
   WriteByte(data&0xFF); // Low byte
 }
 
-void DataFlash_Class::WriteLong(long data)
+void DataFlash_APM1::WriteLong(long data)
 {
   WriteByte(data>>24);   // First byte
   WriteByte(data>>16);
@@ -344,18 +379,18 @@ void DataFlash_Class::WriteLong(long data)
 }
 
 // Get the last page written to
-int DataFlash_Class::GetWritePage() 
+int DataFlash_APM1::GetWritePage() 
 {
   return(df_PageAdr);
 }
 
 // Get the last page read
-int DataFlash_Class::GetPage() 
+int DataFlash_APM1::GetPage() 
 {
   return(df_Read_PageAdr-1);
 }
 
-void DataFlash_Class::StartRead(int PageAdr)
+void DataFlash_APM1::StartRead(int PageAdr)
 {
   df_Read_BufferNum=1;
   df_Read_BufferIdx=0;
@@ -365,7 +400,7 @@ void DataFlash_Class::StartRead(int PageAdr)
   df_Read_PageAdr++;
 }
 
-byte DataFlash_Class::ReadByte()
+byte DataFlash_APM1::ReadByte()
 {
   byte result;
   
@@ -386,7 +421,7 @@ byte DataFlash_Class::ReadByte()
   return result;
 }
 
-int DataFlash_Class::ReadInt()
+int DataFlash_APM1::ReadInt()
 {
   int result;
   
@@ -395,7 +430,7 @@ int DataFlash_Class::ReadInt()
   return result;
 }
 
-long DataFlash_Class::ReadLong()
+long DataFlash_APM1::ReadLong()
 {
   long result;
   
@@ -406,5 +441,3 @@ long DataFlash_Class::ReadLong()
   return result;
 }
 
-// make one instance for the user to use
-DataFlash_Class DataFlash;
