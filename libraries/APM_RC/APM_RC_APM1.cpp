@@ -28,10 +28,8 @@
 #else
 
 // Variable definition for Input Capture interrupt
-//volatile uint16_t ICR4_old;
-//volatile uint8_t PPM_Counter=0;
-volatile uint16_t PWM_RAW[NUM_CHANNELS] = {2400,2400,2400,2400,2400,2400,2400,2400};
-volatile uint8_t radio_status=0;
+volatile uint16_t APM_RC_APM1::_PWM_RAW[NUM_CHANNELS] = {2400,2400,2400,2400,2400,2400,2400,2400};
+volatile uint8_t APM_RC_APM1::_radio_status=0;
 
 /****************************************************
    Input Capture Interrupt ICP4 => PPM signal read
@@ -57,10 +55,10 @@ void APM_RC_APM1::_timer4_capt_cb(void)
   }
   else {
     if (PPM_Counter < NUM_CHANNELS) {         // Valid pulse channel?
-	  PWM_RAW[PPM_Counter++]=Pulse_Width;     // Saving pulse.
+	  _PWM_RAW[PPM_Counter++]=Pulse_Width;     // Saving pulse.
 	  
 	  if (PPM_Counter >= NUM_CHANNELS) {
-	    radio_status = 1;
+	    _radio_status = 1;
       }
     }
   }
@@ -166,21 +164,21 @@ uint16_t APM_RC_APM1::InputCh(uint8_t ch)
 
   // Because servo pulse variables are 16 bits and the interrupts are running values could be corrupted.
   // We dont want to stop interrupts to read radio channels so we have to do two readings to be sure that the value is correct...
-  result =  PWM_RAW[ch];
-  if (result != PWM_RAW[ch]) {
-    result =  PWM_RAW[ch];   // if the results are different we make a third reading (this should be fine)
+  result =  _PWM_RAW[ch];
+  if (result != _PWM_RAW[ch]) {
+    result = _PWM_RAW[ch];   // if the results are different we make a third reading (this should be fine)
   }
   result >>= 1;  // Because timer runs at 0.5us we need to do value/2
 	
   // Limit values to a valid range
   result = constrain(result,MIN_PULSEWIDTH,MAX_PULSEWIDTH);
-  radio_status=0; // Radio channel read
+  _radio_status=0; // Radio channel read
   return(result);
 }
 
 uint8_t APM_RC_APM1::GetState(void)
 {
-  return(radio_status);
+  return(_radio_status);
 }
 
 
@@ -224,7 +222,7 @@ bool APM_RC_APM1::setHIL(int16_t v[NUM_CHANNELS])
 			sum++;
 		}
 	}
-	radio_status = 1;
+	_radio_status = 1;
 	if (sum == 0) {
 		return 0;
 	} else {

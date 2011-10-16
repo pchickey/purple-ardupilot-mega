@@ -25,6 +25,10 @@ class APM_RC_APM1 : public APM_RC_Class
 	void Force_Out6_Out7(void);
 
     static void _timer4_capt_cb(void);
+
+    static volatile uint16_t _PWM_RAW[NUM_CHANNELS];
+    static volatile uint8_t  _radio_status;
+
 	int16_t _HIL_override[NUM_CHANNELS];
 };
 
