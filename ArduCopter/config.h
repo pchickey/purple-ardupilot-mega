@@ -42,6 +42,16 @@
 # define CONFIG_APM_HARDWARE APM_HARDWARE_APM1
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+// PURPLE HARDWARE DEFAULTS
+//
+
+#if CONFIG_APM_HARDWARE == APM_HARDWARE_PURPLE
+# define CONFIG_IMU_TYPE   CONFIG_IMU_MPU6000
+# define CONFIG_SLIDER     DISABLED
+# define CONFIG_PUSHBUTTON DISABLED
+# define CONFIG_RELAY      DISABLED
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,6 +96,42 @@
 # define INSTANT_PWM	DISABLED
 #endif
 
+// LED Pins
+//
+#if CONFIG_APM_HARDWARE == APM_HARDWARE_APM1
+# define A_LED_PIN        37
+# define B_LED_PIN        36
+# define C_LED_PIN        35
+# define SLIDE_SWITCH_PIN 40
+# define PUSHBUTTON_PIN   41
+#elif CONFIG_APM_HARDWARE == APM_HARDWARE_PURPLE
+# define A_LED_PIN        27
+# define B_LED_PIN        26
+# define C_LED_PIN        25
+# define SLIDE_SWITCH_PIN (-1)
+# define PUSHBUTTON_PIN   (-1)
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// Slider, Pushbutton, Relay
+//
+
+/* Slider is default enabled. BROKEN_SLIDER is a legacy config opt. */
+#ifndef CONFIG_SLIDER
+# if BROKEN_SLIDER == 1
+#  define CONFIG_SLIDER DISABLED
+# else
+#  define CONFIG_SLIDER ENABLED
+# endif
+#endif
+
+#ifndef CONFIG_PUSHBUTTON
+# define CONFIG_PUSHBUTTON ENABLED
+#endif
+
+#ifndef CONFIG_RELAY
+# define CONFIG_RELAY ENABLED
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Sonar
@@ -763,10 +809,6 @@
 #endif
 #ifndef CUT_MOTORS
 # define CUT_MOTORS		1		// do we cut the motors with no throttle?
-#endif
-
-#ifndef BROKEN_SLIDER
-# define BROKEN_SLIDER		0		// 1 = yes (use Yaw to enter CLI mode)
 #endif
 
 #ifndef MOTOR_LEDS

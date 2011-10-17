@@ -96,13 +96,24 @@ static void init_ardupilot()
 	report_version();
 
 	// setup IO pins
-	pinMode(C_LED_PIN, OUTPUT);				// GPS status LED
 	pinMode(A_LED_PIN, OUTPUT);				// GPS status LED
-	pinMode(B_LED_PIN, OUTPUT);				// GPS status LED
-	pinMode(SLIDE_SWITCH_PIN, INPUT);		// To enter interactive mode
-	pinMode(PUSHBUTTON_PIN, INPUT);			// unused
-	DDRL |= B00000100;						// Set Port L, pin 2 to output for the relay
+  digitalWrite(A_LED_PIN, LED_OFF);
 
+  pinMode(B_LED_PIN, OUTPUT);				// GPS status LED
+  digitalWrite(B_LED_PIN, LED_OFF);
+
+  pinMode(C_LED_PIN, OUTPUT);				// GPS status LED
+  digitalWrite(C_LED_PIN, LED_OFF);
+
+#if CONFIG_SLIDER == ENABLED
+  pinMode(SLIDE_SWITCH_PIN, INPUT);		// To enter interactive mode
+#endif
+#if CONFIG_PUSHBUTTON == ENABLED
+	pinMode(PUSHBUTTON_PIN, INPUT);			// unused
+#endif
+#if CONFIG_RELAY == ENABLED
+	DDRL |= B00000100;						// Set Port L, pin 2 to output for the relay
+#endif
 	// XXX set Analog out 14 to output
 	//  	   76543210
 	//DDRK |= B01010000;
@@ -145,13 +156,13 @@ static void init_ardupilot()
 		while (true) {
 			delay(1000);
 			if(motor_light){
-				digitalWrite(A_LED_PIN, HIGH);
-				digitalWrite(B_LED_PIN, HIGH);
-				digitalWrite(C_LED_PIN, HIGH);
+				digitalWrite(A_LED_PIN, LED_ON);
+				digitalWrite(B_LED_PIN, LED_ON);
+				digitalWrite(C_LED_PIN, LED_ON);
 			}else{
-				digitalWrite(A_LED_PIN, LOW);
-				digitalWrite(B_LED_PIN, LOW);
-				digitalWrite(C_LED_PIN, LOW);
+				digitalWrite(A_LED_PIN, LED_OFF);
+				digitalWrite(B_LED_PIN, LED_OFF);
+				digitalWrite(C_LED_PIN, LED_OFF);
 			}
 			motor_light = !motor_light;
 		}
@@ -239,7 +250,7 @@ static void init_ardupilot()
 	// menu; they must reset in order to fly.
 	//
 	if (check_startup_for_CLI()) {
-		digitalWrite(A_LED_PIN,HIGH);		// turn on setup-mode LED
+		digitalWrite(A_LED_PIN, LED_ON);		// turn on setup-mode LED
 		Serial.printf_P(PSTR("\nCLI:\n\n"));
         run_cli();
 	}
@@ -528,8 +539,12 @@ init_throttle_cruise()
 	}
 }
 
+<<<<<<< HEAD
 #if CLI_ENABLED == ENABLED
 #if BROKEN_SLIDER == 1
+=======
+#if CONFIG_SLIDER == DISABLED
+>>>>>>> Config for Purple hardware with definable IO pins.
 
 static boolean
 check_startup_for_CLI()
