@@ -174,9 +174,18 @@ void AP_IMU_MPU6000::register_write(uint8_t reg, uint8_t val)
 
 void AP_IMU_MPU6000::hardware_init()
 {
+    // Need to initialize SPI if it hasn't already.
+    SPI.begin();
+    #if F_CPU == 16000000
+    SPI.setClockDivider(SPI_CLOCK_DIV16); // SPI at 1MHz
+    #else
+    # error MPU6000 requires SPI at 1MHZ! Need appropriate SPI clock divider.
+    #endif
+
     // MPU6000 chip select setup
     pinMode(_cs_pin, OUTPUT);
     digitalWrite(_cs_pin, HIGH);
+    delay(1);
     
     // Chip reset
     register_write(MPUREG_PWR_MGMT_1, BIT_H_RESET);
