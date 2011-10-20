@@ -419,6 +419,8 @@ test_imu(uint8_t argc, const Menu::arg *argv)
 	//dcm.kp_yaw(0.02);
 	//dcm.ki_yaw(0);
 
+  imu.init(IMU::WARM_START, delay, &timer_scheduler);
+
 	report_imu();
 	imu.init_gyro();
 	report_imu();
