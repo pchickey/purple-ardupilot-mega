@@ -13,7 +13,7 @@ void Arduino_Mega_ISR_Registry::init()
 
 int Arduino_Mega_ISR_Registry::register_signal(int signal, proc_ptr proc)
 {
-    if (signal > 0 && signal < ISR_REGISTRY_NUM_SLOTS) {
+    if (signal >= 0 && signal < ISR_REGISTRY_NUM_SLOTS) {
         _registry[signal] = proc;
         return 0;
     }
@@ -22,7 +22,7 @@ int Arduino_Mega_ISR_Registry::register_signal(int signal, proc_ptr proc)
 
 int Arduino_Mega_ISR_Registry::unregister_signal(int signal)
 {
-    if (signal > 0 && signal < ISR_REGISTRY_NUM_SLOTS) {
+    if (signal >= 0 && signal < ISR_REGISTRY_NUM_SLOTS) {
         _registry[signal] = NULL;
         return 0;
     }
