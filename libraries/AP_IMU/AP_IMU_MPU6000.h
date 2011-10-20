@@ -44,6 +44,9 @@ private:
         static int              _cs_pin;
 
         void hardware_init();
+
+        static const float _gyro_gain;
+        static const float _accel_gain;
 };
 
 #endif // __AP_IMU_MPU6000_H__

@@ -58,6 +58,11 @@
 uint16_t AP_IMU_MPU6000::_data[7];
 int      AP_IMU_MPU6000::_cs_pin;
 
+/* These are derived from Jose Julio's code but I think I got them wrong - pch */
+const float AP_IMU_MPU6000::_gyro_gain = 0.0174532 * 0.0152;
+const float AP_IMU_MPU6000::_accel_gain = 4096.0 / 9.81;
+
+
 AP_IMU_MPU6000::AP_IMU_MPU6000( AP_Var::Key key, int cs_pin ) :
 	    _sensor_cal(key, PSTR("IMU_SENSOR_CAL"))
 { 
@@ -100,9 +105,21 @@ void AP_IMU_MPU6000::save(void)
 
 bool AP_IMU_MPU6000::update( void )
 {
-    /* _gyro <== _data[3,4,5] */
+    /* _gyro <== _data[0,1,2] */
+    _gyro.x = _gyro_gain * _data[0];
+    _gyro.y = _gyro_gain * _data[1];
+    _gyro.z = _gyro_gain * _data[2];
+
     /* _accel <== _data[3,4,5] */
-    /* _accel_filtered  <== filter ( _data[3,4,5], _accel_filtered ) */
+    _accel.x = _accel_gain * _data[3];
+    _accel.y = _accel_gain * _data[4];
+    _accel.z = _accel_gain * _data[5];
+
+    /* _accel_filtered  <== 0.1 * _data[3,4,5] + 0.9 *  _accel_filtered ) */
+    _accel_filtered.x = ( 0.9 * _accel_filtered.x ) + ( 0.1 * _accel.x );
+    _accel_filtered.y = ( 0.9 * _accel_filtered.y ) + ( 0.1 * _accel.y );
+    _accel_filtered.z = ( 0.9 * _accel_filtered.z ) + ( 0.1 * _accel.z );
+
     _sample_time = 200000;
     return true;
 }
