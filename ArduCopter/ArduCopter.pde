@@ -60,7 +60,8 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 #include <APM_BMP085.h>     // ArduPilot Mega BMP085 Library
 #include <AP_Compass.h>     // ArduPilot Mega Magnetometer Library
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
-#include <AP_IMU.h>         // ArduPilot Mega IMU Library
+#include <AP_INS.h>         // ArduPilot Mega IMU Library
+#include <AP_IMU.h>         // ArduPilot Mega INS Library
 #include <AP_IMU_MPU6000.h>             // Experimental MPU6000 IMU library
 #include <AP_PeriodicProcess.h>         // Parent header of Timer and TimerAperiodic
                                         // (only included for makefile libpath to work)
@@ -218,7 +219,8 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
                        CONFIG_MPU6000_CHIP_SELECT_PIN);
 		AP_TimerProcess timer_scheduler;
         #else
-        AP_IMU_Oilpan  imu(&adc, Parameters::k_param_IMU_calibration);
+    AP_INS_Oilpan ins(&adc);
+    AP_IMU_INS  imu(&ins, Parameters::k_param_IMU_calibration);
 		AP_TimerAperiodicProcess timer_scheduler;
         #endif
 	#else

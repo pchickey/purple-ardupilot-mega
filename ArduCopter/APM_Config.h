@@ -71,5 +71,5 @@
 
 
 // For testing only - enable MPU6000
-#define CONFIG_IMU_TYPE     CONFIG_IMU_MPU6000
+// #define CONFIG_IMU_TYPE     CONFIG_IMU_MPU6000
 
