@@ -419,7 +419,7 @@ test_ins(uint8_t argc, const Menu::arg *argv)
 {
   float gyro[3], accel[3], temp;
 	print_hit_enter();
-	Serial.printf_P(PSTR("INS\n"));
+	Serial.printf_P(PSTR("InertialSensor\n"));
 	delay(1000);
 
 	while(1){

@@ -1,8 +1,8 @@
 // -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
 /// @file	AP_IMU_INS.h
-/// @brief	IMU driver on top of an INS driver. Provides calibration for for the
-//          inertial sensors (gyro and accel).
+/// @brief	IMU driver on top of an AP_InertialSensor (INS) driver. 
+//          Provides offset calibration for for the gyro and accel.
 
 #ifndef __AP_IMU_INS_H__
 #define __AP_IMU_INS_H__
@@ -10,7 +10,7 @@
 
 #include "../AP_Common/AP_Common.h"
 #include "../AP_Math/AP_Math.h"
-#include "../AP_INS/AP_INS.h"
+#include "../AP_InertialSensor/AP_InertialSensor.h"
 #include <inttypes.h>
 
 #include "IMU.h"
@@ -26,7 +26,7 @@ public:
     /// @param  adc         Pointer to the AP_ADC instance that is connected to the gyro and accelerometer.
     /// @param  key         The AP_Var::key value we will use when loading/saving calibration data.
     ///
-	AP_IMU_INS(AP_INS *ins, AP_Var::Key key) :
+	AP_IMU_INS(AP_InertialSensor *ins, AP_Var::Key key) :
         _ins(ins),
 	    _sensor_cal(key, PSTR("IMU_SENSOR_CAL"))
 	{}
@@ -64,7 +64,7 @@ public:
 
 
 private:
-    AP_INS              *_ins;          ///< INS provides an axis and unit correct sensor source.
+    AP_InertialSensor   *_ins;          ///< INS provides an axis and unit correct sensor source.
     AP_VarA<float,6>    _sensor_cal;    ///< Calibrated sensor offsets
 
     virtual void        _init_accel(void (*delay_cb)(unsigned long t));  ///< no-save implementation
