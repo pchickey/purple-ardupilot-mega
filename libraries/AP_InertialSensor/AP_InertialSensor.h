@@ -1,14 +1,14 @@
 
-#ifndef __AP_INS_H__
-#define __AP_INS_H__
+#ifndef __AP_INERTIAL_SENSOR_H__
+#define __AP_INERTIAL_SENSOR_H__
 
-/* AP_INS is an abstraction for INertial Sensor data (gyro and accel)
- * which is correctly aligned to the body axes, and scaled to SI units.
+/* AP_InertialSensor is an abstraction for gyro and accel measurements
+ * which are correctly aligned to the body axes and scaled to SI units.
  */
-class AP_INS 
+class AP_InertialSensor 
 {
   public:
-  AP_INS() {}
+  AP_InertialSensor() {}
 
   /* Update the sensor data, so that getters are nonblocking. 
    * Returns a bool of whether data was updated or not.
@@ -47,7 +47,7 @@ class AP_INS
   virtual uint32_t sample_time() = 0;
 };
 
-#include "AP_INS_Oilpan.h"
+#include "AP_InertialSensor_Oilpan.h"
 
-#endif // __AP_INS_H__
+#endif // __AP_INERTIAL_SENSOR_H__
 

@@ -1,21 +1,21 @@
 
-#ifndef __AP_INS_OILPAN_H__
-#define __AP_INS_OILPAN_H__
+#ifndef __AP_INERTIAL_SENSOR_OILPAN_H__
+#define __AP_INERTIAL_SENSOR_OILPAN_H__
 
 #include <string.h>
 #include <stdint.h>
 
 #include "../AP_ADC/AP_ADC.h"
 #include "../AP_Math/AP_Math.h"
-#include "AP_INS.h"
+#include "AP_InertialSensor.h"
 
-class AP_INS_Oilpan : public AP_INS
+class AP_InertialSensor_Oilpan : public AP_InertialSensor
 {
   public:
 
-  AP_INS_Oilpan( AP_ADC * adc );
+  AP_InertialSensor_Oilpan( AP_ADC * adc );
 
-  /* Concrete implementation of AP_INS functions: */
+  /* Concrete implementation of AP_InertialSensor functions: */
   bool update();
   float gx();
   float gy();
@@ -55,5 +55,5 @@ class AP_INS_Oilpan : public AP_INS
   float _accel_apply_std_offset( uint16_t adc_value );
 };
 
-#endif // __AP_INS_OILPAN_H__
+#endif // __AP_INERTIAL_SENSOR_OILPAN_H__
 
