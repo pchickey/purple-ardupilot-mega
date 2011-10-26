@@ -52,6 +52,7 @@ class AP_InertialSensor
 };
 
 #include "AP_InertialSensor_Oilpan.h"
+#include "AP_InertialSensor_MPU6000.h"
 
 #endif // __AP_INERTIAL_SENSOR_H__
 

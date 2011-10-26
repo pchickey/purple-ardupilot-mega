@@ -214,8 +214,7 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
         #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-		AP_InertialSensor_MPU6000 ins(Parameters::k_param_IMU_calibration,
-                       CONFIG_MPU6000_CHIP_SELECT_PIN);
+		AP_InertialSensor_MPU6000 ins( CONFIG_MPU6000_CHIP_SELECT_PIN );
 		AP_TimerProcess timer_scheduler;
         #else
         AP_InertialSensor_Oilpan ins(&adc);
