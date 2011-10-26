@@ -47,8 +47,18 @@ class AP_InertialSensor_MPU6000 : public AP_InertialSensor
   static const float _accel_scale; 
   static const float _gyro_scale;
 
-  static int _cs_pin;
+  static const uint8_t _gyro_data_index[3];
+  static const  int8_t _gyro_data_sign[3];
+
+  static const uint8_t _accel_data_index[3];
+  static const  int8_t _accel_data_sign[3];
+
+  static const uint8_t _temp_data_index;
+
   static uint16_t _data[7];
+
+  /* TODO deprecate _cs_pin */
+  static int _cs_pin;
 };
 
 #endif // __AP_INERTIAL_SENSOR_MPU6000_H__

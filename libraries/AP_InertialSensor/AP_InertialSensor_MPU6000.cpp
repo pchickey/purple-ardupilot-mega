@@ -58,10 +58,17 @@
 uint16_t AP_InertialSensor_MPU6000::_data[7];
 int      AP_InertialSensor_MPU6000::_cs_pin;
 
-/* These are derived from Jose Julio's code but I think I got them wrong - pch */
 const float AP_InertialSensor_MPU6000::_gyro_scale = 0.0174532 * 0.0152;
-const float AP_InertialSensor_MPU6000::_accel_scale = 4096.0 / 9.81;
+const float AP_InertialSensor_MPU6000::_accel_scale = 9.81 / 4096.0;
 
+/* pch: i might have the gyro data signs mixed up with the accel data signs. */
+const uint8_t AP_InertialSensor_MPU6000::_gyro_data_index[3]  = { 5, 4, 6 };
+const int8_t  AP_InertialSensor_MPU6000::_gyro_data_sign[3]   = { 1, 1, -1 };
+
+const uint8_t AP_InertialSensor_MPU6000::_accel_data_index[3] = { 1, 0, 2 };
+const int8_t  AP_InertialSensor_MPU6000::_accel_data_sign[3]  = { -1, -1, 1 };
+
+const uint8_t AP_InertialSensor_MPU6000::_temp_data_index = 3;
 
 AP_InertialSensor_MPU6000::AP_InertialSensor_MPU6000( int cs_pin )
 { 
@@ -85,17 +92,21 @@ void AP_InertialSensor_MPU6000::init( AP_PeriodicProcess * scheduler )
 
 bool AP_InertialSensor_MPU6000::update( void )
 {
-    /* _gyro <== _data[0,1,2] */
-    _gyro.x = _gyro_scale * _data[0];
-    _gyro.y = _gyro_scale * _data[1];
-    _gyro.z = _gyro_scale * _data[2];
+    _gyro.x = _gyro_scale * _gyro_data_sign[0] *
+                            _data[ _gyro_data_index[0] ];
+    _gyro.y = _gyro_scale * _gyro_data_sign[1] *
+                            _data[ _gyro_data_index[1] ];
+    _gyro.z = _gyro_scale * _gyro_data_sign[2] *
+                            _data[ _gyro_data_index[2] ];
 
-    /* _accel <== _data[3,4,5] */
-    _accel.x = _accel_scale * _data[3];
-    _accel.y = _accel_scale * _data[4];
-    _accel.z = _accel_scale * _data[5];
+    _accel.x = _accel_scale * _accel_data_sign[0] *
+                              _data[ _accel_data_index[0] ];
+    _accel.y = _accel_scale * _accel_data_sign[1] *
+                              _data[ _accel_data_index[1] ];
+    _accel.z = _accel_scale * _accel_data_sign[2] *
+                              _data[ _accel_data_index[2] ];
 
-    _temp    = _temp_to_celsius( _data[6] );
+    _temp    = _temp_to_celsius( _data[ _temp_data_index ] );
 
     return true;
 }
@@ -141,39 +152,30 @@ uint32_t AP_InertialSensor_MPU6000::sample_time() { return 200000; }
 void AP_InertialSensor_MPU6000::read()
 {
     /* SPI transactions to _data */
-    int byte_H;
-    int byte_L;
-  
-  // Read AccelX
-    byte_H = register_read(MPUREG_ACCEL_XOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_XOUT_L);
-    _data[0] = (byte_H<<8)| byte_L;
-    // Read AccelY
-    byte_H = register_read(MPUREG_ACCEL_YOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_YOUT_L);
-    _data[1] = (byte_H<<8)| byte_L;
-    // Read AccelZ
-    byte_H = register_read(MPUREG_ACCEL_ZOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_ZOUT_L);
-    _data[2] = (byte_H<<8)| byte_L;
+    uint8_t dump;
+    uint8_t byte_H;
+    uint8_t byte_L;
+    uint8_t i;
 
-    // Read GyroX
-    byte_H = register_read(MPUREG_GYRO_XOUT_H);
-    byte_L = register_read(MPUREG_GYRO_XOUT_L);
-    _data[3] = (byte_H<<8)| byte_L;
-    // Read GyroY
-    byte_H = register_read(MPUREG_GYRO_YOUT_H);
-    byte_L = register_read(MPUREG_GYRO_YOUT_L);
-    _data[4] = (byte_H<<8)| byte_L;
-    // Read GyroZ
-    byte_H = register_read(MPUREG_GYRO_ZOUT_H);
-    byte_L = register_read(MPUREG_GYRO_ZOUT_L);
-    _data[5] = (byte_H<<8)| byte_L;
+    /* TODO replace digitalWrite _cs_pin with PORTx write */
+    digitalWrite(_cs_pin,LOW);
 
-    // Read Temp
-    byte_H = register_read(MPUREG_TEMP_OUT_H);
-    byte_L = register_read(MPUREG_TEMP_OUT_L);
-    _data[6] = (byte_H<<8)| byte_L; 
+    /* Start reading at ACCEL_XOUT_H. */
+    byte addr = MPUREG_ACCEL_XOUT_H | 0x80; // Set most significant bit
+    dump = SPI.transfer(addr);
+
+    /* Data 0, 1, 2 will be ACCEL_X, _Y, _Z
+     * Data 3 will be TEMP
+     * Data 4, 5, 6 will be GYRO_X, _Y, _Z
+     */
+
+    for (i = 0; i < 7; i++) {
+      byte_H = SPI.transfer(0);
+      byte_L = SPI.transfer(0);
+      _data[i] = ((int)byte_H<<8)| byte_L;
+    }
+
+    digitalWrite(_cs_pin, HIGH);
 
 }
 
