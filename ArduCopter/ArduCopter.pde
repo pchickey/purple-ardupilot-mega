@@ -62,7 +62,6 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
 #include <AP_InertialSensor.h> // ArduPilot Mega Inertial Sensor (accel & gyro) Library
 #include <AP_IMU.h>         // ArduPilot Mega IMU Library
-#include <AP_IMU_MPU6000.h>             // Experimental MPU6000 IMU library
 #include <AP_PeriodicProcess.h>         // Parent header of Timer and TimerAperiodic
                                         // (only included for makefile libpath to work)
 #include <AP_TimerProcess.h>            // TimerProcess is the scheduler for MPU6000 reads.
@@ -215,14 +214,14 @@ static AP_Int8                *flight_modes = &g.flight_mode1;
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
         #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-		AP_IMU_MPU6000 imu(Parameters::k_param_IMU_calibration,
+		AP_InertialSensor_MPU6000 ins(Parameters::k_param_IMU_calibration,
                        CONFIG_MPU6000_CHIP_SELECT_PIN);
 		AP_TimerProcess timer_scheduler;
         #else
-    AP_InertialSensor_Oilpan ins(&adc);
-    AP_IMU_INS  imu(&ins, Parameters::k_param_IMU_calibration);
+        AP_InertialSensor_Oilpan ins(&adc);
 		AP_TimerAperiodicProcess timer_scheduler;
         #endif
+    AP_IMU_INS  imu(&ins, Parameters::k_param_IMU_calibration);
 	#else
 		// hil imu
 		AP_IMU_Shim imu;
