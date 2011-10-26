@@ -2,6 +2,8 @@
 #ifndef __AP_INERTIAL_SENSOR_H__
 #define __AP_INERTIAL_SENSOR_H__
 
+#include "../AP_PeriodicProcess/AP_PeriodicProcess.h"
+
 /* AP_InertialSensor is an abstraction for gyro and accel measurements
  * which are correctly aligned to the body axes and scaled to SI units.
  */
@@ -9,6 +11,8 @@ class AP_InertialSensor
 {
   public:
   AP_InertialSensor() {}
+
+  virtual void init( AP_PeriodicProcess * scheduler );
 
   /* Update the sensor data, so that getters are nonblocking. 
    * Returns a bool of whether data was updated or not.

@@ -47,6 +47,11 @@ AP_InertialSensor_Oilpan::AP_InertialSensor_Oilpan( AP_ADC * adc ) :
   _accel.z = 0;
 }
 
+void AP_InertialSensor_Oilpan::init( AP_PeriodicProcess * scheduler)
+{
+  _adc->Init(scheduler);
+}
+
 bool AP_InertialSensor_Oilpan::update()
 {
   uint16_t adc_values[6];

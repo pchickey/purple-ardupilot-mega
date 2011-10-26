@@ -401,6 +401,10 @@ test_adc(uint8_t argc, const Menu::arg *argv)
 	Serial.printf_P(PSTR("ADC\n"));
 	delay(1000);
 
+  adc.Init(&timer_scheduler);
+
+  delay(50);
+
 	while(1){
 		for(int i = 0; i < 9; i++){
 			Serial.printf_P(PSTR("%u,"),adc.Ch(i));
@@ -421,6 +425,10 @@ test_ins(uint8_t argc, const Menu::arg *argv)
 	print_hit_enter();
 	Serial.printf_P(PSTR("InertialSensor\n"));
 	delay(1000);
+
+  ins.init(&timer_scheduler);
+
+  delay(50);
 
 	while(1){
     ins.update();
@@ -453,7 +461,7 @@ test_imu(uint8_t argc, const Menu::arg *argv)
 {
   Vector3f gyro;
   Vector3f accel;
-
+ 
   imu.init(IMU::WARM_START, delay, &timer_scheduler);
 
 	report_imu();

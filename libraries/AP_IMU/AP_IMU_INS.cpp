@@ -41,6 +41,7 @@ AP_IMU_INS::init( Start_style style,
                      void (*delay_cb)(unsigned long t),
                      AP_PeriodicProcess * scheduler )
 {
+    _ins->init(scheduler);
     // if we are warm-starting, load the calibration data from EEPROM and go
     //
     if (WARM_START == style) {

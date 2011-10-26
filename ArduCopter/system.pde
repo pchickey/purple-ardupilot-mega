@@ -207,7 +207,6 @@ static void init_ardupilot()
         #if CONFIG_ADC == ENABLED
 		// begin filtering the ADC Gyros
 		adc.filter_result = true;
-		adc.Init();	 		// APM ADC library initialization
         #endif
 		barometer.Init();	// APM Abs Pressure sensor initialization
 	#endif
