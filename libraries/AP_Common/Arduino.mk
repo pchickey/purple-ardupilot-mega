@@ -437,6 +437,8 @@ debug:
 	gnome-terminal -x $(GDB) $(SKETCHELF) & \
 	echo -e '\n\nat the gdb prompt type "target remote localhost:4242"'
 
+jtag-program:
+	$(AVARICE) --mkII --jtag usb --erase --program --file $(SKETCHELF)
 clean:
 ifneq ($(findstring CYGWIN, $(SYSTYPE)),)
 	@del /S $(BUILDROOT)
