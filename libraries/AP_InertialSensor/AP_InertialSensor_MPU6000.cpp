@@ -153,76 +153,54 @@ uint32_t AP_InertialSensor_MPU6000::sample_time() { return 200000; }
 
 void AP_InertialSensor_MPU6000::read()
 {
-#if 1
 
-    uint8_t byte_H;
-    uint8_t byte_L;
+  uint8_t byte_H;
+  uint8_t byte_L;
+  uint8_t dump;
+ 
+  // We start a multibyte SPI read of sensors
+  byte addr = MPUREG_ACCEL_XOUT_H | 0x80;      // Set most significant bit
+  digitalWrite(_cs_pin, LOW);
+  dump = SPI.transfer(addr);
 
-    // Read AccelX
-    byte_H = register_read(MPUREG_ACCEL_XOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_XOUT_L);
-    _data[0] = ((uint16_t) byte_H<<8)| byte_L;
-    // Read AccelY
-    byte_H = register_read(MPUREG_ACCEL_YOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_YOUT_L);
-    _data[1] = ((uint16_t) byte_H<<8)| byte_L;
-    // Read AccelZ
-    byte_H = register_read(MPUREG_ACCEL_ZOUT_H);
-    byte_L = register_read(MPUREG_ACCEL_ZOUT_L);
-    _data[2] = ((uint16_t) byte_H<<8)| byte_L;
+  /* For some reason, rolling the following 7 pairs of writes into a loop
+   * doesn't work properly:
+   * for (int i = 0; i < 7; i++) {
+   *   byte_H = SPI.transfer(0);
+   *   byte_H = SPI.transfer(0);
+   *   _data[i] = ((int)byte_H<<8)| byte_L;
+   * }
+   */
 
-   // Read Temp
-    byte_H = register_read(MPUREG_TEMP_OUT_H);
-    byte_L = register_read(MPUREG_TEMP_OUT_L);
-    _data[3] = ((uint16_t) byte_H<<8)| byte_L;
-
-
-    // Read GyroX
-    byte_H = register_read(MPUREG_GYRO_XOUT_H);
-    byte_L = register_read(MPUREG_GYRO_XOUT_L);
-    _data[4] = ((uint16_t) byte_H<<8)| byte_L;
-    // Read GyroY
-    byte_H = register_read(MPUREG_GYRO_YOUT_H);
-    byte_L = register_read(MPUREG_GYRO_YOUT_L);
-    _data[5] = ((uint16_t) byte_H<<8)| byte_L;
-    // Read GyroZ
-    byte_H = register_read(MPUREG_GYRO_ZOUT_H);
-    byte_L = register_read(MPUREG_GYRO_ZOUT_L);
-    _data[6] = ((uint16_t) byte_H<<8)| byte_L;
-
-#endif
-
-    /* I would expect the following code to be equivelant, and Jose Julio claims
-     * very similar code works for him. However, it gives garbage values on my
-     * system at the moment.
-     */
-#if 0
-    /* SPI transactions to _data */
-    uint8_t dump;
-    uint8_t byte_H;
-    uint8_t byte_L;
-    uint8_t i;
-
-    /* TODO replace digitalWrite _cs_pin with PORTx write */
-    digitalWrite(_cs_pin,LOW);
-
-    /* Start reading at ACCEL_XOUT_H. */
-    byte addr = MPUREG_ACCEL_XOUT_H | 0x80; // Set most significant bit
-    dump = SPI.transfer(addr);
-
-    /* Data 0, 1, 2 will be ACCEL_X, _Y, _Z
-     * Data 3 will be TEMP
-     * Data 4, 5, 6 will be GYRO_X, _Y, _Z
-     */
-
-    for (i = 0; i < 7; i++) {
-      byte_H = SPI.transfer(0);
-      byte_L = SPI.transfer(0);
-      _data[i] = ((uint16_t)byte_H<<8)| byte_L;
-    }
-
-    digitalWrite(_cs_pin, HIGH);
-#endif 
+  // Read AccelX
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[0] = ((int)byte_H<<8)| byte_L;
+  // Read AccelY
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[1] = ((int)byte_H<<8)| byte_L;
+  // Read AccelZ
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[2] = ((int)byte_H<<8)| byte_L;
+  // Read Temp
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[3] = ((int)byte_H<<8)| byte_L;
+  // Read GyroX
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[4] = ((int)byte_H<<8)| byte_L;
+  // Read GyroY
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[5] = ((int)byte_H<<8)| byte_L;
+  // Read GyroZ
+  byte_H = SPI.transfer(0);
+  byte_L = SPI.transfer(0);
+  _data[6] = ((int)byte_H<<8)| byte_L;
+  digitalWrite(_cs_pin, HIGH);
 }
 
 uint8_t AP_InertialSensor_MPU6000::register_read( uint8_t reg )
