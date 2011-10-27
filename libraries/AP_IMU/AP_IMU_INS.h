@@ -70,11 +70,7 @@ private:
     virtual void        _init_accel(void (*delay_cb)(unsigned long t));  ///< no-save implementation
     virtual void        _init_gyro(void (*delay_cb)(unsigned long t));   ///< no-save implementation
 
-    float _calibrated(uint8_t channel, float ins_value, int temperature);
-    float _sensor_temp_compensation(uint8_t channel, int temp) const;
-
-	// constants
-	static const float 		_gyro_temp_curve[3][3]; ///< Temperature compensation curve for the gyro
+    float _calibrated(uint8_t channel, float ins_value);
 
 	// Gyro and Accelerometer calibration criterial
 	//

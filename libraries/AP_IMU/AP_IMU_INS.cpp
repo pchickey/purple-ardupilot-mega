@@ -26,16 +26,6 @@
 #define A_LED_PIN   37
 #define C_LED_PIN   35
 
-// Temp compensation curve constants
-// These must be produced by measuring data and curve fitting
-// [X/Y/Z gyro][A/B/C or 0 order/1st order/2nd order constants]
-//
-const float   AP_IMU_INS::_gyro_temp_curve[3][3] = {
-	{1658,0,0},			// Values to use if no temp compensation data available
-	{1658,0,0},			// Based on average values for 20 sample boards
-	{1658,0,0}
-};
-
 void
 AP_IMU_INS::init( Start_style style,
                      void (*delay_cb)(unsigned long t),
@@ -78,7 +68,6 @@ AP_IMU_INS::_init_gyro(void (*delay_cb)(unsigned long t))
   float ins_gyro[6];
 
 	// cold start
-	tc_temp = _ins->temperature();
  	delay_cb(500);
 	Serial.printf_P(PSTR("Init Gyro"));
 
@@ -108,7 +97,6 @@ AP_IMU_INS::_init_gyro(void (*delay_cb)(unsigned long t))
 		for (int j = 0; j <= 2; j++){
 			prev[j]     = _sensor_cal[j];
 			adc_in      = ins_gyro[j];
-			adc_in     -= _sensor_temp_compensation(j, tc_temp);
 			_sensor_cal[j]	= adc_in;
 		}
 
@@ -119,8 +107,6 @@ AP_IMU_INS::_init_gyro(void (*delay_cb)(unsigned long t))
 
 			for (int j = 0; j < 3; j++){
 				adc_in = ins_gyro[j];
-				// Subtract temp compensated typical gyro bias
-				adc_in -= _sensor_temp_compensation(j, tc_temp);
 				// filter
 				_sensor_cal[j] = _sensor_cal[j] * 0.9 + adc_in * 0.1;
 			}
@@ -185,7 +171,6 @@ AP_IMU_INS::_init_accel(void (*delay_cb)(unsigned long t))
 		for (int j = 3; j <= 5; j++){
 			prev[j] = _sensor_cal[j];
 			adc_in 		    = ins_accel[j-3];
-			adc_in 		    -= _sensor_temp_compensation(j, 0);  //  temperature ignored
 			_sensor_cal[j]	= adc_in;
 		}
 
@@ -197,7 +182,6 @@ AP_IMU_INS::_init_accel(void (*delay_cb)(unsigned long t))
 
 			for (int j = 3; j < 6; j++){
 				adc_in 	    	= ins_accel[j-3];
-				adc_in 		    -= _sensor_temp_compensation(j, 0);  //  temperature ignored
 				_sensor_cal[j]	= _sensor_cal[j] * 0.9 + adc_in * 0.1;
 			}
 
@@ -228,32 +212,10 @@ AP_IMU_INS::_init_accel(void (*delay_cb)(unsigned long t))
 	Serial.printf_P(PSTR(" "));
 }
 
-/**************************************************/
-// Returns the temperature compensated raw gyro value
-//---------------------------------------------------
-
-float
-AP_IMU_INS::_sensor_temp_compensation(uint8_t channel, int temperature) const
+  float
+AP_IMU_INS::_calibrated(uint8_t channel, float ins_value)
 {
-    // do gyro temperature compensation
-    if (channel < 3) {
-      /* Temp comp is not implemented - return 0*/
-		  return 0.0;
-       /*
-        return  _gyro_temp_curve[channel][0] +
-                _gyro_temp_curve[channel][1] * temperature +
-                _gyro_temp_curve[channel][2] * temperature * temperature;
-       //*/
-    }
-
-    // Not implemented for accelerometer
-    return 0.0;
-}
-
-float
-AP_IMU_INS::_calibrated(uint8_t channel, float ins_value, int temperature)
-{
-    return ins_value - _sensor_temp_compensation(channel, temperature) - _sensor_cal[channel];
+    return ins_value - _sensor_cal[channel];
 }
 
 
@@ -268,19 +230,18 @@ AP_IMU_INS::update(void)
   _ins->get_gyros(gyros);
   _ins->get_accels(accels);
   _sample_time = _ins->sample_time();
-	tc_temp = (int) _ins->temperature();
 
 	// convert corrected gyro readings to delta acceleration
 	//
-	_gyro.x = _calibrated(0, gyros[0], tc_temp);
-	_gyro.y = _calibrated(1, gyros[1], tc_temp);
-	_gyro.z = _calibrated(2, gyros[2], tc_temp);
+	_gyro.x = _calibrated(0, gyros[0]);
+	_gyro.y = _calibrated(1, gyros[1]);
+	_gyro.z = _calibrated(2, gyros[2]);
 
 	// convert corrected accelerometer readings to acceleration
 	//
-	_accel.x = _calibrated(3, accels[0], tc_temp);
-	_accel.y = _calibrated(4, accels[1], tc_temp);
-	_accel.z = _calibrated(5, accels[2], tc_temp);
+	_accel.x = _calibrated(3, accels[0]);
+	_accel.y = _calibrated(4, accels[1]);
+	_accel.z = _calibrated(5, accels[2]);
 
 	_accel_filtered.x = _accel_filtered.x / 2 + _accel.x / 2;
 	_accel_filtered.y = _accel_filtered.y / 2 + _accel.y / 2;
