@@ -55,7 +55,7 @@ class AP_InertialSensor_MPU6000 : public AP_InertialSensor
 
   static const uint8_t _temp_data_index;
 
-  static uint16_t _data[7];
+  static int16_t _data[7];
 
   /* TODO deprecate _cs_pin */
   static int _cs_pin;

@@ -55,18 +55,20 @@
 #define BIT_RAW_RDY_EN        0x01
 #define BIT_I2C_IF_DIS              0x10
 
-uint16_t AP_InertialSensor_MPU6000::_data[7];
-int      AP_InertialSensor_MPU6000::_cs_pin;
+int16_t AP_InertialSensor_MPU6000::_data[7];
+int     AP_InertialSensor_MPU6000::_cs_pin;
 
 const float AP_InertialSensor_MPU6000::_gyro_scale = 0.0174532 * 0.0152;
 const float AP_InertialSensor_MPU6000::_accel_scale = 9.81 / 4096.0;
 
-/* pch: i might have the gyro data signs mixed up with the accel data signs. */
+/* pch: I believe the accel and gyro indicies are correct
+ *      but somone else should please confirm.
+ */
 const uint8_t AP_InertialSensor_MPU6000::_gyro_data_index[3]  = { 5, 4, 6 };
-const int8_t  AP_InertialSensor_MPU6000::_gyro_data_sign[3]   = { 1, 1, -1 };
+const int8_t  AP_InertialSensor_MPU6000::_gyro_data_sign[3]   = { -1, -1, 1 };
 
 const uint8_t AP_InertialSensor_MPU6000::_accel_data_index[3] = { 1, 0, 2 };
-const int8_t  AP_InertialSensor_MPU6000::_accel_data_sign[3]  = { -1, -1, 1 };
+const int8_t  AP_InertialSensor_MPU6000::_accel_data_sign[3]  = { 1, 1, -1 };
 
 const uint8_t AP_InertialSensor_MPU6000::_temp_data_index = 3;
 
@@ -151,6 +153,50 @@ uint32_t AP_InertialSensor_MPU6000::sample_time() { return 200000; }
 
 void AP_InertialSensor_MPU6000::read()
 {
+#if 1
+
+    uint8_t byte_H;
+    uint8_t byte_L;
+
+    // Read AccelX
+    byte_H = register_read(MPUREG_ACCEL_XOUT_H);
+    byte_L = register_read(MPUREG_ACCEL_XOUT_L);
+    _data[0] = ((uint16_t) byte_H<<8)| byte_L;
+    // Read AccelY
+    byte_H = register_read(MPUREG_ACCEL_YOUT_H);
+    byte_L = register_read(MPUREG_ACCEL_YOUT_L);
+    _data[1] = ((uint16_t) byte_H<<8)| byte_L;
+    // Read AccelZ
+    byte_H = register_read(MPUREG_ACCEL_ZOUT_H);
+    byte_L = register_read(MPUREG_ACCEL_ZOUT_L);
+    _data[2] = ((uint16_t) byte_H<<8)| byte_L;
+
+   // Read Temp
+    byte_H = register_read(MPUREG_TEMP_OUT_H);
+    byte_L = register_read(MPUREG_TEMP_OUT_L);
+    _data[3] = ((uint16_t) byte_H<<8)| byte_L;
+
+
+    // Read GyroX
+    byte_H = register_read(MPUREG_GYRO_XOUT_H);
+    byte_L = register_read(MPUREG_GYRO_XOUT_L);
+    _data[4] = ((uint16_t) byte_H<<8)| byte_L;
+    // Read GyroY
+    byte_H = register_read(MPUREG_GYRO_YOUT_H);
+    byte_L = register_read(MPUREG_GYRO_YOUT_L);
+    _data[5] = ((uint16_t) byte_H<<8)| byte_L;
+    // Read GyroZ
+    byte_H = register_read(MPUREG_GYRO_ZOUT_H);
+    byte_L = register_read(MPUREG_GYRO_ZOUT_L);
+    _data[6] = ((uint16_t) byte_H<<8)| byte_L;
+
+#endif
+
+    /* I would expect the following code to be equivelant, and Jose Julio claims
+     * very similar code works for him. However, it gives garbage values on my
+     * system at the moment.
+     */
+#if 0
     /* SPI transactions to _data */
     uint8_t dump;
     uint8_t byte_H;
@@ -172,11 +218,11 @@ void AP_InertialSensor_MPU6000::read()
     for (i = 0; i < 7; i++) {
       byte_H = SPI.transfer(0);
       byte_L = SPI.transfer(0);
-      _data[i] = ((int)byte_H<<8)| byte_L;
+      _data[i] = ((uint16_t)byte_H<<8)| byte_L;
     }
 
     digitalWrite(_cs_pin, HIGH);
-
+#endif 
 }
 
 uint8_t AP_InertialSensor_MPU6000::register_read( uint8_t reg )
