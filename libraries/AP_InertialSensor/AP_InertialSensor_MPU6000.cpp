@@ -1,3 +1,4 @@
+#include <FastSerial.h>
 
 #include "AP_InertialSensor_MPU6000.h"
 
@@ -55,7 +56,6 @@
 #define BIT_RAW_RDY_EN        0x01
 #define BIT_I2C_IF_DIS              0x10
 
-int16_t AP_InertialSensor_MPU6000::_data[7];
 int     AP_InertialSensor_MPU6000::_cs_pin;
 
 /* pch: by the data sheet, the gyro scale should be 16.4LSB per DPS
@@ -97,27 +97,48 @@ void AP_InertialSensor_MPU6000::init( AP_PeriodicProcess * scheduler )
     scheduler->register_process( &AP_InertialSensor_MPU6000::read );
 }
 
+// accumulation in ISR - must be read with interrupts disabled
+// the sum of the values since last read
+static volatile int32_t _sum[7];
+
+// how many values we've accumulated since last read
+static volatile uint16_t _count;
+
+
 /*================ AP_INERTIALSENSOR PUBLIC INTERFACE ==================== */
 
 bool AP_InertialSensor_MPU6000::update( void )
 {
-    _gyro.x = _gyro_scale * _gyro_data_sign[0] *
-                            _data[ _gyro_data_index[0] ];
-    _gyro.y = _gyro_scale * _gyro_data_sign[1] *
-                            _data[ _gyro_data_index[1] ];
-    _gyro.z = _gyro_scale * _gyro_data_sign[2] *
-                            _data[ _gyro_data_index[2] ];
+	int32_t sum[7];
+	uint16_t count;
+	float count_scale;
 
-    _accel.x = _accel_scale * _accel_data_sign[0] *
-                              _data[ _accel_data_index[0] ];
-    _accel.y = _accel_scale * _accel_data_sign[1] *
-                              _data[ _accel_data_index[1] ];
-    _accel.z = _accel_scale * _accel_data_sign[2] *
-                              _data[ _accel_data_index[2] ];
+	// wait for at least 1 sample
+	while (_count == 0) /* nop */;
 
-    _temp    = _temp_to_celsius( _data[ _temp_data_index ] );
+	// disable interrupts for mininum time
+	cli();
+	for (int i=0; i<7; i++) {
+		sum[i] = _sum[i];
+		_sum[i] = 0;
+	}
+	count = _count;
+	_count = 0;
+	sei();
 
-    return true;
+	count_scale = 1.0 / count;
+
+	_gyro.x = _gyro_scale * _gyro_data_sign[0] * sum[_gyro_data_index[0]] * count_scale;
+	_gyro.y = _gyro_scale * _gyro_data_sign[1] * sum[_gyro_data_index[1]] * count_scale;
+	_gyro.z = _gyro_scale * _gyro_data_sign[2] * sum[_gyro_data_index[2]] * count_scale;
+
+	_accel.x = _accel_scale * _accel_data_sign[0] * sum[_accel_data_index[0]] * count_scale;
+	_accel.y = _accel_scale * _accel_data_sign[1] * sum[_accel_data_index[1]] * count_scale;
+	_accel.z = _accel_scale * _accel_data_sign[2] * sum[_accel_data_index[2]] * count_scale;
+
+	_temp    = _temp_to_celsius(sum[_temp_data_index] * count_scale);
+
+	return true;
 }
 
 float AP_InertialSensor_MPU6000::gx() { return _gyro.x; }
@@ -158,55 +179,32 @@ uint32_t AP_InertialSensor_MPU6000::sample_time() { return 200000; }
 
 /*================ HARDWARE FUNCTIONS ==================== */
 
+static int16_t spi_transfer_16(void)
+{
+	uint8_t byte_H, byte_L;
+	byte_H = SPI.transfer(0);
+	byte_L = SPI.transfer(0);
+	return (((int16_t)byte_H)<<8) | byte_L;
+}
+
 void AP_InertialSensor_MPU6000::read()
 {
-
-  uint8_t byte_H;
-  uint8_t byte_L;
-  uint8_t dump;
- 
   // We start a multibyte SPI read of sensors
   byte addr = MPUREG_ACCEL_XOUT_H | 0x80;      // Set most significant bit
+
   digitalWrite(_cs_pin, LOW);
-  dump = SPI.transfer(addr);
 
-  /* For some reason, rolling the following 7 pairs of writes into a loop
-   * doesn't work properly:
-   * for (int i = 0; i < 7; i++) {
-   *   byte_H = SPI.transfer(0);
-   *   byte_H = SPI.transfer(0);
-   *   _data[i] = ((int)byte_H<<8)| byte_L;
-   * }
-   */
+  SPI.transfer(addr);
 
-  // Read AccelX
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[0] = ((int)byte_H<<8)| byte_L;
-  // Read AccelY
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[1] = ((int)byte_H<<8)| byte_L;
-  // Read AccelZ
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[2] = ((int)byte_H<<8)| byte_L;
-  // Read Temp
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[3] = ((int)byte_H<<8)| byte_L;
-  // Read GyroX
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[4] = ((int)byte_H<<8)| byte_L;
-  // Read GyroY
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[5] = ((int)byte_H<<8)| byte_L;
-  // Read GyroZ
-  byte_H = SPI.transfer(0);
-  byte_L = SPI.transfer(0);
-  _data[6] = ((int)byte_H<<8)| byte_L;
+  for (uint8_t i=0; i<7; i++) {
+	  _sum[i] += spi_transfer_16();
+  }
+  _count++;
+  if (_count == 0) {
+	  // rollover - v unlikely
+	  memset((void*)_sum, 0, sizeof(_sum));
+  }
+
   digitalWrite(_cs_pin, HIGH);
 }
 
