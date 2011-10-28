@@ -48,7 +48,6 @@
 
 #if CONFIG_APM_HARDWARE == APM_HARDWARE_PURPLE
 # define CONFIG_IMU_TYPE   CONFIG_IMU_MPU6000
-# define CONFIG_SLIDER     DISABLED
 # define CONFIG_PUSHBUTTON DISABLED
 # define CONFIG_RELAY      DISABLED
 #endif
@@ -96,7 +95,7 @@
 # define INSTANT_PWM	DISABLED
 #endif
 
-// LED Pins
+// LED and IO Pins
 //
 #if CONFIG_APM_HARDWARE == APM_HARDWARE_APM1
 # define A_LED_PIN        37
@@ -114,20 +113,12 @@
 # define LED_OFF          HIGH
 # define SLIDE_SWITCH_PIN (-1)
 # define PUSHBUTTON_PIN   (-1)
+# define CLI_SLIDER_ENABLED DISABLED
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Slider, Pushbutton, Relay
+// Pushbutton & Relay
 //
-
-/* Slider is default enabled. BROKEN_SLIDER is a legacy config opt. */
-#ifndef CONFIG_SLIDER
-# if BROKEN_SLIDER == 1
-#  define CONFIG_SLIDER DISABLED
-# else
-#  define CONFIG_SLIDER ENABLED
-# endif
-#endif
 
 #ifndef CONFIG_PUSHBUTTON
 # define CONFIG_PUSHBUTTON ENABLED

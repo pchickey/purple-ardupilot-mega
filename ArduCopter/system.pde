@@ -105,7 +105,7 @@ static void init_ardupilot()
   pinMode(C_LED_PIN, OUTPUT);				// GPS status LED
   digitalWrite(C_LED_PIN, LED_OFF);
 
-#if CONFIG_SLIDER == ENABLED
+#if SLIDE_SWITCH_PIN > 0
   pinMode(SLIDE_SWITCH_PIN, INPUT);		// To enter interactive mode
 #endif
 #if CONFIG_PUSHBUTTON == ENABLED
