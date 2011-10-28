@@ -474,17 +474,17 @@ test_imu(uint8_t argc, const Menu::arg *argv)
 	while(1){
 		delay(40);
       
-    imu.update(); 
-    gyro = imu.get_gyro();
-    accel = imu.get_accel();
-      
-    Serial.printf_P(PSTR("g %f %f %f"), gyro.x, gyro.y, gyro.z);
-    Serial.printf_P(PSTR(" a %f %f %f\n"), accel.x, accel.y, accel.z);
-
+        imu.update(); 
+        gyro = imu.get_gyro();
+        accel = imu.get_accel();
+        
+        Serial.printf_P(PSTR("g %8.4f %8.4f %8.4f"), gyro.x, gyro.y, gyro.z);
+        Serial.printf_P(PSTR("  a %8.4f %8.4f %8.4f\n"), accel.x, accel.y, accel.z);
+        
 		if(Serial.available() > 0){
 			return (0);
 		}
-  }
+    }
   return 0;
 }
 static int8_t
@@ -541,10 +541,10 @@ test_dcm_eulers(uint8_t argc, const Menu::arg *argv)
 								dcm.kp_roll_pitch(),
 								(float)g.rc_6.control_in / 2000.0);
 				*/
-				Serial.printf_P(PSTR("%ld, %ld, %ld\n"),
-								dcm.roll_sensor,
-								dcm.pitch_sensor,
-								dcm.yaw_sensor);
+				Serial.printf_P(PSTR("%6.2f %6.2f %6.2f\n"),
+								0.01*dcm.roll_sensor,
+								0.01*dcm.pitch_sensor,
+								0.01*dcm.yaw_sensor);
 
 				if(g.compass_enabled){
 					compass.read();		 				// Read magnetometer
