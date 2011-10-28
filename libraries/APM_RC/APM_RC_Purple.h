@@ -20,10 +20,11 @@ class APM_RC_Purple : public APM_RC_Class
 	bool setHIL(int16_t v[NUM_CHANNELS]);
 	void clearOverride(void);
     void Force_Out(void);
+	void Force_Out0_Out1(void);
+	void Force_Out2_Out3(void);
+	void Force_Out6_Out7(void);
 
   private:
-	void Force_Out0_Out1(void);
-	void Force_Out5_Out6_Out7(void);
     
     static void _timer4_capt_cb(void);
     static volatile uint16_t _PWM_RAW[NUM_CHANNELS];
