@@ -58,17 +58,24 @@
 int16_t AP_InertialSensor_MPU6000::_data[7];
 int     AP_InertialSensor_MPU6000::_cs_pin;
 
-const float AP_InertialSensor_MPU6000::_gyro_scale = 0.0174532 * 0.0152;
+/* pch: by the data sheet, the gyro scale should be 16.4LSB per DPS
+ *      Given the radians conversion factor (0.174532), the gyro scale factor
+ *      is waaaay off - output values are way too sensitive.
+ *      I divided by powers of two until I got to 128. It seems about right based
+ *      on making some 360 deg rotations on my desk.
+ *      However, this issue could bear more investigation...
+ */
+const float AP_InertialSensor_MPU6000::_gyro_scale = (0.0174532 / 16.4) / 128.0 ;
 const float AP_InertialSensor_MPU6000::_accel_scale = 9.81 / 4096.0;
 
 /* pch: I believe the accel and gyro indicies are correct
  *      but somone else should please confirm.
  */
 const uint8_t AP_InertialSensor_MPU6000::_gyro_data_index[3]  = { 5, 4, 6 };
-const int8_t  AP_InertialSensor_MPU6000::_gyro_data_sign[3]   = { -1, -1, 1 };
+const int8_t  AP_InertialSensor_MPU6000::_gyro_data_sign[3]   = { -1, -1, -1 };
 
 const uint8_t AP_InertialSensor_MPU6000::_accel_data_index[3] = { 1, 0, 2 };
-const int8_t  AP_InertialSensor_MPU6000::_accel_data_sign[3]  = { 1, 1, -1 };
+const int8_t  AP_InertialSensor_MPU6000::_accel_data_sign[3]  = { -1, -1, -1 };
 
 const uint8_t AP_InertialSensor_MPU6000::_temp_data_index = 3;
 
@@ -255,10 +262,10 @@ void AP_InertialSensor_MPU6000::hardware_init()
     // SAMPLE RATE
     register_write(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
     delay(1);
-    // FS & DLPF   FS=1000º/s, DLPF = 42Hz (low pass filter)
+    // FS & DLPF   FS=2000º/s, DLPF = 42Hz (low pass filter)
     register_write(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
     delay(1);
-    register_write(MPUREG_GYRO_CONFIG,BITS_FS_500DPS);  // Gyro scale 500º/s
+    register_write(MPUREG_GYRO_CONFIG,BITS_FS_2000DPS);  // Gyro scale 2000º/s
     delay(1);
     register_write(MPUREG_ACCEL_CONFIG,0x08);           // Accel scele 4g (4096LSB/g)
     delay(1);    

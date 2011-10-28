@@ -248,7 +248,8 @@ static void init_ardupilot()
 	// the system in an odd state, we don't let the user exit the top
 	// menu; they must reset in order to fly.
 	//
-	if (check_startup_for_CLI()) {
+	if (true) {
+	//if (check_startup_for_CLI()) {
 		digitalWrite(A_LED_PIN, LED_ON);		// turn on setup-mode LED
 		Serial.printf_P(PSTR("\nCLI:\n\n"));
         run_cli();

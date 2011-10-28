@@ -70,6 +70,5 @@
 #define USERHOOK_VARIABLES "UserVariables.h"
 
 
-// For testing only - enable MPU6000
-// #define CONFIG_IMU_TYPE     CONFIG_IMU_MPU6000
+// #define CONFIG_APM_HARDWARE APM_HARDWARE_PURPLE
 
