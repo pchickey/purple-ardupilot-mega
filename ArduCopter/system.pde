@@ -539,12 +539,8 @@ init_throttle_cruise()
 	}
 }
 
-<<<<<<< HEAD
 #if CLI_ENABLED == ENABLED
 #if BROKEN_SLIDER == 1
-=======
-#if CONFIG_SLIDER == DISABLED
->>>>>>> Config for Purple hardware with definable IO pins.
 
 static boolean
 check_startup_for_CLI()
