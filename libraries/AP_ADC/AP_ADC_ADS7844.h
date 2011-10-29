@@ -21,7 +21,7 @@ class AP_ADC_ADS7844 : public AP_ADC
 {
 	public:
 	AP_ADC_ADS7844();  // Constructor
-	void init( AP_PeriodicProcess * scheduler );
+	void Init( AP_PeriodicProcess * scheduler );
 
 	// Read 1 sensor value
 	uint16_t Ch(unsigned char ch_num);

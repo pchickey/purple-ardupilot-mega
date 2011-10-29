@@ -83,7 +83,7 @@ static inline unsigned char ADC_SPI_transfer(unsigned char data)
 }
 
 
-AP_ADC_ADS7844::read(void)
+void AP_ADC_ADS7844::read(void)
 {
 	uint8_t ch;
 	static uint8_t timer_offset;
@@ -130,7 +130,7 @@ AP_ADC_ADS7844::AP_ADC_ADS7844() :
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-void AP_ADC_ADS7844::init( AP_PeriodicProcess * scheduler )
+void AP_ADC_ADS7844::Init( AP_PeriodicProcess * scheduler )
 {
 	pinMode(ADC_CHIP_SELECT, OUTPUT);
 
