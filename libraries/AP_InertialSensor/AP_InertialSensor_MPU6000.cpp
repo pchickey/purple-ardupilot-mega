@@ -61,11 +61,12 @@ int     AP_InertialSensor_MPU6000::_cs_pin;
 /* pch: by the data sheet, the gyro scale should be 16.4LSB per DPS
  *      Given the radians conversion factor (0.174532), the gyro scale factor
  *      is waaaay off - output values are way too sensitive.
- *      I divided by powers of two until I got to 128. It seems about right based
+ *      Previously a divisor of 128 was appropriate.
+ *      After tridge's changes to ::read, 50.0 seems about right based
  *      on making some 360 deg rotations on my desk.
- *      However, this issue could bear more investigation...
+ *      This issue requires more investigation.
  */
-const float AP_InertialSensor_MPU6000::_gyro_scale = (0.0174532 / 16.4) / 128.0 ;
+const float AP_InertialSensor_MPU6000::_gyro_scale = (0.0174532 / 16.4) / 50.0 ;
 const float AP_InertialSensor_MPU6000::_accel_scale = 9.81 / 4096.0;
 
 /* pch: I believe the accel and gyro indicies are correct
