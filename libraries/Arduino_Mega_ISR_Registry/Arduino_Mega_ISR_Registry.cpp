@@ -42,3 +42,8 @@ extern "C" ISR(TIMER4_CAPT_vect) {
         Arduino_Mega_ISR_Registry::_registry[ISR_REGISTRY_TIMER4_CAPT]();
 }
 
+extern "C" ISR(TIMER5_CAPT_vect) {
+    if (Arduino_Mega_ISR_Registry::_registry[ISR_REGISTRY_TIMER5_CAPT] != NULL)
+        Arduino_Mega_ISR_Registry::_registry[ISR_REGISTRY_TIMER5_CAPT]();
+}
+
