@@ -26,7 +26,7 @@ class APM_RC_Purple : public APM_RC_Class
 
   private:
     
-    static void _timer4_capt_cb(void);
+    static void _timer5_capt_cb(void);
     static volatile uint16_t _PWM_RAW[NUM_CHANNELS];
     static volatile uint8_t _radio_status;
     int16_t _HIL_override[NUM_CHANNELS];
