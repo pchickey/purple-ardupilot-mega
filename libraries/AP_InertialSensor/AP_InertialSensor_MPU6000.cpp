@@ -66,7 +66,7 @@ int     AP_InertialSensor_MPU6000::_cs_pin;
  *      on making some 360 deg rotations on my desk.
  *      This issue requires more investigation.
  */
-const float AP_InertialSensor_MPU6000::_gyro_scale = (0.0174532 / 16.4) / 50.0 ;
+const float AP_InertialSensor_MPU6000::_gyro_scale = (0.0174532 / 16.4);
 const float AP_InertialSensor_MPU6000::_accel_scale = 9.81 / 4096.0;
 
 /* pch: I believe the accel and gyro indicies are correct
@@ -176,7 +176,7 @@ void AP_InertialSensor_MPU6000::get_sensors( float * sensors )
 
 float AP_InertialSensor_MPU6000::temperature() { return _temp; }
 
-uint32_t AP_InertialSensor_MPU6000::sample_time() { return 200000; }
+uint32_t AP_InertialSensor_MPU6000::sample_time() { return 5000; }
 
 /*================ HARDWARE FUNCTIONS ==================== */
 
