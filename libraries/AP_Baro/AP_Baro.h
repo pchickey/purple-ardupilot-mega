@@ -13,6 +13,6 @@ class AP_Baro
 
 };
 
-#include "AP_Baro_MeasSense.h"
+#include "AP_Baro_MS5611.h"
 
 #endif // __AP_BARO_H__
