@@ -105,6 +105,7 @@ void AP_InertialSensor_Oilpan::get_sensors( float * sensors )
 float AP_InertialSensor_Oilpan::temperature() { return _temp; }
 
 uint32_t AP_InertialSensor_Oilpan::sample_time() { return _sample_time; }
+void AP_InertialSensor_Oilpan::reset_sample_time() { }
 
 /* ------ Private functions -------------------------------------------*/
 
