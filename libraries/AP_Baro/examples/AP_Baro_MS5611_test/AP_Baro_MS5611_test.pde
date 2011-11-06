@@ -15,10 +15,12 @@ void setup()
 
 	delay(1000);
 
-    baro.init();
-
-
+  pinMode(53, OUTPUT);
+  digitalWrite(53, HIGH);
   SPI.begin();
+  SPI.setClockDivider(SPI_CLOCK_DIV32); // 500khz for debugging, increase later
+
+  baro.init();
 }
 
 void loop()

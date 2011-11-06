@@ -4,9 +4,9 @@
 #include "WProgram.h"
 #include <SPI.h>
 
+/* Chip select tied to, PB0 (SS); arduino pin 53 */
 #define CS_PORT PORTB
 #define CS_MASK 0x01;
-
 #define CS_ASSERT  do { CS_PORT |=  CS_MASK; } while (0)
 #define CS_RELEASE do { CS_PORT &= ~CS_MASK; } while (0)
 
