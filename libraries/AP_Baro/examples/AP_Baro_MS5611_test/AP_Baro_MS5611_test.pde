@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <FastSerial.h>
+#include <SPI.h>
 #include <AP_Baro.h> // ArduPilot Mega ADC Library
 
 FastSerialPort0(Serial);
@@ -16,6 +17,8 @@ void setup()
 
     baro.init();
 
+
+  SPI.begin();
 }
 
 void loop()
