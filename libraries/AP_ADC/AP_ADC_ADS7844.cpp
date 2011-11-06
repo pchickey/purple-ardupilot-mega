@@ -258,6 +258,7 @@ uint32_t AP_ADC_ADS7844::Ch6(const uint8_t *channel_numbers, uint16_t *result)
 
 
 	// return number of microseconds since last call
+    // XXX rollover creates a major bug
 	uint32_t us = micros();
 	uint32_t ret = us - last_ch6_micros;
 	last_ch6_micros = us;
