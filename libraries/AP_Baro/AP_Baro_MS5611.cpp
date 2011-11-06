@@ -2,8 +2,7 @@
 #include "AP_Baro_MS5611.h"
 
 #include "WProgram.h"
-// XXX XXX dirty hack- I don't know why SPI isn't found without an absolute path...
-#include "/home/pat/src/arduino-0022/libraries/SPI/SPI.h"
+#include <SPI.h>
 
 #define CS_PORT PORTB
 #define CS_MASK 0x01;
