@@ -48,7 +48,11 @@ class AP_InertialSensor
   /* Temperature, in degrees celsius, of the gyro. */
   virtual float temperature() = 0;
 
+  /* sample_time returns the delta in microseconds since the
+   * last call to reset_sample_time.
+   */
   virtual uint32_t sample_time() = 0;
+  virtual void reset_sample_time() = 0;
 };
 
 #include "AP_InertialSensor_Oilpan.h"

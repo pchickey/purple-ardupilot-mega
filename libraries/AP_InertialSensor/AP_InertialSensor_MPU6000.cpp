@@ -176,7 +176,18 @@ void AP_InertialSensor_MPU6000::get_sensors( float * sensors )
 
 float AP_InertialSensor_MPU6000::temperature() { return _temp; }
 
-uint32_t AP_InertialSensor_MPU6000::sample_time() { return 5000; }
+uint32_t AP_InertialSensor_MPU6000::sample_time()
+{
+  uint32_t us = micros();
+  /* XXX rollover creates a major bug */
+  uint32_t delta = us - _last_sample_micros;
+  return delta;
+}
+
+void AP_InertialSensor_MPU6000::reset_sample_time()
+{
+    _last_sample_micros = micros();
+}
 
 /*================ HARDWARE FUNCTIONS ==================== */
 
