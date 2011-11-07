@@ -5,9 +5,15 @@
 */
 
 #include <FastSerial.h>
+#include <Arduino_Mega_ISR_Registry.h>
+#include <AP_PeriodicProcess.h>
 #include <AP_ADC.h> // ArduPilot Mega ADC Library
 
 FastSerialPort0(Serial);        // FTDI/console
+
+Arduino_Mega_ISR_Registry isr_registry;
+AP_TimerAperiodicProcess  adc_scheduler;
+
 
 unsigned long timer;
 AP_ADC_ADS7844 adc;
@@ -17,7 +23,11 @@ void setup()
 	Serial.begin(115200, 128, 128);
 	Serial.println("ArduPilot Mega ADC library test");
 	delay(1000);
-	adc.Init();   // APM ADC initialization
+
+    isr_registry.init();
+    adc_scheduler.init(&isr_registry);
+
+	adc.Init(&adc_scheduler);   // APM ADC initialization
 	delay(1000);
 	timer = millis();
 }
