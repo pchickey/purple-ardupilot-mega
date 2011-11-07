@@ -6,11 +6,16 @@
 	(Works with last PPM_encoder firmware)
 */
 
+#include <Arduino_Mega_ISR_Registry.h>
 #include <APM_RC.h> // ArduPilot Mega RC Library
+
+Arduino_Mega_ISR_Registry isr_registry;
+APM_RC_Purple APM_RC;
 
 void setup()
 {
-	APM_RC.Init();	 // APM Radio initialization
+    isr_registry.init();
+	APM_RC.Init(&isr_registry);	 // APM Radio initialization
 
 	Serial.begin(38400);
 	Serial.println("ArduPilot Mega RC library test");
