@@ -29,6 +29,7 @@ class AP_InertialSensor_Oilpan : public AP_InertialSensor
   void get_sensors( float * );
   float temperature();
   uint32_t sample_time();
+  void reset_sample_time();
 
   private:
 

@@ -30,6 +30,7 @@ class AP_InertialSensor_MPU6000 : public AP_InertialSensor
   void get_sensors( float * );
   float temperature();
   uint32_t sample_time();
+  void reset_sample_time();
 
   static void read();
   static uint8_t register_read( uint8_t reg );
@@ -42,6 +43,8 @@ class AP_InertialSensor_MPU6000 : public AP_InertialSensor
   Vector3f _accel;
   float _temp;
   
+  uint32_t _last_sample_micros;
+
   float _temp_to_celsius( uint16_t );
 
   static const float _accel_scale; 
