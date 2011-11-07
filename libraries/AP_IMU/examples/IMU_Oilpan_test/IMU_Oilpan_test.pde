@@ -5,6 +5,7 @@
 //
 
 #include <FastSerial.h>
+#include <SPI.h>
 #include <Arduino_Mega_ISR_Registry.h>
 #include <AP_PeriodicProcess.h>
 #include <AP_InertialSensor.h>
