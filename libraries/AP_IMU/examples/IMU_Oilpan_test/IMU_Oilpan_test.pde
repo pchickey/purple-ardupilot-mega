@@ -21,7 +21,7 @@ AP_TimerAperiodicProcess  adc_scheduler;
 
 AP_ADC_ADS7844	adc;
 AP_InertialSensor_Oilpan oilpan_ins(&adc);
-AP_IMU_INS imu;
+AP_IMU_INS imu(&oilpan_ins,0);
 
 void setup(void)
 {
@@ -31,8 +31,8 @@ void setup(void)
     isr_registry.init();
     adc_scheduler.init(&isr_registry);
 
-	adc.Init(&adc_scheduler);
-	imu.init(IMU::COLD_START);
+    /* Should also call ins.init and adc.init */
+	imu.init(IMU::COLD_START, delay, &adc_scheduler); 
 }
 
 void loop(void)
