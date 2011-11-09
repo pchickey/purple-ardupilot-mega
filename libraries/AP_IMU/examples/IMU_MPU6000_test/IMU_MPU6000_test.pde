@@ -26,7 +26,7 @@ void setup(void)
   pinMode(53, OUTPUT);
   digitalWrite(53, HIGH);
 
-	Serial.begin(38400);
+	Serial.begin(115200);
 	Serial.println("Doing IMU startup...");
 
     isr_registry.init();

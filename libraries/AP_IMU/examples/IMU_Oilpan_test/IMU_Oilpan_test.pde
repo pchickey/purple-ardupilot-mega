@@ -25,7 +25,7 @@ AP_IMU_INS imu(&oilpan_ins,0);
 
 void setup(void)
 {
-	Serial.begin(38400);
+	Serial.begin(115200);
 	Serial.println("Doing IMU startup...");
 
     isr_registry.init();
