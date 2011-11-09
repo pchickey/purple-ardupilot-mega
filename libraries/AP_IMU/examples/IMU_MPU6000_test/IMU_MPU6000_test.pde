@@ -23,14 +23,16 @@ AP_IMU_INS imu(&mpu6000, 0); /* second arg is for Parameters. Can we leave it nu
 
 void setup(void)
 {
+  pinMode(53, OUTPUT);
+  digitalWrite(53, HIGH);
+
 	Serial.begin(38400);
 	Serial.println("Doing IMU startup...");
 
     isr_registry.init();
     mpu_scheduler.init(&isr_registry);
 
-	mpu6000.init(&mpu_scheduler);
-	imu.init(IMU::COLD_START);
+	imu.init(IMU::COLD_START, delay, &mpu_scheduler);
 }
 
 void loop(void)
