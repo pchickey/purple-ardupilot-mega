@@ -15,8 +15,8 @@ void setup()
 
 	delay(1000);
 
-  pinMode(53, OUTPUT);
-  digitalWrite(53, HIGH);
+  pinMode(63, OUTPUT);
+  digitalWrite(63, HIGH);
   SPI.begin();
   SPI.setClockDivider(SPI_CLOCK_DIV32); // 500khz for debugging, increase later
 
