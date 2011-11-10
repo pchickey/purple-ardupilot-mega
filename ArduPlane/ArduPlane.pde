@@ -38,6 +38,7 @@ version 2.1 of the License, or (at your option) any later version.
 #include <APM_BMP085.h>     // ArduPilot Mega BMP085 Library
 #include <AP_Compass.h>     // ArduPilot Mega Magnetometer Library
 #include <AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
+#include <AP_InertialSensor.h> // Inertial Sensor (uncalibated IMU) Library
 #include <AP_IMU.h>         // ArduPilot Mega IMU Library
 #include <AP_DCM.h>         // ArduPilot Mega DCM Library
 #include <PID.h>            // PID library
@@ -181,13 +182,13 @@ AP_IMU_Shim             imu; // never used
 	#if HIL_MODE != HIL_MODE_SENSORS
 		// Normal
     #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-    AP_IMU_MPU6000 imu( Parameters::k_param_IMU_calibration,
-                        CONFIG_MPU6000_CHIP_SELECT_PIN );
+    AP_InertialSensor_MPU6000 ins( CONFIG_MPU6000_CHIP_SELECT_PIN );
     AP_TimerProcess timer_scheduler;
     #else
-		AP_IMU_Oilpan imu(&adc, Parameters::k_param_IMU_calibration);
+		AP_InertialSensor_Oilpan ins( &adc );
     AP_TimerAperiodicProcess timer_scheduler; 
     #endif
+  AP_IMU_INS imu( &ins, Parameters::k_param_IMU_calibration );
 	#else
 		// hil imu
 		AP_IMU_Shim imu;
