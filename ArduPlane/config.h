@@ -48,6 +48,10 @@
 
 #ifndef CONFIG_APM_HARDWARE
 # define CONFIG_APM_HARDWARE APM_HARDWARE_APM1
+#else
+# if CONFIG_APM_HARDWARE == APM_HARDWARE_PURPLE
+#  define CONFIG_IMU_TYPE CONFIG_IMU_MPU6000
+# endif
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
