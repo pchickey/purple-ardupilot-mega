@@ -208,7 +208,11 @@ static void init_ardupilot()
 		// begin filtering the ADC Gyros
 		adc.filter_result = true;
         #endif
-		barometer.Init();	// APM Abs Pressure sensor initialization
+#if CONFIG_APM_HARDWARE == APM_HARDWARE_PURPLE
+        barometer.Init(1, true);
+#else
+        barometer.Init(1, false);
+#endif
 	#endif
 
 	// Do GPS init
