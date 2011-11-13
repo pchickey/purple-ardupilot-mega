@@ -11,9 +11,13 @@ static int8_t	test_radio(uint8_t argc, 		const Menu::arg *argv);
 static int8_t	test_gps(uint8_t argc, 			const Menu::arg *argv);
 static int8_t	test_tri(uint8_t argc, 			const Menu::arg *argv);
 static int8_t	test_adc(uint8_t argc, 			const Menu::arg *argv);
+
+#if HIL_MODE != HIL_MODE_ATTITUDE
 static int8_t	test_ins(uint8_t argc, 			const Menu::arg *argv);
 static int8_t	test_imu(uint8_t argc, 			const Menu::arg *argv);
 static int8_t	test_dcm_eulers(uint8_t argc, 			const Menu::arg *argv);
+#endif // HIL_MODE
+
 //static int8_t	test_dcm(uint8_t argc, 			const Menu::arg *argv);
 //static int8_t	test_omega(uint8_t argc, 		const Menu::arg *argv);
 static int8_t	test_battery(uint8_t argc, 		const Menu::arg *argv);
@@ -64,9 +68,11 @@ const struct Menu::command test_menu_commands[] PROGMEM = {
 #if HIL_MODE != HIL_MODE_ATTITUDE && CONFIG_ADC == ENABLED
 	{"adc", 		test_adc},
 #endif
+#if HIL_MODE != HIL_MODE_ATTITUDE
 	{"ins", 		test_ins},
 	{"imu",			test_imu},
 	{"dcm",			test_dcm_eulers},
+#endif
 	//{"omega",		test_omega},
 	{"battery",		test_battery},
 	{"tune",		test_tuning},
@@ -395,6 +401,8 @@ test_stabilize(uint8_t argc, const Menu::arg *argv)
 	}
 }
 */
+
+
 #if HIL_MODE != HIL_MODE_ATTITUDE && CONFIG_ADC == ENABLED
 static int8_t
 test_adc(uint8_t argc, const Menu::arg *argv)
@@ -420,6 +428,7 @@ test_adc(uint8_t argc, const Menu::arg *argv)
 }
 #endif
 
+#if HIL_MODE != HIL_MODE_ATTITUDE
 static int8_t
 test_ins(uint8_t argc, const Menu::arg *argv)
 {
@@ -456,8 +465,10 @@ test_ins(uint8_t argc, const Menu::arg *argv)
 		}
 	}
 }
+#endif // HIL_MODE
 
 
+#if HIL_MODE != HIL_MODE_ATTITUDE
 /*
   test the IMU interface
  */
@@ -492,8 +503,10 @@ test_imu(uint8_t argc, const Menu::arg *argv)
     }
   return 0;
 }
+#endif // HIL_MODE
 
 
+#if HIL_MODE != HIL_MODE_ATTITUDE
 /*
    test the DCM code, printing Euler angles
  */
@@ -558,6 +571,7 @@ test_dcm_eulers(uint8_t argc, const Menu::arg *argv)
 		}
 	}
 }
+#endif // HIL_MODE
 
 static int8_t
 test_gps(uint8_t argc, const Menu::arg *argv)
