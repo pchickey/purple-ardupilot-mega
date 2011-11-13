@@ -68,3 +68,5 @@
 #define USERHOOK_VARIABLES "UserVariables.h"
 
 
+// enable this for the new 'purple' hardware
+// #define CONFIG_APM_HARDWARE APM_HARDWARE_PURPLE
