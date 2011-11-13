@@ -327,15 +327,6 @@ enum gcs_severity {
 // sonar
 //#define SonarToCm(x) (x*1.26)   // Sonar raw value to centimeters
 
-// Hardware Parameters
-#define SLIDE_SWITCH_PIN 40
-#define PUSHBUTTON_PIN 41
-
-#define A_LED_PIN 37			//36 = B,	37 = A,	35 = C
-#define B_LED_PIN 36
-#define C_LED_PIN 35
-
-
 // EEPROM addresses
 #define EEPROM_MAX_ADDR		4096
 // parameters get the first 1KiB of EEPROM, remainder is for waypoints
