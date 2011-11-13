@@ -202,9 +202,7 @@ static void init_ardupilot()
 	init_rc_out();		// sets up the timer libs
 	init_camera();
 
-#if HIL_MODE != HIL_MODE_ATTITUDE
     timer_scheduler.init( &isr_registry );
-#endif
 
 #if HIL_MODE != HIL_MODE_ATTITUDE
 #if CONFIG_ADC == ENABLED
