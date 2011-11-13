@@ -54,6 +54,8 @@ extern "C" {
 
 // the purple hardware needs to check the state of the
 // chip using a direct IO port
+// On Purple prerelease hw, the data ready port is hooked up to PE7, which
+// is not available to the arduino digitalRead function.
 #define BMP_DATA_READY() (_purple_hardware?(PINE&0x80):digitalRead(BMP085_EOC))
 
 
