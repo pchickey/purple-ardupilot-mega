@@ -18,6 +18,7 @@ class APM_RC_APM1 : public APM_RC_Class
 	bool setHIL(int16_t v[NUM_CHANNELS]);
 	void clearOverride(void);
 	void Force_Out(void);
+    void SetFastOutputChannels(uint32_t chmask);
 
 	void Force_Out0_Out1(void);
 	void Force_Out2_Out3(void);
