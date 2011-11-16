@@ -13,6 +13,7 @@
 #define CH_6 5
 #define CH_7 6
 #define CH_8 7
+#define CH_9 8
 #define CH_10 9
 #define CH_11 10
 
