@@ -2,7 +2,7 @@
 
 #include "ArduCopter_Motors_Tri.h"
 
-static void init_motors_out()
+static void ArduCopter_Motors_Tri::init_out()
 {
 	#if INSTANT_PWM == 0
     APM_RC.SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_4 );
@@ -10,7 +10,7 @@ static void init_motors_out()
 }
 
 
-static void output_motors_armed()
+static void ArduCopter_Motors_Tri::output_armed()
 {
 	int out_min = g.rc_3.radio_min;
 	int out_max = g.rc_3.radio_max;
@@ -81,7 +81,7 @@ static void output_motors_armed()
 	#endif
 }
 
-static void output_motors_disarmed()
+static void ArduCopter_Motors_Tri::output_disarmed()
 {
 	if(g.rc_3.control_in > 0){
 		// we have pushed up the throttle

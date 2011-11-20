@@ -204,7 +204,7 @@ static void heli_move_swash(int roll_out, int pitch_out, int coll_out, int yaw_o
 	}
 }
 
-static void init_motors_out()
+static void ArduCopter_Motors_Heli::init_out()
 {
 	#if INSTANT_PWM == 0
     APM_RC.SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
@@ -212,7 +212,7 @@ static void init_motors_out()
 }
 
 // these are not really motors, they're servos but we don't rename the function because it fits with the rest of the code better
-static void output_motors_armed()
+static void ArduCopter_Motors_Heli::output_armed()
 {
     // if manual override (i.e. when setting up swash), pass pilot commands straight through to swash
     if( g.heli_servo_manual == 1 ) {
@@ -232,14 +232,14 @@ static void output_motors_armed()
 }
 
 // for helis - armed or disarmed we allow servos to move
-static void output_motors_disarmed()
+static void ArduCopter_Motors_Heli::output_disarmed()
 {
 	if(g.rc_3.control_in > 0){
 		// we have pushed up the throttle, remove safety
 		motor_auto_armed = true;
 	}
 
-	output_motors_armed();
+	output_armed();
 }
 
 static void output_motor_test()
