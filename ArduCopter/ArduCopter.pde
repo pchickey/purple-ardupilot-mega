@@ -75,6 +75,7 @@ And much more so PLEASE PM me on DIYDRONES to add your contribution to the List
 #include <AP_Relay.h>		// APM relay
 #include <GCS_MAVLink.h>    // MAVLink GCS definitions
 #include <memcheck.h>
+#include <ArduCopter_Motors.h>
 
 // Configuration
 #include "defines.h"
@@ -233,6 +234,26 @@ AP_TimerProcess timer_scheduler;
 #endif // HIL MODE
 
 
+//////////////////////////////////////////////////////////////////////////////
+// ArduCopter_Motors selection
+//////////////////////////////////////////////////////////////////////////////
+#if FRAME_CONFIG == HELI_FRAME
+  ArduCopter_Motors_Heli AC_Motors;
+#elif FRAME_CONFIG == HEXA_FRAME
+  ArduCopter_Motors_Hexa AC_Motors;
+#elif FRAME_CONFIG == OCTA_FRAME
+  ArduCopter_Motors_Octa AC_Motors;
+#elif FRAME_CONFIG == OCTA_QUAD_FRAME
+  ArduCopter_Motors_Octa_Quad AC_Motors;
+#elif FRAME_CONFIG == QUAD_FRAME
+  ArduCopter_Motors_Quad AC_Motors;
+#elif FRAME_CONFIG == TRI_FRAME
+  ArduCopter_Motors_Tri AC_Motors;
+#elif FRAME_CONFIG == Y6_FRAME
+  ArduCopter_Motors_Y6 AC_Motors;
+#else
+#error Must define a valid FRAME_CONFIG
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // GCS selection
