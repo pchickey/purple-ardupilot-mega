@@ -1,6 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-#if FRAME_CONFIG ==	HELI_FRAME
+#include "ArduCopter_Motors_Heli.h"
 
 #define HELI_SERVO_AVERAGING_DIGITAL 0  // 250Hz
 #define HELI_SERVO_AVERAGING_ANALOG  2  // 125Hz
@@ -231,4 +231,3 @@ static int heli_get_angle_boost(int pwm_out)
 	return pwm_out + throttle_above_center*angle_boost_factor;
 }
 
-#endif // HELI_FRAME

@@ -1,6 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-#if FRAME_CONFIG ==	HEXA_FRAME
+#include "ArduCopter_Motors_Hexa.h"
 
 static void init_motors_out()
 {
@@ -225,4 +225,3 @@ static void output_motor_test()
 }
 */
 
-#endif

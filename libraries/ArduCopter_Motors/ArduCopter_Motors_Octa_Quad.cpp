@@ -1,6 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-#if FRAME_CONFIG ==	OCTA_QUAD_FRAME
+#include "ArduCopter_Motors_Octa_Quad.h"
 
 static void init_motors_out()
 {
@@ -192,4 +192,3 @@ static void output_motor_test()
 	delay(1000);
 }
 
-#endif
