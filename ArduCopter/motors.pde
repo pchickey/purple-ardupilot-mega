@@ -5,6 +5,20 @@
 #define DISARM_DELAY 20
 #define LEVEL_DELAY 100
 
+static void init_motors_out() {
+  AC_Motors.init_out();
+}
+static void output_motors_armed() {
+  AC_Motors.output_armed();
+}
+
+static void output_motors_disarmed() {
+  AC_Motors.output_disarmed();
+}
+
+static void output_motor_test() {
+  AC_Motors.output_test();
+}
 
 // called at 10hz
 static void arm_motors()
