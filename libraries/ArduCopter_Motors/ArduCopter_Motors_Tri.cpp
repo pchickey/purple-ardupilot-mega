@@ -1,5 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
-#if FRAME_CONFIG ==	TRI_FRAME
+
+#include "ArduCopter_Motors_Tri.h"
 
 static void init_motors_out()
 {
@@ -123,4 +124,3 @@ static void output_motor_test()
 	APM_RC.OutputCh(CH_4, motor_out[CH_4]);
 }
 
-#endif

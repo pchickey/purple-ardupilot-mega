@@ -1,6 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-#if FRAME_CONFIG ==	Y6_FRAME
+#include "ArduCopter_Motors_Y6.h"
 
 #define YAW_DIRECTION 1
 
@@ -176,4 +176,3 @@ static void output_motor_test()
 	APM_RC.OutputCh(CH_8, motor_out[CH_8]);
 }
 
-#endif
