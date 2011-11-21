@@ -2,6 +2,18 @@
 #ifndef __ARDUCOPTER_MOTORS_H__
 #define __ARDUCOPTER_MOTORS_H__
 
+/* The MINIMUM_THROTTLE used to come from ArduCopter/config.h
+ * while these files were present in the ArduCopter sketch. Now
+ * that they've moved, we need to give the define a new name
+ * (to prevent collisions) and define it in this header.
+ *
+ * If this value needs to be changed frequently by the user
+ * from the sketch config, we'll add it to the constructor
+ * and make it available as an ivar. It doesn't look like it
+ * is changed very often, though.
+ */
+#define AC_MOTORS_MINIMUM_THROTTLE 130
+
 class ArduCopter_Motors
 {
   public:

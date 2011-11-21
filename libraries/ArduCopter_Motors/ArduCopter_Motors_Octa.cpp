@@ -20,7 +20,7 @@ void ArduCopter_Motors_Octa::output_armed()
 	g.rc_3.servo_out 	= constrain(g.rc_3.servo_out, 0, 1000);
 
 	if(g.rc_3.servo_out > 0)
-		out_min = g.rc_3.radio_min + MINIMUM_THROTTLE;
+		out_min = g.rc_3.radio_min + AC_MOTORS_MINIMUM_THROTTLE;
 
 	g.rc_1.calc_pwm();
 	g.rc_2.calc_pwm();
