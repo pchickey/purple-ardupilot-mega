@@ -4,7 +4,7 @@
 
 #define YAW_DIRECTION 1
 
-static void ArduCopter_Motors_Y6::init_out()
+void ArduCopter_Motors_Y6::init_out()
 {
 	#if INSTANT_PWM == 0
     _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4
@@ -12,7 +12,7 @@ static void ArduCopter_Motors_Y6::init_out()
 	#endif
 }
 
-static void ArduCopter_Motors_Y6::output_armed()
+void ArduCopter_Motors_Y6::output_armed()
 {
 	int out_min = g.rc_3.radio_min;
 	int out_max = g.rc_3.radio_max;
@@ -121,7 +121,7 @@ static void ArduCopter_Motors_Y6::output_armed()
 	#endif
 }
 
-static void ArduCopter_Motors_Y6::output_disarmed()
+void ArduCopter_Motors_Y6::output_disarmed()
 {
 	if(g.rc_3.control_in > 0){
 		// we have pushed up the throttle
