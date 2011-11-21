@@ -157,7 +157,7 @@ void ArduCopter_Motors_Octa_Quad::output_disarmed()
 	_apm_rc->OutputCh(CH_11, g.rc_3.radio_min);
 }
 
-static void output_motor_test()
+void ArduCopter_Motors_Octa_Quad::output_test()
 {
 	_apm_rc->OutputCh(CH_8, g.rc_3.radio_min);
 	_apm_rc->OutputCh(CH_10, g.rc_3.radio_min + 100);

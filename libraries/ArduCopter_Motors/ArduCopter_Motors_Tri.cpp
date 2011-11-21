@@ -100,7 +100,7 @@ void ArduCopter_Motors_Tri::output_disarmed()
 	_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
 }
 
-static void output_motor_test()
+void ArduCopter_Motors_Tri::output_test()
 {
 	motor_out[CH_1] = g.rc_3.radio_min;
 	motor_out[CH_2] = g.rc_3.radio_min;
