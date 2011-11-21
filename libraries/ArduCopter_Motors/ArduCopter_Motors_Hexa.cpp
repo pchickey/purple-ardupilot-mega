@@ -1,5 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
+#include "WProgram.h"
 #include "ArduCopter_Motors_Hexa.h"
 
 void ArduCopter_Motors_Hexa::init_out()
