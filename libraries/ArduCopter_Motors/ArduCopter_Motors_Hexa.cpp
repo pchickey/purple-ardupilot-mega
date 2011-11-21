@@ -32,77 +32,77 @@ void ArduCopter_Motors_Hexa::output_armed()
 		pitch_out 	 	= (float)g.rc_2.pwm_out * .866;
 
 		//left side
-		motor_out[CH_2]		= g.rc_3.radio_out + g.rc_1.pwm_out;		// CCW Middle
-		motor_out[CH_3]		= g.rc_3.radio_out + roll_out + pitch_out;	// CW Front
-		motor_out[CH_8]     = g.rc_3.radio_out + roll_out - pitch_out;	// CW Back
+		_motor_out[CH_2]		= g.rc_3.radio_out + g.rc_1.pwm_out;		// CCW Middle
+		_motor_out[CH_3]		= g.rc_3.radio_out + roll_out + pitch_out;	// CW Front
+		_motor_out[CH_8]     = g.rc_3.radio_out + roll_out - pitch_out;	// CW Back
 
 		//right side
-		motor_out[CH_1]		= g.rc_3.radio_out - g.rc_1.pwm_out;		// CW Middle
-		motor_out[CH_7] 	= g.rc_3.radio_out - roll_out + pitch_out;	// CCW Front
-		motor_out[CH_4] 	= g.rc_3.radio_out - roll_out - pitch_out;	// CCW Back
+		_motor_out[CH_1]		= g.rc_3.radio_out - g.rc_1.pwm_out;		// CW Middle
+		_motor_out[CH_7] 	= g.rc_3.radio_out - roll_out + pitch_out;	// CCW Front
+		_motor_out[CH_4] 	= g.rc_3.radio_out - roll_out - pitch_out;	// CCW Back
 
 	}else{
 		roll_out 	 	= (float)g.rc_1.pwm_out * .866;
 		pitch_out 	 	= g.rc_2.pwm_out / 2;
 
 		//Front side
-		motor_out[CH_1]		= g.rc_3.radio_out + g.rc_2.pwm_out;		// CW	 FRONT
-		motor_out[CH_7] 	= g.rc_3.radio_out + roll_out + pitch_out;	// CCW	 FRONT LEFT
-		motor_out[CH_4] 	= g.rc_3.radio_out - roll_out + pitch_out;	// CCW	 FRONT RIGHT
+		_motor_out[CH_1]		= g.rc_3.radio_out + g.rc_2.pwm_out;		// CW	 FRONT
+		_motor_out[CH_7] 	= g.rc_3.radio_out + roll_out + pitch_out;	// CCW	 FRONT LEFT
+		_motor_out[CH_4] 	= g.rc_3.radio_out - roll_out + pitch_out;	// CCW	 FRONT RIGHT
 
 		//Back side
-		motor_out[CH_2]		= g.rc_3.radio_out - g.rc_2.pwm_out;		// CCW	BACK
-		motor_out[CH_3]		= g.rc_3.radio_out + roll_out - pitch_out;	// CW, 	BACK LEFT
-		motor_out[CH_8]		= g.rc_3.radio_out - roll_out - pitch_out;	// CW	BACK RIGHT
+		_motor_out[CH_2]		= g.rc_3.radio_out - g.rc_2.pwm_out;		// CCW	BACK
+		_motor_out[CH_3]		= g.rc_3.radio_out + roll_out - pitch_out;	// CW, 	BACK LEFT
+		_motor_out[CH_8]		= g.rc_3.radio_out - roll_out - pitch_out;	// CW	BACK RIGHT
 	}
 
 	// Yaw
-	motor_out[CH_2]		+= g.rc_4.pwm_out;	// CCW
-	motor_out[CH_7]		+= g.rc_4.pwm_out;	// CCW
-	motor_out[CH_4] 	+= g.rc_4.pwm_out;	// CCW
+	_motor_out[CH_2]		+= g.rc_4.pwm_out;	// CCW
+	_motor_out[CH_7]		+= g.rc_4.pwm_out;	// CCW
+	_motor_out[CH_4] 	+= g.rc_4.pwm_out;	// CCW
 
-	motor_out[CH_3]		-= g.rc_4.pwm_out;	// CW
-	motor_out[CH_1]		-= g.rc_4.pwm_out;	// CW
-	motor_out[CH_8]		-= g.rc_4.pwm_out;  // CW
+	_motor_out[CH_3]		-= g.rc_4.pwm_out;	// CW
+	_motor_out[CH_1]		-= g.rc_4.pwm_out;	// CW
+	_motor_out[CH_8]		-= g.rc_4.pwm_out;  // CW
 
 
 	// Tridge's stability patch
     for (int i = CH_1; i<=CH_8; i++) {
 	if(i == CH_5 || i == CH_6)
 		break;
-        if (motor_out[i] > out_max) {
+        if (_motor_out[i] > out_max) {
             // note that i^1 is the opposite motor
-            motor_out[i^1] -= motor_out[i] - out_max;
-            motor_out[i] = out_max;
+            _motor_out[i^1] -= _motor_out[i] - out_max;
+            _motor_out[i] = out_max;
         }
     }
 
 	// limit output so motors don't stop
-	motor_out[CH_1] = max(motor_out[CH_1],  out_min);
-	motor_out[CH_2] = max(motor_out[CH_2],  out_min);
-	motor_out[CH_3] = max(motor_out[CH_3],  out_min);
-	motor_out[CH_4] = max(motor_out[CH_4],  out_min);
-	motor_out[CH_7] = max(motor_out[CH_7],  out_min);
-	motor_out[CH_8] = max(motor_out[CH_8],  out_min);
+	_motor_out[CH_1] = max(_motor_out[CH_1],  out_min);
+	_motor_out[CH_2] = max(_motor_out[CH_2],  out_min);
+	_motor_out[CH_3] = max(_motor_out[CH_3],  out_min);
+	_motor_out[CH_4] = max(_motor_out[CH_4],  out_min);
+	_motor_out[CH_7] = max(_motor_out[CH_7],  out_min);
+	_motor_out[CH_8] = max(_motor_out[CH_8],  out_min);
 
 	#if CUT_MOTORS == ENABLED
 	// if we are not sending a throttle output, we cut the motors
 	if(g.rc_3.servo_out == 0){
-		motor_out[CH_1]		= g.rc_3.radio_min;
-		motor_out[CH_2]		= g.rc_3.radio_min;
-		motor_out[CH_3]		= g.rc_3.radio_min;
-		motor_out[CH_4] 	= g.rc_3.radio_min;
-		motor_out[CH_7] 	= g.rc_3.radio_min;
-		motor_out[CH_8] 	= g.rc_3.radio_min;
+		_motor_out[CH_1]		= g.rc_3.radio_min;
+		_motor_out[CH_2]		= g.rc_3.radio_min;
+		_motor_out[CH_3]		= g.rc_3.radio_min;
+		_motor_out[CH_4] 	= g.rc_3.radio_min;
+		_motor_out[CH_7] 	= g.rc_3.radio_min;
+		_motor_out[CH_8] 	= g.rc_3.radio_min;
 	}
 	#endif
 
-	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
-	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
-	_apm_rc->OutputCh(CH_3, motor_out[CH_3]);
-	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
-	_apm_rc->OutputCh(CH_7, motor_out[CH_7]);
-	_apm_rc->OutputCh(CH_8, motor_out[CH_8]);
+	_apm_rc->OutputCh(CH_1, _motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, _motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, _motor_out[CH_3]);
+	_apm_rc->OutputCh(CH_4, _motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_7, _motor_out[CH_7]);
+	_apm_rc->OutputCh(CH_8, _motor_out[CH_8]);
 
 	#if INSTANT_PWM == 1
 	// InstantPWM
@@ -121,9 +121,9 @@ void ArduCopter_Motors_Hexa::output_disarmed()
 		motor_auto_armed = true;
 	}
 
-	// fill the motor_out[] array for HIL use
+	// fill the _motor_out[] array for HIL use
 	for (unsigned char i = 0; i < 8; i++) {
-		motor_out[i] = g.rc_3.radio_min;
+		_motor_out[i] = g.rc_3.radio_min;
 	}
 
 	// Send commands to motors
@@ -137,33 +137,33 @@ void ArduCopter_Motors_Hexa::output_disarmed()
 
 void ArduCopter_Motors_Hexa::output_test()
 {
-	motor_out[CH_1] = g.rc_3.radio_min;
-	motor_out[CH_2] = g.rc_3.radio_min;
-	motor_out[CH_3] = g.rc_3.radio_min;
-	motor_out[CH_4] = g.rc_3.radio_min;
-	motor_out[CH_7] = g.rc_3.radio_min;
-	motor_out[CH_8] = g.rc_3.radio_min;
+	_motor_out[CH_1] = g.rc_3.radio_min;
+	_motor_out[CH_2] = g.rc_3.radio_min;
+	_motor_out[CH_3] = g.rc_3.radio_min;
+	_motor_out[CH_4] = g.rc_3.radio_min;
+	_motor_out[CH_7] = g.rc_3.radio_min;
+	_motor_out[CH_8] = g.rc_3.radio_min;
 
 
 	if(g.frame_orientation == X_FRAME){
 //  31
 //	24
 		if(g.rc_1.control_in > 3000){	// right
-			motor_out[CH_1] += 100;
+			_motor_out[CH_1] += 100;
 		}
 
 		if(g.rc_1.control_in < -3000){	// left
-			motor_out[CH_2] += 100;
+			_motor_out[CH_2] += 100;
 		}
 
 		if(g.rc_2.control_in > 3000){ 	// back
-			motor_out[CH_8] += 100;
-			motor_out[CH_4] += 100;
+			_motor_out[CH_8] += 100;
+			_motor_out[CH_4] += 100;
 		}
 
 		if(g.rc_2.control_in < -3000){	// front
-			motor_out[CH_7] += 100;
-			motor_out[CH_3] += 100;
+			_motor_out[CH_7] += 100;
+			_motor_out[CH_3] += 100;
 		}
 
 	}else{
@@ -171,31 +171,31 @@ void ArduCopter_Motors_Hexa::output_test()
 // 2 1
 //	4
 		if(g.rc_1.control_in > 3000){	// right
-			motor_out[CH_4] += 100;
-			motor_out[CH_8] += 100;
+			_motor_out[CH_4] += 100;
+			_motor_out[CH_8] += 100;
 		}
 
 		if(g.rc_1.control_in < -3000){	// left
-			motor_out[CH_7] += 100;
-			motor_out[CH_3] += 100;
+			_motor_out[CH_7] += 100;
+			_motor_out[CH_3] += 100;
 		}
 
 		if(g.rc_2.control_in > 3000){ 	// back
-			motor_out[CH_2] += 100;
+			_motor_out[CH_2] += 100;
 		}
 
 		if(g.rc_2.control_in < -3000){	// front
-			motor_out[CH_1] += 100;
+			_motor_out[CH_1] += 100;
 		}
 
 	}
 
-	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
-	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
-	_apm_rc->OutputCh(CH_3, motor_out[CH_3]);
-	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
-	_apm_rc->OutputCh(CH_7, motor_out[CH_7]);
-	_apm_rc->OutputCh(CH_8, motor_out[CH_8]);
+	_apm_rc->OutputCh(CH_1, _motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, _motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, _motor_out[CH_3]);
+	_apm_rc->OutputCh(CH_4, _motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_7, _motor_out[CH_7]);
+	_apm_rc->OutputCh(CH_8, _motor_out[CH_8]);
 }
 
 /*
