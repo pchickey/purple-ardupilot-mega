@@ -2,6 +2,7 @@
 #ifndef __ARDUCOPTER_MOTORS_OCTA_QUAD_H__
 #define __ARDUCOPTER_MOTORS_OCTA_QUAD_H__
 
+#include "../APM_RC/APM_RC.h"
 #include "ArduCopter_Motors.h"
 
 class ArduCopter_Motors_Octa_Quad : public ArduCopter_Motors
