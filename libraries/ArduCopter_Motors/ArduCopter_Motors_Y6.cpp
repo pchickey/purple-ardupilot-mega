@@ -7,7 +7,7 @@
 static void ArduCopter_Motors_Y6::init_out()
 {
 	#if INSTANT_PWM == 0
-    APM_RC.SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4
+    _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4
                                 | MSK_CH_7 | MSK_CH_8 );
 	#endif
 }
@@ -106,18 +106,18 @@ static void ArduCopter_Motors_Y6::output_armed()
 	}
 	#endif
 
-	APM_RC.OutputCh(CH_1, motor_out[CH_1]);
-	APM_RC.OutputCh(CH_2, motor_out[CH_2]);
-	APM_RC.OutputCh(CH_3, motor_out[CH_3]);
-	APM_RC.OutputCh(CH_4, motor_out[CH_4]);
-	APM_RC.OutputCh(CH_7, motor_out[CH_7]);
-	APM_RC.OutputCh(CH_8, motor_out[CH_8]);
+	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, motor_out[CH_3]);
+	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_7, motor_out[CH_7]);
+	_apm_rc->OutputCh(CH_8, motor_out[CH_8]);
 
 	#if INSTANT_PWM == 1
 	// InstantPWM
-	APM_RC.Force_Out0_Out1();
-	APM_RC.Force_Out2_Out3();
-	APM_RC.Force_Out6_Out7();
+	_apm_rc->Force_Out0_Out1();
+	_apm_rc->Force_Out2_Out3();
+	_apm_rc->Force_Out6_Out7();
 	#endif
 }
 
@@ -135,12 +135,12 @@ static void ArduCopter_Motors_Y6::output_disarmed()
 	}
 
 	// Send commands to motors
-	APM_RC.OutputCh(CH_1, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_2, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_3, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_4, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_7, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_8, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_3, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_7, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_8, g.rc_3.radio_min);
 }
 
 static void output_motor_test()
@@ -168,11 +168,11 @@ static void output_motor_test()
 		motor_out[CH_4] += 100;
 	}
 
-	APM_RC.OutputCh(CH_1, motor_out[CH_1]);
-	APM_RC.OutputCh(CH_2, motor_out[CH_2]);
-	APM_RC.OutputCh(CH_3, motor_out[CH_4]);
-	APM_RC.OutputCh(CH_4, motor_out[CH_4]);
-	APM_RC.OutputCh(CH_7, motor_out[CH_7]);
-	APM_RC.OutputCh(CH_8, motor_out[CH_8]);
+	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_7, motor_out[CH_7]);
+	_apm_rc->OutputCh(CH_8, motor_out[CH_8]);
 }
 

@@ -5,7 +5,7 @@
 static void ArduCopter_Motors_Quad::init_out()
 {
 	#if INSTANT_PWM == 0
-    APM_RC.SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
+    _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
 	#endif
 }
 
@@ -89,15 +89,15 @@ static void ArduCopter_Motors_Quad::output_armed()
 	}
 	#endif
 
-	APM_RC.OutputCh(CH_1, motor_out[CH_1]);
-	APM_RC.OutputCh(CH_2, motor_out[CH_2]);
-	APM_RC.OutputCh(CH_3, motor_out[CH_3]);
-	APM_RC.OutputCh(CH_4, motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, motor_out[CH_3]);
+	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
 
 	#if INSTANT_PWM == 1
 	// InstantPWM
-	APM_RC.Force_Out0_Out1();
-	APM_RC.Force_Out2_Out3();
+	_apm_rc->Force_Out0_Out1();
+	_apm_rc->Force_Out2_Out3();
 	#endif
 }
 
@@ -115,14 +115,14 @@ static void ArduCopter_Motors_Quad::output_disarmed()
 	}
 
 	// Send commands to motors
-	APM_RC.OutputCh(CH_1, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_2, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_3, g.rc_3.radio_min);
-	APM_RC.OutputCh(CH_4, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_3, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
 
 	// InstantPWM
-	APM_RC.Force_Out0_Out1();
-	APM_RC.Force_Out2_Out3();
+	_apm_rc->Force_Out0_Out1();
+	_apm_rc->Force_Out2_Out3();
 }
 
 /*
@@ -184,9 +184,9 @@ static void output_motor_test()
 			motor_out[CH_3] += 100;
 	}
 
-	APM_RC.OutputCh(CH_1, motor_out[CH_1]);
-	APM_RC.OutputCh(CH_2, motor_out[CH_2]);
-	APM_RC.OutputCh(CH_3, motor_out[CH_3]);
-	APM_RC.OutputCh(CH_4, motor_out[CH_4]);
+	_apm_rc->OutputCh(CH_1, motor_out[CH_1]);
+	_apm_rc->OutputCh(CH_2, motor_out[CH_2]);
+	_apm_rc->OutputCh(CH_3, motor_out[CH_3]);
+	_apm_rc->OutputCh(CH_4, motor_out[CH_4]);
 }
 
