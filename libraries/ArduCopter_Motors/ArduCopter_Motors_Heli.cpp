@@ -242,7 +242,7 @@ void ArduCopter_Motors_Heli::output_disarmed()
 	output_armed();
 }
 
-static void output_motor_test()
+void ArduCopter_Motors_Heli::output_test()
 {
 }
 

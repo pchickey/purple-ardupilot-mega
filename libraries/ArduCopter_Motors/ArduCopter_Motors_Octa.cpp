@@ -190,7 +190,7 @@ void ArduCopter_Motors_Octa::output_disarmed()
 	_apm_rc->OutputCh(CH_10, g.rc_3.radio_min);
 }
 
-static void output_motor_test()
+void ArduCopter_Motors_Octa::output_test()
 {
 	if( g.frame_orientation == X_FRAME || g.frame_orientation == PLUS_FRAME )
 	{

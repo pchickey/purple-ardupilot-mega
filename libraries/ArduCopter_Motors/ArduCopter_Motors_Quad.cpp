@@ -136,7 +136,7 @@ static void debug_motors()
 }
 */
 
-static void output_motor_test()
+void ArduCopter_Motors_Quad::output_test()
 {
 	motor_out[CH_1] = g.rc_3.radio_min;
 	motor_out[CH_2] = g.rc_3.radio_min;
