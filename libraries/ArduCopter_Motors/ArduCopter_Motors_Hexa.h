@@ -2,6 +2,7 @@
 #ifndef __ARDUCOPTER_MOTORS_HEXA_H__
 #define __ARDUCOPTER_MOTORS_HEXA_H__
 
+#include "../APM_RC/APM_RC.h"
 #include "ArduCopter_Motors.h"
 
 class ArduCopter_Motors_Hexa : public ArduCopter_Motors
