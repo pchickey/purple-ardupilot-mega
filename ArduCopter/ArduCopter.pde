@@ -237,20 +237,21 @@ AP_TimerProcess timer_scheduler;
 //////////////////////////////////////////////////////////////////////////////
 // ArduCopter_Motors selection
 //////////////////////////////////////////////////////////////////////////////
+static int16_t  motor_out[8];
 #if FRAME_CONFIG == HELI_FRAME
-  ArduCopter_Motors_Heli AC_Motors( &APM_RC );
+  ArduCopter_Motors_Heli AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == HEXA_FRAME
-  ArduCopter_Motors_Hexa AC_Motors( &APM_RC );
+  ArduCopter_Motors_Hexa AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == OCTA_FRAME
-  ArduCopter_Motors_Octa AC_Motors( &APM_RC );
+  ArduCopter_Motors_Octa AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == OCTA_QUAD_FRAME
-  ArduCopter_Motors_Octa_Quad AC_Motors( &APM_RC );
+  ArduCopter_Motors_Octa_Quad AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == QUAD_FRAME
-  ArduCopter_Motors_Quad AC_Motors( &APM_RC );
+  ArduCopter_Motors_Quad AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == TRI_FRAME
-  ArduCopter_Motors_Tri AC_Motors( &APM_RC );
+  ArduCopter_Motors_Tri AC_Motors( &APM_RC, motor_out );
 #elif FRAME_CONFIG == Y6_FRAME
-  ArduCopter_Motors_Y6 AC_Motors( &APM_RC );
+  ArduCopter_Motors_Y6 AC_Motors( &APM_RC, motor_out );
 #else
 #error Must define a valid FRAME_CONFIG
 #endif
@@ -331,7 +332,6 @@ static int16_t x_rate_error;
 static byte 	control_mode		= STABILIZE;
 static byte 	old_control_mode	= STABILIZE;
 static byte 	oldSwitchPosition;					// for remembering the control mode switch
-static int16_t  motor_out[8];
 static bool		do_simple = false;
 
 // Heli
