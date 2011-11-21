@@ -2,7 +2,7 @@
 
 #include "ArduCopter_Motors_Hexa.h"
 
-static void ArduCopter_Motors_Hexa::init_out()
+void ArduCopter_Motors_Hexa::init_out()
 {
 	#if INSTANT_PWM == 0
     _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4
@@ -10,7 +10,7 @@ static void ArduCopter_Motors_Hexa::init_out()
 	#endif
 }
 
-static void ArduCopter_Motors_Hexa::output_armed()
+void ArduCopter_Motors_Hexa::output_armed()
 {
 	int roll_out, pitch_out;
 	int out_min = g.rc_3.radio_min;
@@ -113,7 +113,7 @@ static void ArduCopter_Motors_Hexa::output_armed()
 
 }
 
-static void ArduCopter_Motors_Hexa::output_disarmed()
+void ArduCopter_Motors_Hexa::output_disarmed()
 {
 	if(g.rc_3.control_in > 0){
 		// we have pushed up the throttle

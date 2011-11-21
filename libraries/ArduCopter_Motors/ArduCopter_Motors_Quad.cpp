@@ -2,14 +2,14 @@
 
 #include "ArduCopter_Motors_Quad.h"
 
-static void ArduCopter_Motors_Quad::init_out()
+void ArduCopter_Motors_Quad::init_out()
 {
 	#if INSTANT_PWM == 0
     _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
 	#endif
 }
 
-static void ArduCopter_Motors_Quad::output_armed()
+void ArduCopter_Motors_Quad::output_armed()
 {
 	int roll_out, pitch_out;
 	int out_min = g.rc_3.radio_min;
@@ -101,7 +101,7 @@ static void ArduCopter_Motors_Quad::output_armed()
 	#endif
 }
 
-static void ArduCopter_Motors_Quad::output_disarmed()
+void ArduCopter_Motors_Quad::output_disarmed()
 {
 	if(g.rc_3.control_in > 0){
 		// we have pushed up the throttle
