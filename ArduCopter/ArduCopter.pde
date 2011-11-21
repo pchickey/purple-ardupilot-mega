@@ -238,19 +238,19 @@ AP_TimerProcess timer_scheduler;
 // ArduCopter_Motors selection
 //////////////////////////////////////////////////////////////////////////////
 #if FRAME_CONFIG == HELI_FRAME
-  ArduCopter_Motors_Heli AC_Motors;
+  ArduCopter_Motors_Heli AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == HEXA_FRAME
-  ArduCopter_Motors_Hexa AC_Motors;
+  ArduCopter_Motors_Hexa AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == OCTA_FRAME
-  ArduCopter_Motors_Octa AC_Motors;
+  ArduCopter_Motors_Octa AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == OCTA_QUAD_FRAME
-  ArduCopter_Motors_Octa_Quad AC_Motors;
+  ArduCopter_Motors_Octa_Quad AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == QUAD_FRAME
-  ArduCopter_Motors_Quad AC_Motors;
+  ArduCopter_Motors_Quad AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == TRI_FRAME
-  ArduCopter_Motors_Tri AC_Motors;
+  ArduCopter_Motors_Tri AC_Motors( &APM_RC );
 #elif FRAME_CONFIG == Y6_FRAME
-  ArduCopter_Motors_Y6 AC_Motors;
+  ArduCopter_Motors_Y6 AC_Motors( &APM_RC );
 #else
 #error Must define a valid FRAME_CONFIG
 #endif
