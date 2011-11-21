@@ -143,20 +143,20 @@ static void heli_move_swash(int roll_out, int pitch_out, int coll_out, int yaw_o
 		}
 		
 		// actually move the servos
-		APM_RC.OutputCh(CH_1, heli_servo_out[0]);
-		APM_RC.OutputCh(CH_2, heli_servo_out[1]);
-		APM_RC.OutputCh(CH_3, heli_servo_out[2]);
-		APM_RC.OutputCh(CH_4, heli_servo_out[3]);
+		_apm_rc->OutputCh(CH_1, heli_servo_out[0]);
+		_apm_rc->OutputCh(CH_2, heli_servo_out[1]);
+		_apm_rc->OutputCh(CH_3, heli_servo_out[2]);
+		_apm_rc->OutputCh(CH_4, heli_servo_out[3]);
 		
 		// output gyro value
 		if( g.heli_ext_gyro_enabled ) {
-			APM_RC.OutputCh(CH_7, g.heli_ext_gyro_gain);
+			_apm_rc->OutputCh(CH_7, g.heli_ext_gyro_gain);
 		}
 
 		#if INSTANT_PWM == 1
 		// InstantPWM
-		APM_RC.Force_Out0_Out1();
-		APM_RC.Force_Out2_Out3();
+		_apm_rc->Force_Out0_Out1();
+		_apm_rc->Force_Out2_Out3();
 		#endif
 
 		// reset the averaging
@@ -171,7 +171,7 @@ static void heli_move_swash(int roll_out, int pitch_out, int coll_out, int yaw_o
 static void ArduCopter_Motors_Heli::init_out()
 {
 	#if INSTANT_PWM == 0
-    APM_RC.SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
+    _apm_rc->SetFastOutputChannels( MSK_CH_1 | MSK_CH_2 | MSK_CH_3 | MSK_CH_4 );
 	#endif
 }
 
