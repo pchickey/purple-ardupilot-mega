@@ -12,6 +12,7 @@ class ArduCopter_Motors_Heli : public ArduCopter_Motors
   ArduCopter_Motors_Heli(APM_RC_Class *apm_rc, int16_t *motor_out) :
     _apm_rc(apm_rc) , _motor_out(motor_out) {}
 
+  void init();
   void init_out();
   void output_armed();
   void output_disarmed();

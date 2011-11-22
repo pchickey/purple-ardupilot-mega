@@ -22,6 +22,7 @@
 class ArduCopter_Motors
 {
   public:
+  virtual void init() = 0;
   virtual void init_out() = 0;
   virtual void output_armed() = 0;
   virtual void output_disarmed() = 0;
