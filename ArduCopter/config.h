@@ -62,7 +62,7 @@
 # define FRAME_CONFIG		QUAD_FRAME
 #endif
 #ifndef FRAME_ORIENTATION
-# define FRAME_ORIENTATION		PLUS_FRAME
+# define FRAME_ORIENTATION		AC_MOTORS_PLUS_FRAME
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

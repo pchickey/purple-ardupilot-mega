@@ -255,13 +255,13 @@ static int8_t
 setup_frame(uint8_t argc, const Menu::arg *argv)
 {
 	if (!strcmp_P(argv[1].str, PSTR("x"))) {
-		g.frame_orientation.set_and_save(X_FRAME);
+		g.frame_orientation.set_and_save(AC_MOTORS_X_FRAME);
 	} else if (!strcmp_P(argv[1].str, PSTR("p"))) {
-		g.frame_orientation.set_and_save(PLUS_FRAME);
+		g.frame_orientation.set_and_save(AC_MOTORS_PLUS_FRAME);
 	} else if (!strcmp_P(argv[1].str, PSTR("+"))) {
-		g.frame_orientation.set_and_save(PLUS_FRAME);
+		g.frame_orientation.set_and_save(AC_MOTORS_PLUS_FRAME);
 	} else if (!strcmp_P(argv[1].str, PSTR("v"))) {
-		g.frame_orientation.set_and_save(V_FRAME);
+		g.frame_orientation.set_and_save(AC_MOTORS_V_FRAME);
 	}else{
 		Serial.printf_P(PSTR("\nOp:[x,+,v]\n"));
 		report_frame();
@@ -828,11 +828,11 @@ static void report_frame()
 #endif
 
 #if FRAME_CONFIG != HELI_FRAME
-	if(g.frame_orientation == X_FRAME)
+	if(g.frame_orientation == AC_MOTORS_X_FRAME)
 		Serial.printf_P(PSTR("X mode\n"));
-	else if(g.frame_orientation == PLUS_FRAME)
+	else if(g.frame_orientation == AC_MOTORS_PLUS_FRAME)
 		Serial.printf_P(PSTR("+ mode\n"));
-	else if(g.frame_orientation == V_FRAME)
+	else if(g.frame_orientation == AC_MOTORS_V_FRAME)
 		Serial.printf_P(PSTR("V mode\n"));
 #endif
 

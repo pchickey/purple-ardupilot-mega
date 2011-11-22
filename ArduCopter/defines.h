@@ -51,10 +51,6 @@
 #define HELI_FRAME 5
 #define OCTA_QUAD_FRAME 6
 
-#define PLUS_FRAME 0
-#define X_FRAME 1
-#define V_FRAME 2
-
 // LED output
 #define NORMAL_LEDS 0
 #define AUTO_TRIM_LEDS 1

@@ -27,7 +27,7 @@ void ArduCopter_Motors_Quad::output_armed()
 	_rc_3->calc_pwm();
 	_rc_4->calc_pwm();
 
-	if(_frame_orientation == X_FRAME){
+	if(_frame_orientation == AC_MOTORS_X_FRAME){
 		roll_out 	 	= _rc_1->pwm_out * .707;
 		pitch_out 	 	= _rc_2->pwm_out * .707;
 
@@ -145,7 +145,7 @@ void ArduCopter_Motors_Quad::output_test()
 	_motor_out[CH_4] = _rc_3->radio_min;
 
 
-	if(_frame_orientation == X_FRAME){
+	if(_frame_orientation == AC_MOTORS_X_FRAME){
 //  31
 //	24
 		if(_rc_1->control_in > 3000){
