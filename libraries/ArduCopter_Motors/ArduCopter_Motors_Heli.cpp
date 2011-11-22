@@ -6,6 +6,14 @@
 #define HELI_SERVO_AVERAGING_DIGITAL 0  // 250Hz
 #define HELI_SERVO_AVERAGING_ANALOG  2  // 125Hz
 
+void ArduCopter_Motors_Heli::_init_g() {
+  // TODO
+}
+
+void ArduCopter_Motors_Heli::init() {
+  _init_g();
+}
+
 static float heli_throttle_scaler = 0;
 static bool heli_swash_initialised = false;
 
@@ -181,27 +189,27 @@ void ArduCopter_Motors_Heli::output_armed()
 {
     // if manual override (i.e. when setting up swash), pass pilot commands straight through to swash
     if( g.heli_servo_manual == 1 ) {
-		g.rc_1.servo_out = g.rc_1.control_in;
-		g.rc_2.servo_out = g.rc_2.control_in;
-		g.rc_3.servo_out = g.rc_3.control_in;
-		g.rc_4.servo_out = g.rc_4.control_in;
+		_rc_1->servo_out = _rc_1->control_in;
+		_rc_2->servo_out = _rc_2->control_in;
+		_rc_3->servo_out = _rc_3->control_in;
+		_rc_4->servo_out = _rc_4->control_in;
 	}
 	
     //static int counter = 0;
-	g.rc_1.calc_pwm();
-	g.rc_2.calc_pwm();
-	g.rc_3.calc_pwm();
-	g.rc_4.calc_pwm();
+	_rc_1->calc_pwm();
+	_rc_2->calc_pwm();
+	_rc_3->calc_pwm();
+	_rc_4->calc_pwm();
 
-	heli_move_swash( g.rc_1.servo_out, g.rc_2.servo_out, g.rc_3.radio_out, g.rc_4.servo_out );
+	heli_move_swash( _rc_1->servo_out, _rc_2->servo_out, _rc_3->radio_out, _rc_4->servo_out );
 }
 
 // for helis - armed or disarmed we allow servos to move
 void ArduCopter_Motors_Heli::output_disarmed()
 {
-	if(g.rc_3.control_in > 0){
+	if(_rc_3->control_in > 0){
 		// we have pushed up the throttle, remove safety
-		motor_auto_armed = true;
+		*_motor_auto_armed = true;
 	}
 
 	output_armed();

@@ -10,7 +10,9 @@
 //
 class Parameters :
     public ArduCopter_Motors_MulticopterDelegate
-class Parameters {
+#if FRAME_CONFIG == HELI_FRAME
+  , public ArduCopter_Motors_HeliDelegate
+#endif
 {
 public:
 	// The version of the layout as described by the parameter enum.
@@ -422,6 +424,11 @@ public:
   RC_Channel * get_rc_8() { return &rc_8; }
   int8_t       get_frame_orientation() { return frame_orientation.get(); }
   float        get_top_bottom_ratio()  { return top_bottom_ratio.get(); }
+  #if FRAME_CONFIG == HELI
+  /* ArduCopter_Motors_HeliDelegate Implementation */
+  // TODO
+  #endif
+
 };
 
 #endif // PARAMETERS_H
