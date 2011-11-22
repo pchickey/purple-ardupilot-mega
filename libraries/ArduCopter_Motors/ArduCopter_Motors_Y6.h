@@ -16,6 +16,7 @@ class ArduCopter_Motors_Y6 :
                        boolean* auto_armed  ) :
     ArduCopter_Motors_Multicopter(g, apm_rc, motor_out, auto_armed) {}
 
+  void init();
   void init_out();
   void output_armed();
   void output_disarmed();
