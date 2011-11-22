@@ -14,103 +14,103 @@ void ArduCopter_Motors_Octa::init_out()
 void ArduCopter_Motors_Octa::output_armed()
 {
 	int roll_out, pitch_out;
-	int out_min = g.rc_3.radio_min;
-	int out_max = g.rc_3.radio_max;
+	int out_min = _rc_3->radio_min;
+	int out_max = _rc_3->radio_max;
 
 	// Throttle is 0 to 1000 only
-	g.rc_3.servo_out 	= constrain(g.rc_3.servo_out, 0, 1000);
+	_rc_3->servo_out 	= constrain(_rc_3->servo_out, 0, 1000);
 
-	if(g.rc_3.servo_out > 0)
-		out_min = g.rc_3.radio_min + AC_MOTORS_MINIMUM_THROTTLE;
+	if(_rc_3->servo_out > 0)
+		out_min = _rc_3->radio_min + AC_MOTORS_MINIMUM_THROTTLE;
 
-	g.rc_1.calc_pwm();
-	g.rc_2.calc_pwm();
-	g.rc_3.calc_pwm();
-	g.rc_4.calc_pwm();
+	_rc_1->calc_pwm();
+	_rc_2->calc_pwm();
+	_rc_3->calc_pwm();
+	_rc_4->calc_pwm();
 
-	if(g.frame_orientation == X_FRAME){
-		roll_out 	 	= (float)g.rc_1.pwm_out * 0.4;
-		pitch_out 	 	= (float)g.rc_2.pwm_out * 0.4;
-
-		//Front side
-		_motor_out[CH_1]		= g.rc_3.radio_out + g.rc_2.pwm_out - roll_out;	 // CW	 FRONT RIGHT
-		_motor_out[CH_7] 	= g.rc_3.radio_out + g.rc_2.pwm_out + roll_out;	 // CCW	 FRONT LEFT
-
-		//Back side
-		_motor_out[CH_2]		= g.rc_3.radio_out - g.rc_2.pwm_out + roll_out;	 // CW	 BACK LEFT
-		_motor_out[CH_4]		= g.rc_3.radio_out - g.rc_2.pwm_out - roll_out;	 // CCW  BACK RIGHT
-
-		//Left side
-		_motor_out[CH_10] 	= g.rc_3.radio_out + g.rc_1.pwm_out + pitch_out; // CW	 LEFT FRONT
-		_motor_out[CH_8] 	= g.rc_3.radio_out + g.rc_1.pwm_out - pitch_out; // CCW	 LEFT BACK
-
-		//Right side
-		_motor_out[CH_11] 	= g.rc_3.radio_out - g.rc_1.pwm_out - pitch_out; // CW	 RIGHT BACK
-		_motor_out[CH_3]		= g.rc_3.radio_out - g.rc_1.pwm_out + pitch_out; // CCW	 RIGHT FRONT
-
-	}else if(g.frame_orientation == PLUS_FRAME){
-		roll_out 		= (float)g.rc_1.pwm_out * 0.71;
-		pitch_out 	 	= (float)g.rc_2.pwm_out * 0.71;
+	if(_frame_orientation == X_FRAME){
+		roll_out 	 	= (float)_rc_1->pwm_out * 0.4;
+		pitch_out 	 	= (float)_rc_2->pwm_out * 0.4;
 
 		//Front side
-		_motor_out[CH_1]		= g.rc_3.radio_out + g.rc_2.pwm_out;		// CW	FRONT
-		_motor_out[CH_3] 	= g.rc_3.radio_out - roll_out + pitch_out;	// CCW	FRONT RIGHT
-		_motor_out[CH_7] 	= g.rc_3.radio_out + roll_out + pitch_out;	// CCW	FRONT LEFT
-
-		//Left side
-		_motor_out[CH_10] 	= g.rc_3.radio_out + g.rc_1.pwm_out;		// CW	LEFT
-
-		//Right side
-		_motor_out[CH_11] 	= g.rc_3.radio_out - g.rc_1.pwm_out;		// CW	RIGHT
+		_motor_out[CH_1]		= _rc_3->radio_out + _rc_2->pwm_out - roll_out;	 // CW	 FRONT RIGHT
+		_motor_out[CH_7] 	= _rc_3->radio_out + _rc_2->pwm_out + roll_out;	 // CCW	 FRONT LEFT
 
 		//Back side
-		_motor_out[CH_2]		= g.rc_3.radio_out - g.rc_2.pwm_out;		// CW	BACK
-		_motor_out[CH_4]		= g.rc_3.radio_out - roll_out - pitch_out;	// CCW 	BACK RIGHT
-		_motor_out[CH_8]		= g.rc_3.radio_out + roll_out - pitch_out;	// CCW	BACK LEFT
+		_motor_out[CH_2]		= _rc_3->radio_out - _rc_2->pwm_out + roll_out;	 // CW	 BACK LEFT
+		_motor_out[CH_4]		= _rc_3->radio_out - _rc_2->pwm_out - roll_out;	 // CCW  BACK RIGHT
 
-	}else if(g.frame_orientation == V_FRAME){
+		//Left side
+		_motor_out[CH_10] 	= _rc_3->radio_out + _rc_1->pwm_out + pitch_out; // CW	 LEFT FRONT
+		_motor_out[CH_8] 	= _rc_3->radio_out + _rc_1->pwm_out - pitch_out; // CCW	 LEFT BACK
+
+		//Right side
+		_motor_out[CH_11] 	= _rc_3->radio_out - _rc_1->pwm_out - pitch_out; // CW	 RIGHT BACK
+		_motor_out[CH_3]		= _rc_3->radio_out - _rc_1->pwm_out + pitch_out; // CCW	 RIGHT FRONT
+
+	}else if(_frame_orientation == PLUS_FRAME){
+		roll_out 		= (float)_rc_1->pwm_out * 0.71;
+		pitch_out 	 	= (float)_rc_2->pwm_out * 0.71;
+
+		//Front side
+		_motor_out[CH_1]		= _rc_3->radio_out + _rc_2->pwm_out;		// CW	FRONT
+		_motor_out[CH_3] 	= _rc_3->radio_out - roll_out + pitch_out;	// CCW	FRONT RIGHT
+		_motor_out[CH_7] 	= _rc_3->radio_out + roll_out + pitch_out;	// CCW	FRONT LEFT
+
+		//Left side
+		_motor_out[CH_10] 	= _rc_3->radio_out + _rc_1->pwm_out;		// CW	LEFT
+
+		//Right side
+		_motor_out[CH_11] 	= _rc_3->radio_out - _rc_1->pwm_out;		// CW	RIGHT
+
+		//Back side
+		_motor_out[CH_2]		= _rc_3->radio_out - _rc_2->pwm_out;		// CW	BACK
+		_motor_out[CH_4]		= _rc_3->radio_out - roll_out - pitch_out;	// CCW 	BACK RIGHT
+		_motor_out[CH_8]		= _rc_3->radio_out + roll_out - pitch_out;	// CCW	BACK LEFT
+
+	}else if(_frame_orientation == V_FRAME){
 
 		int roll_out2, pitch_out2;
 		int roll_out3, pitch_out3;
 		int roll_out4, pitch_out4;
 
-		roll_out 	 	= g.rc_1.pwm_out;
-		pitch_out 	 	= g.rc_2.pwm_out;
-		roll_out2 	 	= (float)g.rc_1.pwm_out * 0.833;
-		pitch_out2 	 	= (float)g.rc_2.pwm_out * 0.34;
-		roll_out3 	 	= (float)g.rc_1.pwm_out * 0.666;
-		pitch_out3 	 	= (float)g.rc_2.pwm_out * 0.32;
-		roll_out4 	 	= g.rc_1.pwm_out / 2;
-		pitch_out4 	 	= (float)g.rc_2.pwm_out * 0.98;
+		roll_out 	 	= _rc_1->pwm_out;
+		pitch_out 	 	= _rc_2->pwm_out;
+		roll_out2 	 	= (float)_rc_1->pwm_out * 0.833;
+		pitch_out2 	 	= (float)_rc_2->pwm_out * 0.34;
+		roll_out3 	 	= (float)_rc_1->pwm_out * 0.666;
+		pitch_out3 	 	= (float)_rc_2->pwm_out * 0.32;
+		roll_out4 	 	= _rc_1->pwm_out / 2;
+		pitch_out4 	 	= (float)_rc_2->pwm_out * 0.98;
 
 		//Front side
-		_motor_out[CH_10]	= g.rc_3.radio_out + g.rc_2.pwm_out - roll_out;		// CW  FRONT RIGHT
-		_motor_out[CH_7] 	= g.rc_3.radio_out + g.rc_2.pwm_out + roll_out;		// CCW FRONT LEFT
+		_motor_out[CH_10]	= _rc_3->radio_out + _rc_2->pwm_out - roll_out;		// CW  FRONT RIGHT
+		_motor_out[CH_7] 	= _rc_3->radio_out + _rc_2->pwm_out + roll_out;		// CCW FRONT LEFT
 
 		//Left side
-		_motor_out[CH_1] 	= g.rc_3.radio_out + g.rc_1.pwm_out + pitch_out2; 	// CW  LEFT FRONT
-		_motor_out[CH_3] 	= g.rc_3.radio_out + g.rc_1.pwm_out - pitch_out3;	// CCW LEFT BACK
+		_motor_out[CH_1] 	= _rc_3->radio_out + _rc_1->pwm_out + pitch_out2; 	// CW  LEFT FRONT
+		_motor_out[CH_3] 	= _rc_3->radio_out + _rc_1->pwm_out - pitch_out3;	// CCW LEFT BACK
 
 		//Right side
-		_motor_out[CH_2] 	= g.rc_3.radio_out - g.rc_1.pwm_out - pitch_out3;	// CW  RIGHT BACK
-		_motor_out[CH_8]		= g.rc_3.radio_out - g.rc_1.pwm_out + pitch_out2;	// CCW RIGHT FRONT
+		_motor_out[CH_2] 	= _rc_3->radio_out - _rc_1->pwm_out - pitch_out3;	// CW  RIGHT BACK
+		_motor_out[CH_8]		= _rc_3->radio_out - _rc_1->pwm_out + pitch_out2;	// CCW RIGHT FRONT
 
 		//Back side
-		_motor_out[CH_11]	= g.rc_3.radio_out - g.rc_2.pwm_out + roll_out4;	// CW  BACK LEFT
-		_motor_out[CH_4]		= g.rc_3.radio_out - g.rc_2.pwm_out - roll_out4;	// CCW BACK RIGHT
+		_motor_out[CH_11]	= _rc_3->radio_out - _rc_2->pwm_out + roll_out4;	// CW  BACK LEFT
+		_motor_out[CH_4]		= _rc_3->radio_out - _rc_2->pwm_out - roll_out4;	// CCW BACK RIGHT
 
 	}
 
 	// Yaw
-	_motor_out[CH_3]		+= g.rc_4.pwm_out;	// CCW
-	_motor_out[CH_4]		+= g.rc_4.pwm_out;	// CCW
-	_motor_out[CH_7] 	+= g.rc_4.pwm_out;	// CCW
-	_motor_out[CH_8] 	+= g.rc_4.pwm_out;	// CCW
+	_motor_out[CH_3]		+= _rc_4->pwm_out;	// CCW
+	_motor_out[CH_4]		+= _rc_4->pwm_out;	// CCW
+	_motor_out[CH_7] 	+= _rc_4->pwm_out;	// CCW
+	_motor_out[CH_8] 	+= _rc_4->pwm_out;	// CCW
 
-	_motor_out[CH_1]		-= g.rc_4.pwm_out;	// CW
-	_motor_out[CH_2]		-= g.rc_4.pwm_out;	// CW
-	_motor_out[CH_10]	-= g.rc_4.pwm_out;	// CW
-	_motor_out[CH_11]	-= g.rc_4.pwm_out;	// CW
+	_motor_out[CH_1]		-= _rc_4->pwm_out;	// CW
+	_motor_out[CH_2]		-= _rc_4->pwm_out;	// CW
+	_motor_out[CH_10]	-= _rc_4->pwm_out;	// CW
+	_motor_out[CH_11]	-= _rc_4->pwm_out;	// CW
 
 
 	// TODO add stability patch
@@ -137,15 +137,15 @@ void ArduCopter_Motors_Octa::output_armed()
 
 	#if CUT_MOTORS == ENABLED
 	// if we are not sending a throttle output, we cut the motors
-	if(g.rc_3.servo_out == 0){
-		_motor_out[CH_1]		= g.rc_3.radio_min;
-		_motor_out[CH_2]		= g.rc_3.radio_min;
-		_motor_out[CH_3]		= g.rc_3.radio_min;
-		_motor_out[CH_4] 	= g.rc_3.radio_min;
-		_motor_out[CH_7] 	= g.rc_3.radio_min;
-		_motor_out[CH_8] 	= g.rc_3.radio_min;
-		_motor_out[CH_10] 	= g.rc_3.radio_min;
-		_motor_out[CH_11] 	= g.rc_3.radio_min;
+	if(_rc_3->servo_out == 0){
+		_motor_out[CH_1]		= _rc_3->radio_min;
+		_motor_out[CH_2]		= _rc_3->radio_min;
+		_motor_out[CH_3]		= _rc_3->radio_min;
+		_motor_out[CH_4] 	= _rc_3->radio_min;
+		_motor_out[CH_7] 	= _rc_3->radio_min;
+		_motor_out[CH_8] 	= _rc_3->radio_min;
+		_motor_out[CH_10] 	= _rc_3->radio_min;
+		_motor_out[CH_11] 	= _rc_3->radio_min;
 	}
 	#endif
 
@@ -168,98 +168,98 @@ void ArduCopter_Motors_Octa::output_armed()
 
 void ArduCopter_Motors_Octa::output_disarmed()
 {
-	if(g.rc_3.control_in > 0){
+	if(_rc_3->control_in > 0){
 		// we have pushed up the throttle
 		// remove safety
-		motor_auto_armed = true;
+		*_motor_auto_armed = true;
 	}
 
 	// fill the _motor_out[] array for HIL use
 	for (unsigned char i = 0; i < 11; i++) {
-		_motor_out[i] = g.rc_3.radio_min;
+		_motor_out[i] = _rc_3->radio_min;
 	}
 
 	// Send commands to motors
-	_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_7, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_8, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_11, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_1, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_2, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_7, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_8, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_11, _rc_3->radio_min);
 
-	_apm_rc->OutputCh(CH_3, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_10, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_3, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_4, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_10, _rc_3->radio_min);
 }
 
 void ArduCopter_Motors_Octa::output_test()
 {
-	if( g.frame_orientation == X_FRAME || g.frame_orientation == PLUS_FRAME )
+	if( _frame_orientation == X_FRAME || _frame_orientation == PLUS_FRAME )
 	{
-		_apm_rc->OutputCh(CH_7, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_1, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_7, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_1, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_3, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_1, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_3, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_3, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_11, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_3, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_11, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_11, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_4, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_11, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_4, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_2, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_4, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_2, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_8, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_2, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_8, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_8, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_10, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_8, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_10, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_10, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_7, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_10, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_7, _rc_3->radio_min + 100);
 		delay(1000);
 	}
 
-	if( g.frame_orientation == V_FRAME )
+	if( _frame_orientation == V_FRAME )
 	{
-		_apm_rc->OutputCh(CH_7, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_10, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_7, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_10, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_10, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_8, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_10, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_8, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_8, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_2, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_8, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_2, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_4, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_2, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_4, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_11, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_4, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_11, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_11, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_3, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_11, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_3, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_3, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_1, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_3, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_1, _rc_3->radio_min + 100);
 		delay(1000);
 
-		_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
-		_apm_rc->OutputCh(CH_7, g.rc_3.radio_min + 100);
+		_apm_rc->OutputCh(CH_1, _rc_3->radio_min);
+		_apm_rc->OutputCh(CH_7, _rc_3->radio_min + 100);
 		delay(1000);
 	}
 }

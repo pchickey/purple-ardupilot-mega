@@ -13,30 +13,30 @@ void ArduCopter_Motors_Tri::init_out()
 
 void ArduCopter_Motors_Tri::output_armed()
 {
-	int out_min = g.rc_3.radio_min;
-	int out_max = g.rc_3.radio_max;
+	int out_min = _rc_3->radio_min;
+	int out_max = _rc_3->radio_max;
 
 	// Throttle is 0 to 1000 only
-	g.rc_3.servo_out 	= constrain(g.rc_3.servo_out, 0, 1000);
+	_rc_3->servo_out 	= constrain(_rc_3->servo_out, 0, 1000);
 
-	if(g.rc_3.servo_out > 0)
-		out_min = g.rc_3.radio_min + AC_MOTORS_MINIMUM_THROTTLE;
+	if(_rc_3->servo_out > 0)
+		out_min = _rc_3->radio_min + AC_MOTORS_MINIMUM_THROTTLE;
 
-	g.rc_1.calc_pwm();
-	g.rc_2.calc_pwm();
-	g.rc_3.calc_pwm();
+	_rc_1->calc_pwm();
+	_rc_2->calc_pwm();
+	_rc_3->calc_pwm();
 
-	int roll_out 		= (float)g.rc_1.pwm_out * .866;
-	int pitch_out 		= g.rc_2.pwm_out / 2;
+	int roll_out 		= (float)_rc_1->pwm_out * .866;
+	int pitch_out 		= _rc_2->pwm_out / 2;
 
 	//left front
-	_motor_out[CH_2]		= g.rc_3.radio_out + roll_out + pitch_out;
+	_motor_out[CH_2]		= _rc_3->radio_out + roll_out + pitch_out;
 	//right front
-	_motor_out[CH_1]		= g.rc_3.radio_out - roll_out + pitch_out;
+	_motor_out[CH_1]		= _rc_3->radio_out - roll_out + pitch_out;
 	// rear
-	_motor_out[CH_4] 	= g.rc_3.radio_out - g.rc_2.pwm_out;
+	_motor_out[CH_4] 	= _rc_3->radio_out - _rc_2->pwm_out;
 
-	//_motor_out[CH_4]		+= (float)(abs(g.rc_4.control_in)) * .013;
+	//_motor_out[CH_4]		+= (float)(abs(_rc_4->control_in)) * .013;
 
 	// Tridge's stability patch
 	if (_motor_out[CH_1] > out_max) {
@@ -64,10 +64,10 @@ void ArduCopter_Motors_Tri::output_armed()
 
 	#if CUT_MOTORS == ENABLED
 	// if we are not sending a throttle output, we cut the motors
-	if(g.rc_3.servo_out == 0){
-		_motor_out[CH_1]		= g.rc_3.radio_min;
-		_motor_out[CH_2]		= g.rc_3.radio_min;
-		_motor_out[CH_4] 	= g.rc_3.radio_min;
+	if(_rc_3->servo_out == 0){
+		_motor_out[CH_1]		= _rc_3->radio_min;
+		_motor_out[CH_2]		= _rc_3->radio_min;
+		_motor_out[CH_4] 	= _rc_3->radio_min;
 	}
 	#endif
 
@@ -84,39 +84,39 @@ void ArduCopter_Motors_Tri::output_armed()
 
 void ArduCopter_Motors_Tri::output_disarmed()
 {
-	if(g.rc_3.control_in > 0){
+	if(_rc_3->control_in > 0){
 		// we have pushed up the throttle
 		// remove safety
-		motor_auto_armed = true;
+		*_motor_auto_armed = true;
 	}
 
 	// fill the _motor_out[] array for HIL use
 	for (unsigned char i = 0; i < 8; i++) {
-		_motor_out[i] = g.rc_3.radio_min;
+		_motor_out[i] = _rc_3->radio_min;
 	}
 
 	// Send commands to motors
-	_apm_rc->OutputCh(CH_1, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_2, g.rc_3.radio_min);
-	_apm_rc->OutputCh(CH_4, g.rc_3.radio_min);
+	_apm_rc->OutputCh(CH_1, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_2, _rc_3->radio_min);
+	_apm_rc->OutputCh(CH_4, _rc_3->radio_min);
 }
 
 void ArduCopter_Motors_Tri::output_test()
 {
-	_motor_out[CH_1] = g.rc_3.radio_min;
-	_motor_out[CH_2] = g.rc_3.radio_min;
-	_motor_out[CH_4] = g.rc_3.radio_min;
+	_motor_out[CH_1] = _rc_3->radio_min;
+	_motor_out[CH_2] = _rc_3->radio_min;
+	_motor_out[CH_4] = _rc_3->radio_min;
 
 
-	if(g.rc_1.control_in > 3000){	// right
+	if(_rc_1->control_in > 3000){	// right
 		_motor_out[CH_1] += 100;
 	}
 
-	if(g.rc_1.control_in < -3000){	// left
+	if(_rc_1->control_in < -3000){	// left
 		_motor_out[CH_2] += 100;
 	}
 
-	if(g.rc_2.control_in > 3000){	// back
+	if(_rc_2->control_in > 3000){	// back
 		_motor_out[CH_4] += 100;
 	}
 
