@@ -4,10 +4,14 @@
 #define PARAMETERS_H
 
 #include <AP_Common.h>
+#include <ArduCopter_Motors.h>
 
 // Global parameter class.
 //
+class Parameters :
+    public ArduCopter_Motors_MulticopterDelegate
 class Parameters {
+{
 public:
 	// The version of the layout as described by the parameter enum.
 	//
@@ -406,6 +410,18 @@ public:
 	junk(0)		// XXX just so that we can add things without worrying about the trailing comma
 	{
 	}
+
+  /* ArduCopter_Motors_MulticopterDelegate Implementation */
+  RC_Channel * get_rc_1() { return &rc_1; }
+  RC_Channel * get_rc_2() { return &rc_2; }
+  RC_Channel * get_rc_3() { return &rc_3; }
+  RC_Channel * get_rc_4() { return &rc_4; }
+  RC_Channel * get_rc_5() { return &rc_5; }
+  RC_Channel * get_rc_6() { return &rc_6; }
+  RC_Channel * get_rc_7() { return &rc_7; }
+  RC_Channel * get_rc_8() { return &rc_8; }
+  int8_t       get_frame_orientation() { return frame_orientation.get(); }
+  float        get_top_bottom_ratio()  { return top_bottom_ratio.get(); }
 };
 
 #endif // PARAMETERS_H
