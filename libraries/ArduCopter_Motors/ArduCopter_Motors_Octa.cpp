@@ -28,7 +28,7 @@ void ArduCopter_Motors_Octa::output_armed()
 	_rc_3->calc_pwm();
 	_rc_4->calc_pwm();
 
-	if(_frame_orientation == X_FRAME){
+	if(_frame_orientation == AC_MOTORS_X_FRAME){
 		roll_out 	 	= (float)_rc_1->pwm_out * 0.4;
 		pitch_out 	 	= (float)_rc_2->pwm_out * 0.4;
 
@@ -48,7 +48,7 @@ void ArduCopter_Motors_Octa::output_armed()
 		_motor_out[CH_11] 	= _rc_3->radio_out - _rc_1->pwm_out - pitch_out; // CW	 RIGHT BACK
 		_motor_out[CH_3]		= _rc_3->radio_out - _rc_1->pwm_out + pitch_out; // CCW	 RIGHT FRONT
 
-	}else if(_frame_orientation == PLUS_FRAME){
+	}else if(_frame_orientation == AC_MOTORS_PLUS_FRAME){
 		roll_out 		= (float)_rc_1->pwm_out * 0.71;
 		pitch_out 	 	= (float)_rc_2->pwm_out * 0.71;
 
@@ -68,7 +68,7 @@ void ArduCopter_Motors_Octa::output_armed()
 		_motor_out[CH_4]		= _rc_3->radio_out - roll_out - pitch_out;	// CCW 	BACK RIGHT
 		_motor_out[CH_8]		= _rc_3->radio_out + roll_out - pitch_out;	// CCW	BACK LEFT
 
-	}else if(_frame_orientation == V_FRAME){
+	}else if(_frame_orientation == AC_MOTORS_V_FRAME){
 
 		int roll_out2, pitch_out2;
 		int roll_out3, pitch_out3;
@@ -193,7 +193,7 @@ void ArduCopter_Motors_Octa::output_disarmed()
 
 void ArduCopter_Motors_Octa::output_test()
 {
-	if( _frame_orientation == X_FRAME || _frame_orientation == PLUS_FRAME )
+	if( _frame_orientation == AC_MOTORS_X_FRAME || _frame_orientation == AC_MOTORS_PLUS_FRAME )
 	{
 		_apm_rc->OutputCh(CH_7, _rc_3->radio_min);
 		_apm_rc->OutputCh(CH_1, _rc_3->radio_min + 100);
@@ -228,7 +228,7 @@ void ArduCopter_Motors_Octa::output_test()
 		delay(1000);
 	}
 
-	if( _frame_orientation == V_FRAME )
+	if( _frame_orientation == AC_MOTORS_V_FRAME )
 	{
 		_apm_rc->OutputCh(CH_7, _rc_3->radio_min);
 		_apm_rc->OutputCh(CH_10, _rc_3->radio_min + 100);

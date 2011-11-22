@@ -14,6 +14,11 @@
  */
 #define AC_MOTORS_MINIMUM_THROTTLE 130
 
+/* Frame definitions yanked from ArduCopter/defines.h */
+#define AC_MOTORS_PLUS_FRAME 0
+#define AC_MOTORS_X_FRAME    1
+#define AC_MOTORS_V_FRAME    2
+
 class ArduCopter_Motors
 {
   public:
@@ -24,6 +29,7 @@ class ArduCopter_Motors
 };
 
 #include "ArduCopter_Motors_Heli.h"
+
 #include "ArduCopter_Motors_Hexa.h"
 #include "ArduCopter_Motors_Octa.h"
 #include "ArduCopter_Motors_Octa_Quad.h"
@@ -32,5 +38,7 @@ class ArduCopter_Motors
 #include "ArduCopter_Motors_Y6.h"
 
 #include "ArduCopter_Motors_MulticopterDelegate.h"
+#include "ArduCopter_Motors_HeliDelegate.h"
+
 #endif // __ARDUCOPTER_MOTORS_H__
 

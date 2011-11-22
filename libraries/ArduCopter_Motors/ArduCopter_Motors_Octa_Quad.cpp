@@ -28,7 +28,7 @@ void ArduCopter_Motors_Octa_Quad::output_armed()
 	_rc_3->calc_pwm();
 	_rc_4->calc_pwm();
 
-	if(_frame_orientation == X_FRAME){
+	if(_frame_orientation == AC_MOTORS_X_FRAME){
 		roll_out 	 	= (float)_rc_1->pwm_out * .707;
 		pitch_out 	 	= (float)_rc_2->pwm_out * .707;
 
@@ -50,7 +50,7 @@ void ArduCopter_Motors_Octa_Quad::output_armed()
 
 
 
-	}if(_frame_orientation == PLUS_FRAME){
+	}if(_frame_orientation == AC_MOTORS_PLUS_FRAME){
 		roll_out 	 	= _rc_1->pwm_out;
 		pitch_out 	 	= _rc_2->pwm_out;
 
