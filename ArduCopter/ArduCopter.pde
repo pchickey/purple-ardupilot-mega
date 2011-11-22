@@ -238,20 +238,21 @@ AP_TimerProcess timer_scheduler;
 // ArduCopter_Motors selection
 //////////////////////////////////////////////////////////////////////////////
 static int16_t  motor_out[8];
+static boolean  motor_auto_armed;
 #if FRAME_CONFIG == HELI_FRAME
-  ArduCopter_Motors_Heli AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Heli AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == HEXA_FRAME
-  ArduCopter_Motors_Hexa AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Hexa AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == OCTA_FRAME
-  ArduCopter_Motors_Octa AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Octa AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == OCTA_QUAD_FRAME
-  ArduCopter_Motors_Octa_Quad AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Octa_Quad AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == QUAD_FRAME
-  ArduCopter_Motors_Quad AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Quad AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == TRI_FRAME
-  ArduCopter_Motors_Tri AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Tri AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #elif FRAME_CONFIG == Y6_FRAME
-  ArduCopter_Motors_Y6 AC_Motors( &APM_RC, motor_out );
+  ArduCopter_Motors_Y6 AC_Motors( &g, &APM_RC, motor_out , &motor_auto_armed );
 #else
 #error Must define a valid FRAME_CONFIG
 #endif
@@ -348,7 +349,6 @@ static int16_t heli_servo_out_count = 0;                   // use for servo aver
 static boolean 		failsafe;						// did our throttle dip below the failsafe value?
 static boolean 		ch3_failsafe;
 static boolean		motor_armed;
-static boolean		motor_auto_armed;				// if true,
 
 // PIDs
 // ----
