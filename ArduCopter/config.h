@@ -371,8 +371,9 @@
 #endif
 
 
-#ifndef MINIMUM_THROTTLE
-# define MINIMUM_THROTTLE	130
+#ifdef MINIMUM_THROTTLE
+# warning MINIMUM_THROTTLE define deprecated. Please use AC_MOTORS_MINIMUM_THROTTLE
+# warning found in the ArduCopter_Motors header.
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
