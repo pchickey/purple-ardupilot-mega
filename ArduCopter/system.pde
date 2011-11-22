@@ -193,6 +193,9 @@ static void init_ardupilot()
 	    AP_Var::load_all();
 	}
 
+  // Load Parameters into AC_Motors
+  AC_Motors.init();
+
 	// init the GCS
     gcs0.init(&Serial);
 
