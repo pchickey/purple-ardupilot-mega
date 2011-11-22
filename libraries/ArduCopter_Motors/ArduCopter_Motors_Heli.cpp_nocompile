@@ -258,4 +258,3 @@ static int heli_get_angle_boost(int throttle)
 	return throttle + throttle_above_mid*angle_boost_factor;
 
 }
-
