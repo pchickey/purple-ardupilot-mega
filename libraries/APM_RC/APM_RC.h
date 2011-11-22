@@ -43,6 +43,12 @@ class APM_RC_Class
 	virtual void clearOverride(void) = 0;
     virtual void Force_Out() = 0;
     virtual void SetFastOutputChannels( uint32_t channelmask ) = 0;
+  /* For legacy support purposes only. These should never be implemented
+   * polymorphically except with APM1 hardware.
+   */
+	virtual void Force_Out0_Out1(void) = 0;
+	virtual void Force_Out2_Out3(void) = 0;
+	virtual void Force_Out6_Out7(void) = 0;
 };
 
 #include "APM_RC_APM1.h"
