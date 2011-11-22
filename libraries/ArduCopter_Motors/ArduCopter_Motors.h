@@ -31,5 +31,6 @@ class ArduCopter_Motors
 #include "ArduCopter_Motors_Tri.h"
 #include "ArduCopter_Motors_Y6.h"
 
+#include "ArduCopter_Motors_MulticopterDelegate.h"
 #endif // __ARDUCOPTER_MOTORS_H__
 
