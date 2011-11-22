@@ -5,6 +5,10 @@
 
 #define YAW_DIRECTION 1
 
+void ArduCopter_Motors_Y6::init() {
+  _init_g();
+}
+
 void ArduCopter_Motors_Y6::init_out()
 {
 	#if INSTANT_PWM == 0

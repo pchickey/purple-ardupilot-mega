@@ -3,6 +3,10 @@
 #include "WProgram.h"
 #include "ArduCopter_Motors_Tri.h"
 
+void ArduCopter_Motors_Tri::init() {
+  _init_g();
+}
+
 void ArduCopter_Motors_Tri::init_out()
 {
 	#if INSTANT_PWM == 0
