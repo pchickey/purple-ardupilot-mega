@@ -10,7 +10,6 @@
 //
 class Parameters :
     public ArduCopter_Motors_MulticopterDelegate
-class Parameters {
 {
 public:
 	// The version of the layout as described by the parameter enum.
