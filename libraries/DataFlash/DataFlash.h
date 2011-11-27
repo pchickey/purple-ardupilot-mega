@@ -3,5 +3,6 @@
 
 #include "DataFlash_Class.h"
 #include "DataFlashHW_APM1.h"
+#include "DataFlashHW_APM2.h"
 
 #endif // __DATAFLASH_H__
