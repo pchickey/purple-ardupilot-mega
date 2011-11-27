@@ -1,72 +1,44 @@
 /* ************************************************************ */
-/* DataFlash_APM2 Log library                                 */
+/* DataFlash for APM2 HW                                        */
 /* ************************************************************ */
-#ifndef __DATAFLASH_APM2_H__
-#define __DATAFLASH_APM2_H__
+#ifndef __DATAFLASH_HW_APM2_H__
+#define __DATAFLASH_HW_APM2_H__
 
-#include "DataFlash.h"
+#include "DataFlashHW.h"
 
-class DataFlash_APM2 : public DataFlash_Class
+class DataFlashHW_APM2 : public DataFlashHW
 {
-  private:
-	// DataFlash Log variables...
-	unsigned char df_BufferNum;
-	unsigned char df_Read_BufferNum;
-	unsigned int df_BufferIdx;
-	unsigned int df_Read_BufferIdx;
-	unsigned int df_PageAdr;
-	unsigned int df_Read_PageAdr;
-	unsigned char df_Read_END;
-	unsigned char df_Stop_Write;
-
-	uint16_t df_FileNumber;
-	uint16_t df_FilePage;
-
-	//Methods
-	unsigned char BufferRead (unsigned char BufferNum, uint16_t IntPageAdr);
-	void BufferWrite (unsigned char BufferNum, uint16_t IntPageAdr, unsigned char Data);
-	void BufferToPage (unsigned char BufferNum, uint16_t PageAdr, unsigned char wait);
-	void PageToBuffer(unsigned char BufferNum, uint16_t PageAdr);
-	void WaitReady();
-	unsigned char ReadStatusReg();
-	unsigned char ReadStatus();
-	uint16_t PageSize();
-
-	unsigned char SPI_transfer(unsigned char data);
-	void CS_inactive();
-	void CS_active();
-
-
   public:
-	unsigned char df_manufacturer;
-	unsigned char df_device_0;
-	unsigned char df_device_1;
-	uint16_t df_PageSize;
+  void     init();
+  void     wait_ready();
 
-	DataFlash_APM2(); // Constructor
-	void Init();
-	void ReadManufacturerID();
-	bool CardInserted();
-	int16_t GetPage();
-	int16_t GetWritePage();
-	void PageErase (uint16_t PageAdr);
-	void ChipErase ();
-	// Write methods
-	void StartWrite(int16_t PageAdr);
-	void FinishWrite();
-	void WriteByte(unsigned char data);
-	void WriteInt(int16_t data);
-	void WriteLong(int32_t data);
+  void     buffer_write(uint8_t buffer_num, uint16_t page_addr, uint8_t data);
+  uint8_t  buffer_read(uint8_t buffer_num, uint16_t page_addr);
 
-	// Read methods
-	void StartRead(int16_t PageAdr);
-	unsigned char ReadByte();
-	int16_t ReadInt();
-	int32_t ReadLong();
+  void     page_to_buffer(uint8_t buffer_num, uint16_t page_addr);
+  void     buffer_to_page(uint8_t buffer_num, uint16_t page_addr, uint8_t wait);
 
-	void SetFileNumber(uint16_t FileNumber);
-	uint16_t GetFileNumber();
-	uint16_t GetFilePage();
+  void     page_erase(uint16_t page_addr);
+  void     chip_erase();
+
+  uint16_t last_page();
+
+
+  private:
+  uint16_t _page_size;
+
+  uint8_t  _read_status_reg();
+  uint8_t  _read_status_busy();
+
+  void     _read_manufacturer_id();
+  uint16_t _read_page_size();
+
+  void     _cs_active();
+  void     _cs_inactive();
+
+  uint8_t  _manufacturer;
+  uint8_t  _device_0;
+  uint8_t  _device_1;
 };
 
-#endif
+#endif // __DATAFLASH_HW_APM2_H__
