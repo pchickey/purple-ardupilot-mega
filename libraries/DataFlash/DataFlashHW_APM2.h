@@ -9,6 +9,7 @@
 class DataFlashHW_APM2 : public DataFlashHW
 {
   public:
+  DataFlashHW_APM2() {};
   /* DataFlashHW Public Interface: */
   void     init();
   void     wait_ready();

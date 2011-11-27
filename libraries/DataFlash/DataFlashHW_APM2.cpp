@@ -99,11 +99,6 @@ void DataFlashHW_APM2::_cs_active()
   digitalWrite(DF_SLAVESELECT,LOW); //enable device
 }
 
-// Constructors ////////////////////////////////////////////////////////////////
-DataFlashHW_APM2::DataFlashHW_APM2()
-{
-}
-
 // Public Methods //////////////////////////////////////////////////////////////
 void DataFlashHW_APM2::init(void)
 {
