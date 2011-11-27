@@ -130,7 +130,7 @@ void DataFlashHW_APM2::init(void)
 }
 
 // This function is mainly to test the device
-void DataFlashHW_APM2::ReadManufacturerID()
+void DataFlashHW_APM2::_read_manufacturer_id()
 {
   _cs_inactive();    // Reset dataflash command decoder
   _cs_active();
@@ -138,20 +138,20 @@ void DataFlashHW_APM2::ReadManufacturerID()
   // Read manufacturer and ID command...
   _spi_transfer(DF_READ_MANUFACTURER_AND_DEVICE_ID);
 
-  df_manufacturer = _spi_transfer(0xff);
-  df_device_0 = _spi_transfer(0xff);
-  df_device_1 = _spi_transfer(0xff);
+  _manufacturer = _spi_transfer(0xff);
+  _device_0 = _spi_transfer(0xff);
+  _device_1 = _spi_transfer(0xff);
   _spi_transfer(0xff);
 }
 
 // This function return 1 if Card is inserted on SD slot
-bool DataFlashHW_APM2::CardInserted()
+bool DataFlashHW_APM2::card_inserted()
 {
     return (digitalRead(DF_CARDDETECT) != 0);
 }
 
 // Read the status register
-byte DataFlashHW_APM2::ReadStatusReg()
+uint8_t DataFlashHW_APM2::_read_status_reg()
 {
   _cs_inactive();    // Reset dataflash command decoder
   _cs_active();
@@ -162,66 +162,65 @@ byte DataFlashHW_APM2::ReadStatusReg()
 }
 
 // Read the status of the DataFlash
-inline
-byte DataFlashHW_APM2::ReadStatus()
+uint8_t DataFlashHW_APM2::_read_status_busy()
 {
-  return(ReadStatusReg()&0x80);  // We only want to extract the READY/BUSY bit
+  return(_read_status_reg()&0x80);  // We only want to extract the READY/BUSY bit
 }
 
 
-inline
-uint16_t DataFlashHW_APM2::PageSize()
+uint16_t DataFlashHW_APM2::_read_page_size()
 {
-  return(528-((ReadStatusReg()&0x01)<<4));  // if first bit 1 trhen 512 else 528 bytes
+  return(528-((_read_status_reg()&0x01)<<4));  // if first bit 1 trhen 512 else 528 bytes
 }
 
 
 // Wait until DataFlash is in ready state...
-void DataFlashHW_APM2::WaitReady()
+void DataFlashHW_APM2::wait_ready()
 {
-  while(!ReadStatus());
+  while(!_read_status_busy());
 }
 
-void DataFlashHW_APM2::PageToBuffer(unsigned char BufferNum, uint16_t PageAdr)
+void DataFlashHW_APM2::page_to_buffer(uint8_t buffer_num, uint16_t page_addr)
 {
   _cs_inactive();
   _cs_active();
-  if (BufferNum==1)
+  if (buffer_num==1)
     _spi_transfer(DF_TRANSFER_PAGE_TO_BUFFER_1);
   else
     _spi_transfer(DF_TRANSFER_PAGE_TO_BUFFER_2);
 
-  if(df_PageSize==512){
-    _spi_transfer((unsigned char)(PageAdr >> 7));
-    _spi_transfer((unsigned char)(PageAdr << 1));
+  if(_page_size == 512){
+    _spi_transfer((unsigned char)(page_addr >> 7));
+    _spi_transfer((unsigned char)(page_addr << 1));
   }else{
-    _spi_transfer((unsigned char)(PageAdr >> 6));
-    _spi_transfer((unsigned char)(PageAdr << 2));
+    _spi_transfer((unsigned char)(page_addr >> 6));
+    _spi_transfer((unsigned char)(page_addr << 2));
   }
   _spi_transfer(0x00);	// don´t care bytes
 
   _cs_inactive();	//initiate the transfer
   _cs_active();
 
-  while(!ReadStatus());  //monitor the status register, wait until busy-flag is high
+  wait_ready();
 }
 
-void DataFlashHW_APM2::BufferToPage (unsigned char BufferNum, uint16_t PageAdr, unsigned char wait)
+void DataFlashHW_APM2::buffer_to_page(unsigned char buffer_num, uint16_t page_addr,
+                                      unsigned char wait)
 {
   _cs_inactive();     // Reset dataflash command decoder
   _cs_active();
 
-  if (BufferNum==1)
+  if (buffer_num==1)
     _spi_transfer(DF_BUFFER_1_TO_PAGE_WITH_ERASE);
   else
     _spi_transfer(DF_BUFFER_2_TO_PAGE_WITH_ERASE);
 
-  if(df_PageSize==512){
-    _spi_transfer((unsigned char)(PageAdr >> 7));
-    _spi_transfer((unsigned char)(PageAdr << 1));
+  if(_page_size == 512){
+    _spi_transfer((unsigned char)(page_addr >> 7));
+    _spi_transfer((unsigned char)(page_addr << 1));
   }else{
-    _spi_transfer((unsigned char)(PageAdr >> 6));
-    _spi_transfer((unsigned char)(PageAdr << 2));
+    _spi_transfer((unsigned char)(page_addr >> 6));
+    _spi_transfer((unsigned char)(page_addr << 2));
   }
   _spi_transfer(0x00);	// don´t care bytes
 
@@ -230,67 +229,66 @@ void DataFlashHW_APM2::BufferToPage (unsigned char BufferNum, uint16_t PageAdr, 
 
   // Check if we need to wait to write the buffer to memory or we can continue...
   if (wait)
-	while(!ReadStatus());  //monitor the status register, wait until busy-flag is high
+    wait_ready();
 }
 
-void DataFlashHW_APM2::BufferWrite (unsigned char BufferNum, uint16_t IntPageAdr, unsigned char Data)
+void DataFlashHW_APM2::buffer_write(uint8_t buffer_num, uint16_t page_addr, unsigned char data)
 {
   _cs_inactive();   // Reset dataflash command decoder
   _cs_active();
 
-  if (BufferNum==1)
+  if (buffer_num == 1)
     _spi_transfer(DF_BUFFER_1_WRITE);
   else
     _spi_transfer(DF_BUFFER_2_WRITE);
   _spi_transfer(0x00);				 //don't cares
-  _spi_transfer((unsigned char)(IntPageAdr>>8));  //upper part of internal buffer address
-  _spi_transfer((unsigned char)(IntPageAdr));	 //lower part of internal buffer address
-  _spi_transfer(Data);				 //write data byte
+  _spi_transfer((unsigned char)(page_addr >> 8));  //upper part of internal buffer address
+  _spi_transfer((unsigned char)(page_addr));	 //lower part of internal buffer address
+  _spi_transfer(data);				 //write data byte
 }
 
-unsigned char DataFlashHW_APM2::BufferRead (unsigned char BufferNum, uint16_t IntPageAdr)
+uint8_t DataFlashHW_APM2::buffer_read(unsigned char buffer_num, uint16_t page_addr)
 {
-  byte tmp;
+  uint8_t tmp;
 
   _cs_inactive();   // Reset dataflash command decoder
   _cs_active();
 
-  if (BufferNum==1)
+  if (buffer_num == 1)
     _spi_transfer(DF_BUFFER_1_READ);
   else
     _spi_transfer(DF_BUFFER_2_READ);
   _spi_transfer(0x00);				 //don't cares
-  _spi_transfer((unsigned char)(IntPageAdr>>8));  //upper part of internal buffer address
-  _spi_transfer((unsigned char)(IntPageAdr));	 //lower part of internal buffer address
+  _spi_transfer((unsigned char)(page_addr >> 8));  //upper part of internal buffer address
+  _spi_transfer((unsigned char)(page_addr));	 //lower part of internal buffer address
   _spi_transfer(0x00);                            //don't cares
   tmp = _spi_transfer(0x00);		         //read data byte
 
   return (tmp);
 }
-// *** END OF INTERNAL FUNCTIONS ***
 
-void DataFlashHW_APM2::PageErase (uint16_t PageAdr)
+void DataFlashHW_APM2::page_erase(uint16_t page_addr)
 {
   _cs_inactive();																//make sure to toggle CS signal in order
   _cs_active();																//to reset Dataflash command decoder
   _spi_transfer(DF_PAGE_ERASE);   // Command
 
-  if(df_PageSize==512){
-    _spi_transfer((unsigned char)(PageAdr >> 7));
-    _spi_transfer((unsigned char)(PageAdr << 1));
+  if(_page_size==512){
+    _spi_transfer((unsigned char)(page_addr >> 7));
+    _spi_transfer((unsigned char)(page_addr << 1));
   }else{
-    _spi_transfer((unsigned char)(PageAdr >> 6));
-    _spi_transfer((unsigned char)(PageAdr << 2));
+    _spi_transfer((unsigned char)(page_addr >> 6));
+    _spi_transfer((unsigned char)(page_addr << 2));
   }
 
   _spi_transfer(0x00);	           // "dont cares"
   _cs_inactive();               //initiate flash page erase
   _cs_active();
-  while(!ReadStatus());
+  wait_ready();
 }
 
 
-void DataFlashHW_APM2::ChipErase ()
+void DataFlashHW_APM2::chip_erase()
 {
   _cs_inactive();																//make sure to toggle CS signal in order
   _cs_active();																//to reset Dataflash command decoder
@@ -302,6 +300,11 @@ void DataFlashHW_APM2::ChipErase ()
 
   _cs_inactive();               //initiate flash page erase
   _cs_active();
-  while(!ReadStatus());
+  wait_ready();
+}
+
+uint16_t DataFlashHW_APM2::last_page()
+{
+  return 4096;
 }
 
