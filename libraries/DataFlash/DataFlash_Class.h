@@ -1,16 +1,18 @@
-/* ************************************************************ */
-/* Test for DataFlash Log library                               */
-/* ************************************************************ */
-#ifndef __DATAFLASH_APM1_H__
-#define __DATAFLASH_APM1_H__
 
-#include "DataFlash.h"
+#ifndef __DATAFLASH_CLASS_H__
+#define __DATAFLASH_CLASS_H__
+
+#include "DataFlashHW.h"
 
 // flash size
 #define DF_LAST_PAGE 4096
 
-class DataFlash_APM1 : public DataFlash_Class
+class DataFlash_Class
 {
+  public:
+	DataFlash_Class( DataFlashHW * hw_delegate ) :
+    _hw(hw_delegate)
+  {}
   private:
 	// DataFlash Log variables...
 	unsigned char df_BufferNum;
@@ -33,13 +35,15 @@ class DataFlash_APM1 : public DataFlash_Class
 	unsigned char ReadStatus();
 	uint16_t PageSize();
 
-  public:
 	unsigned char df_manufacturer;
 	unsigned char df_device_0;
 	unsigned char df_device_1;
 	uint16_t df_PageSize;
+  
+  DataFlashHW *_hw;
 
-	DataFlash_APM1(); // Constructor
+  public:
+
 	void Init();
 	void ReadManufacturerID();
 	int16_t GetPage();
@@ -64,4 +68,4 @@ class DataFlash_APM1 : public DataFlash_Class
 	uint16_t GetFilePage();
 };
 
-#endif // __DATAFLASH_APM1_H__
+#endif // __DATAFLASH_Class_H__
