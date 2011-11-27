@@ -192,6 +192,12 @@ uint16_t DataFlashHW_APM1::last_page()
   return 4096;
 }
 
+uint16_t DataFlashHW_APM1::get_page_size()
+{
+  return _page_size;
+}
+
+
 /* ---------------------------- PRIVATE FUNCTIONS ----------------------------- */
 
 void DataFlashHW_APM1::_cs_inactive()

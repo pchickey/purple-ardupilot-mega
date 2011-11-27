@@ -308,3 +308,8 @@ uint16_t DataFlashHW_APM2::last_page()
   return 4096;
 }
 
+uint16_t DataFlashHW_APM2::get_page_size()
+{
+  return _page_size;
+}
+

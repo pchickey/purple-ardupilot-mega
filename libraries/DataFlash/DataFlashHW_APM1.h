@@ -20,6 +20,7 @@ class DataFlashHW_APM1 : public DataFlashHW
   void     chip_erase();
 
   uint16_t last_page();
+  uint16_t get_page_size();
 
   bool     card_inserted() { return true; } /* Always inserted on APM1 */
 

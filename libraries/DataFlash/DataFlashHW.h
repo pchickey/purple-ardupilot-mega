@@ -20,6 +20,7 @@ class DataFlashHW
   virtual void    chip_erase() = 0;
 
   virtual uint16_t last_page() = 0;
+  virtual uint16_t get_page_size() = 0;
 
   virtual bool    card_inserted() = 0;
 
