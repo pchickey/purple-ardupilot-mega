@@ -123,11 +123,11 @@ static void update_events(void);
 // Dataflash
 ////////////////////////////////////////////////////////////////////////////////
 #if CONFIG_APM_HARDWARE == APM_HARDWARE_APM2
-    DataFlash_APM2 DataFlash;
+    DataFlashHW_APM2 dfhw;
 #else
-    DataFlash_APM1   DataFlash;
+    DataFlashHW_APM1 dfhw;
 #endif
-
+DataFlash_Class DataFlash(&dfhw);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Sensors
