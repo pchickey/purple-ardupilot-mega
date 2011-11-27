@@ -18,6 +18,11 @@ class DataFlashHW
 
   virtual void    page_erase(uint16_t page_addr) = 0;
   virtual void    chip_erase() = 0;
+
+  virtual uint16_t last_page() = 0;
+
+  virtual bool    card_inserted() = 0;
+
 };
 
 #endif // __DATAFLASH_HW_H__

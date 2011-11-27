@@ -21,6 +21,7 @@ class DataFlashHW_APM1 : public DataFlashHW
 
   uint16_t last_page();
 
+  bool     card_inserted() { return true; } /* Always inserted on APM1 */
 
   private:
   uint16_t _page_size;

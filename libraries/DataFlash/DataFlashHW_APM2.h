@@ -9,6 +9,7 @@
 class DataFlashHW_APM2 : public DataFlashHW
 {
   public:
+  /* DataFlashHW Public Interface: */
   void     init();
   void     wait_ready();
 
@@ -22,7 +23,8 @@ class DataFlashHW_APM2 : public DataFlashHW
   void     chip_erase();
 
   uint16_t last_page();
-
+  
+  bool     card_inserted();
 
   private:
   uint16_t _page_size;
