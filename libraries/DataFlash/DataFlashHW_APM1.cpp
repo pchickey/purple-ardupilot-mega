@@ -52,35 +52,9 @@ void DataFlashHW_APM1::init()
   _page_size = _read_page_size();
 }
 
-uint16_t DataFlashHW_APM1::last_page()
+void DataFlashHW_APM1::wait_ready()
 {
-  return 4096;
-}
-
-void DataFlashHW_APM1::read_manufacturer_id()
-{
-  _cs_active();     // activate dataflash command decoder
-
-  // Read manufacturer and ID command...
-  SPI.transfer(DF_READ_MANUFACTURER_AND_DEVICE_ID);
-
-  _manufacturer = SPI.transfer(0xff);
-  _device_0 = SPI.transfer(0xff);
-  _device_1 = SPI.transfer(0xff);
-  SPI.transfer(0xff);
-
-  _cs_inactive();    // Reset dataflash command decoder
-
-}
-
-int16_t DataFlashHW_APM1::get_page()
-{
-  return 0;
-}
-
-int16_t DataFlashHW_APM1::get_write_page()
-{ 
-  return 0;
+  while(!_read_status_busy());
 }
 
 void DataFlashHW_APM1::page_erase(uint16_t page_addr)
@@ -99,7 +73,7 @@ void DataFlashHW_APM1::page_erase(uint16_t page_addr)
   SPI.transfer(0x00);	           // "dont cares"
   _cs_inactive();               //initiate flash page erase
   _cs_active();
-  while(!read_status_busy());
+  while(!_read_status_busy());
 
   _cs_inactive();   // deactivate dataflash command decoder
 }
@@ -116,28 +90,9 @@ void DataFlashHW_APM1::chip_erase()
 
   _cs_inactive();               //initiate flash page erase
   _cs_active();
-  while(!read_status_busy());
+  while(!_read_status_busy());
 
   _cs_inactive();   // deactivate dataflash command decoder
-}
-
-uint8_t DataFlashHW_APM1::read_status_reg()
-{
-  uint8_t tmp;
-
-  _cs_active();     // activate dataflash command decoder
-
-  // Read status command
-  SPI.transfer(DF_STATUS_REGISTER_READ);
-  tmp = SPI.transfer(0x00);  // We only want to extract the READY/BUSY bit
-
-  _cs_inactive();    // Reset dataflash command decoder
-  return tmp;
-}
-
-uint8_t DataFlashHW_APM1::read_status_busy()
-{
-  return (read_status_reg() & 0x80); // Extract READ/BUSY bit
 }
 
 void DataFlashHW_APM1::page_to_buffer(uint8_t buffer_num, uint16_t page_addr)
@@ -161,7 +116,7 @@ void DataFlashHW_APM1::page_to_buffer(uint8_t buffer_num, uint16_t page_addr)
   _cs_inactive();	//initiate the transfer
   _cs_active();
 
-  while(!read_status_busy());  //monitor the status register, wait until busy-flag is high
+  while(!_read_status_busy());  //monitor the status register, wait until busy-flag is high
 
   _cs_inactive();
 }
@@ -189,7 +144,7 @@ void DataFlashHW_APM1::buffer_to_page(uint8_t buffer_num, uint16_t page_addr, ui
 
   // Check if we need to wait to write the buffer to memory or we can continue...
   if (wait)
-	while(!read_status_busy());  //monitor the status register, wait until busy-flag is high
+	while(!_read_status_busy());  //monitor the status register, wait until busy-flag is high
 
   _cs_inactive();	//deactivate dataflash command decoder
 }
@@ -231,12 +186,13 @@ uint8_t DataFlashHW_APM1::buffer_read(uint8_t buffer_num, uint16_t page_addr)
   return (tmp);
 }
 
-/* ---------------------------- PRIVATE FUNCTIONS ----------------------------- */
 
-uint16_t DataFlashHW_APM1::_read_page_size()
+uint16_t DataFlashHW_APM1::last_page()
 {
-  return(528-((read_status_reg()&0x01)<<4));  // if first bit 1 trhen 512 else 528 bytes
+  return 4096;
 }
+
+/* ---------------------------- PRIVATE FUNCTIONS ----------------------------- */
 
 void DataFlashHW_APM1::_cs_inactive()
 {
@@ -247,4 +203,45 @@ void DataFlashHW_APM1::_cs_active()
 {
   digitalWrite(DF_SLAVESELECT,LOW); //enable device
 }
+
+uint16_t DataFlashHW_APM1::_read_page_size()
+{
+  return(528-((_read_status_reg()&0x01)<<4));  // if first bit 1 trhen 512 else 528 bytes
+}
+
+void DataFlashHW_APM1::_read_manufacturer_id()
+{
+  _cs_active();     // activate dataflash command decoder
+
+  // Read manufacturer and ID command...
+  SPI.transfer(DF_READ_MANUFACTURER_AND_DEVICE_ID);
+
+  _manufacturer = SPI.transfer(0xff);
+  _device_0 = SPI.transfer(0xff);
+  _device_1 = SPI.transfer(0xff);
+  SPI.transfer(0xff);
+
+  _cs_inactive();    // Reset dataflash command decoder
+}
+
+uint8_t DataFlashHW_APM1::_read_status_reg()
+{
+  uint8_t tmp;
+
+  _cs_active();     // activate dataflash command decoder
+
+  // Read status command
+  SPI.transfer(DF_STATUS_REGISTER_READ);
+  tmp = SPI.transfer(0x00);  // We only want to extract the READY/BUSY bit
+
+  _cs_inactive();    // Reset dataflash command decoder
+  return tmp;
+}
+
+uint8_t DataFlashHW_APM1::_read_status_busy()
+{
+  return (_read_status_reg() & 0x80); // Extract READ/BUSY bit
+}
+
+
 
