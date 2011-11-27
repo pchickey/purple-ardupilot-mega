@@ -41,6 +41,7 @@
 void DataFlash_Class::Init()
 {
   _hw->init();
+  df_PageSize = _hw->get_page_size();
   df_Read_END = false;
 }
 
