@@ -35,6 +35,7 @@ class DataFlashHW_APM2 : public DataFlashHW
 
   void     _cs_active();
   void     _cs_inactive();
+  uint8_t  _spi_transfer(uint8_t);
 
   uint8_t  _manufacturer;
   uint8_t  _device_0;
