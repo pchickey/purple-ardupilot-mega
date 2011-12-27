@@ -1,4 +1,4 @@
-
+#include <avr/io.h>
 #include <DuinOS.h>
 
 
@@ -7,9 +7,14 @@ void *task2_handle;
 
 void setup () {
   Serial.begin(115200);
-  xTaskCreate(task1_func, (signed portCHAR *)"task1", configMINIMAL_STACK_SIZE,
+
+  /* PB5, 6, 7 are outputs, set low */
+  DDRB |= _BV(PORTB4) | _BV(PORTB5) | _BV(PORTB6) | _BV(PORTB7);
+  PORTB &= ~ (_BV(PORTB4) | _BV(PORTB5) | _BV(PORTB6) | _BV(PORTB7));
+
+  xTaskCreate(task1_func, (signed portCHAR *)"task1", 200,
               NULL, NORMAL_PRIORITY, &task1_handle);
-  xTaskCreate(task2_func, (signed portCHAR *)"task2", configMINIMAL_STACK_SIZE,
+  xTaskCreate(task2_func, (signed portCHAR *)"task2", 200,
               NULL, NORMAL_PRIORITY, &task2_handle);
   vTaskStartScheduler();
   /* code after vTaskStartScheduler, and code in loop(), is never reached. */
@@ -27,7 +32,9 @@ void task1_func(void *params)
 }
 
 void task1_loop() {
+   PORTB |= _BV(PORTB5);
    Serial.println("1: Task Loop");
+   PORTB &= ~_BV(PORTB5);
    portYIELD();
 }
 
@@ -40,6 +47,8 @@ void task2_func(void *params)
 }
 
 void task2_loop() {
+   PORTB |= _BV(PORTB6);
    Serial.println("2: Task Loop");
+   PORTB &= ~_BV(PORTB6);
    portYIELD();
 }
