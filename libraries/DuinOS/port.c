@@ -434,90 +434,28 @@ unsigned long ulCompareMatch;
 unsigned char ucHighByte, ucLowByte; */
 unsigned portLONG ulCompareMatch;
 
-// timer 0 will be used in Arduino, and it's setup by the Arduino lib
-#ifndef FREERTOS_ARDUINO
-		
-	/* Using 16bit timer 1 to generate the tick.  Correct fuses must be
-	selected for the configCPU_CLOCK_HZ clock. */
-	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
 
-	/* We only have 16 bits so have to scale to get our required tick rate. */
-	ulCompareMatch /= portCLOCK_PRESCALER;
+    // We want to configure Timer1 in mode 8: WGM1[3:0] = { 1, 0, 0, 0 }
+    // The timer TOP will be designated by ICR1, and the overflow flag will
+    // be set at BOTTOM (0)
+    
+    // OCR[3:1] mode bits: all disabled
+    // WGM[1:0] : 0
+    TCCR1A = 0; 
+    // Clock source will be set to CLKio/1 (no precaling)
+    // CS1[2:0]= { 0, 0, 1 }
+    // WGM[3] = 1
+    // WGM[2] = 0
+    TCCR1B = _BV(CS11) | _BV(WGM13);
 
-	/* Adjust for correct value. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ulCompareMatch -= ( unsigned long ) 1; */
-	ulCompareMatch -= ( unsigned portLONG ) 1;
+    // CLKio = 16000000MHz. so a 1khz tick has a period of 16000.
+    TCNT1 = 16000;
 
-	/* Setup compare match value for compare match A.  Interrupts are disabled 
-	before this is called so we need not worry here. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ucLowByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-	ulCompareMatch >>= 8;
-	ucHighByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-	OCR1AH = ucHighByte;
-	OCR1AL = ucLowByte; */
-	OCR1A = ulCompareMatch;
-
-	/* Setup clock source and compare match behaviour. */
-	/* Disable this part  for Atmel AVR ATmega323  
-	ucLowByte = portCLEAR_COUNTER_ON_MATCH | portPRESCALE_64;
-	TCCR1B = ucLowByte; */
-	TCCR1A = 0;
-	// CS10 and CS11 will set a prescale value of 64
-	TCCR1B = ((1 << CS10) | (1 << CS11) | (1 << WGM12));
-
-	/* Enable the interrupt - this is okay as interrupt are currently globally
-	disabled. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ucLowByte = TIMSK;
-	ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
-	TIMSK = ucLowByte; */
 	TIMSK1 = (1 << OCIE1A);
-#endif
 }
 /*-----------------------------------------------------------*/
 
-#if FREERTOS_ARDUINO == 1
-    void arduino_increment_millis();
-   
-  #if configUSE_PREEMPTION == 1
-
-	/*
-	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
-	 * the context is saved at the start of vPortYieldFromTick().  The tick
-	 * count is incremented after the context is saved.
-	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER0_OVF_vect, ISR_NAKED) 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-	ISR(TIMER0_OVF_vect, ISR_NAKED)
-	{
-		vPortYieldFromTick();
-		asm volatile ( "reti" );
-	}
-  #else
-
-	/*
-	 * Tick ISR for the cooperative scheduler.  All this does is increment the
-	 * tick count.  We don't need to switch context, this can only be done by
-	 * manual calls to taskYIELD();
-	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER0_OVF_vect 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-  	void TIMER0_OVF_vect( void ) __attribute__ ( ( signal ) );
-  	void TIMER0_OVF_vect( void )
-	{
-		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
-		arduino_increment_millis();
-		vTaskIncrementTick();
-	}
-  #endif
-#else
-  #if configUSE_PREEMPTION == 1
+#if configUSE_PREEMPTION == 1
 
 	/*
 	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
@@ -533,7 +471,7 @@ unsigned portLONG ulCompareMatch;
 		vPortYieldFromTick();
 		asm volatile ( "reti" );
 	}
-  #else
+#else
 
 	/*
 	 * Tick ISR for the cooperative scheduler.  All this does is increment the
@@ -544,13 +482,10 @@ unsigned portLONG ulCompareMatch;
 	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
 	void SIG_OUTPUT_COMPARE1A( void ) */
 	
-	ISR(TIMER1_OVF_vect, ISR_NAKED)
+	ISR(TIMER1_OVF_vect)
 	{
+            #error isnt preemption on??
 		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
-		arduino_increment_millis();
 		vTaskIncrementTick();
 	}
-  #endif
 #endif
-
-	
