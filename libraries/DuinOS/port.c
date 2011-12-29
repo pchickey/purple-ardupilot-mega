@@ -429,12 +429,6 @@ void vPortYieldFromTick( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
-/* Disable this part for Atmel AVR ATmega323  
-unsigned long ulCompareMatch;
-unsigned char ucHighByte, ucLowByte; */
-unsigned portLONG ulCompareMatch;
-
-
     // We want to configure Timer1 in mode 8: WGM1[3:0] = { 1, 0, 0, 0 }
     // The timer TOP will be designated by ICR1, and the overflow flag will
     // be set at BOTTOM (0)
@@ -446,12 +440,14 @@ unsigned portLONG ulCompareMatch;
     // CS1[2:0]= { 0, 0, 1 }
     // WGM[3] = 1
     // WGM[2] = 0
-    TCCR1B = _BV(CS11) | _BV(WGM13);
+    TCCR1B = _BV(CS10) | _BV(WGM13);
 
     // CLKio = 16000000MHz. so a 1khz tick has a period of 16000.
-    TCNT1 = 16000;
+    // For whatever reason, it looks like the ICR value has to be half that?
+    ICR1 = 8000;
 
-	TIMSK1 = (1 << OCIE1A);
+    // Enable the timer1 overflow interrupt.
+    TIMSK1 = _BV(TOIE1);
 }
 /*-----------------------------------------------------------*/
 
@@ -462,10 +458,7 @@ unsigned portLONG ulCompareMatch;
 	 * the context is saved at the start of vPortYieldFromTick().  The tick
 	 * count is incremented after the context is saved.
 	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER1_OVF_vect, ISR_NAKED)
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
+
 	ISR(TIMER1_OVF_vect, ISR_NAKED)
 	{
 		vPortYieldFromTick();
@@ -478,13 +471,9 @@ unsigned portLONG ulCompareMatch;
 	 * tick count.  We don't need to switch context, this can only be done by
 	 * manual calls to taskYIELD();
 	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER1_OVF_vect 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
 	
 	ISR(TIMER1_OVF_vect)
 	{
-            #error isnt preemption on??
 		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
 		vTaskIncrementTick();
 	}
