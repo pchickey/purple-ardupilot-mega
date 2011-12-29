@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include <DuinOS.h>
+#include <ArduinoFreeRTOS.h>
 
 
 void *task1_handle;
@@ -13,9 +13,9 @@ void setup () {
   PORTB &= ~ (_BV(PORTB4) | _BV(PORTB5) | _BV(PORTB6) | _BV(PORTB7));
 
   xTaskCreate(task1_func, (signed portCHAR *)"task1", 200,
-              NULL, NORMAL_PRIORITY, &task1_handle);
+              NULL, 1, &task1_handle);
   xTaskCreate(task2_func, (signed portCHAR *)"task2", 200,
-              NULL, NORMAL_PRIORITY, &task2_handle);
+              NULL, 1, &task2_handle);
   vTaskStartScheduler();
   /* code after vTaskStartScheduler, and code in loop(), is never reached. */
 }
