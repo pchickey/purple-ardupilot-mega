@@ -47,8 +47,13 @@
 # define FS_MAX_PORTS   1
 #endif
 
+#if 0
 RTOSSerial::Buffer __RTOSSerial__rxBuffer[FS_MAX_PORTS];
 RTOSSerial::Buffer __RTOSSerial__txBuffer[FS_MAX_PORTS];
+#else
+xQueueHandle __RTOSSerial__rxQueue[FS_MAX_PORTS];
+xQueueHandle __RTOSSerial__txQueue[FS_MAX_PORTS];
+#endif
 uint8_t RTOSSerial::_serialInitialized = 0;
 
 // Constructor /////////////////////////////////////////////////////////////////
@@ -63,8 +68,8 @@ RTOSSerial::RTOSSerial(const uint8_t portNumber, volatile uint8_t *ubrrh, volati
 					   _u2x(u2x),
 					   _portEnableBits(portEnableBits),
 					   _portTxBits(portTxBits),
-					   _rxBuffer(&__RTOSSerial__rxBuffer[portNumber]),
-					   _txBuffer(&__RTOSSerial__txBuffer[portNumber])
+					   _rxQueue(&__RTOSSerial__rxQueue[portNumber]),
+					   _txQueue(&__RTOSSerial__txQueue[portNumber])
 {
 	setInitialized(portNumber);
 	begin(57600);
@@ -84,26 +89,31 @@ void RTOSSerial::begin(long baud, unsigned int rxSpace, unsigned int txSpace)
 
 	// if we are currently open...
 	if (_open) {
-		// If the caller wants to preserve the buffer sizing, work out what
-		// it currently is...
-		if (0 == rxSpace)
-			rxSpace = _rxBuffer->mask + 1;
-		if (0 == txSpace)
-			txSpace = _txBuffer->mask + 1;
-
 		// close the port in its current configuration, clears _open
 		end();
 	}
 
 	// allocate buffers
+#if 0
 	if (!_allocBuffer(_rxBuffer, rxSpace ? : _default_rx_buffer_size) || !_allocBuffer(_txBuffer, txSpace ?	: _default_tx_buffer_size)) {
 		end();
 		return; // couldn't allocate buffers - fatal
 	}
+#else
+  _rxQueue = xQueueCreate( rxSpace, sizeof( uint8_t ));
+  _txQueue = xQueueCreate( txSpace, sizeof( uint8_t ));
+  if (_rxQueue == 0 || _txQueue == 0) {
+    end();
+    return; // couldn't allocate queues - fatal
+  }
+  _txsize = txSpace;
+#endif
 
+#if 0
 	// reset buffer pointers
 	_txBuffer->head = _txBuffer->tail = 0;
 	_rxBuffer->head = _rxBuffer->tail = 0;
+#endif
 
 	// mark the port as open
 	_open = true;
@@ -137,8 +147,13 @@ void RTOSSerial::end()
 {
 	*_ucsrb &= ~(_portEnableBits | _portTxBits);
 
+#if 0
 	_freeBuffer(_rxBuffer);
 	_freeBuffer(_txBuffer);
+#else
+  vQueueDelete(_rxQueue);
+  vQueueDelete(_txQueue);
+#endif
 	_open = false;
 }
 
@@ -146,20 +161,32 @@ int RTOSSerial::available(void)
 {
 	if (!_open)
 		return (-1);
+#if 0
 	return ((_rxBuffer->head - _rxBuffer->tail) & _rxBuffer->mask);
+#else
+  unsigned portBASE_TYPE avail;
+  avail = uxQueueMessagesWaiting( _rxQueue );
+  return (int) avail;
+#endif
 }
 
 int RTOSSerial::txspace(void)
 {
 	if (!_open)
 		return (-1);
+#if 0
 	return ((_txBuffer->mask+1) - ((_txBuffer->head - _txBuffer->tail) & _txBuffer->mask));
+#else
+  unsigned portBASE_TYPE avail;
+  avail = uxQueueMessagesWaiting( _rxQueue );
+  return (int) (_txsize - avail);
+#endif
 }
 
 int RTOSSerial::read(void)
 {
 	uint8_t c;
-
+#if 0
 	// if the head and tail are equal, the buffer is empty
 	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
 		return (-1);
@@ -167,23 +194,39 @@ int RTOSSerial::read(void)
 	// pull character from tail
 	c = _rxBuffer->bytes[_rxBuffer->tail];
 	_rxBuffer->tail = (_rxBuffer->tail + 1) & _rxBuffer->mask;
-
 	return (c);
+#else
+  if (!_open) return (-1);
+  if ( xQueueReceive( _rxQueue, &c, ( portTickType ) 0 )) {
+    return (int) c;
+  }
+  return (-1);
+  // TODO
+#endif
 }
 
 int RTOSSerial::peek(void)
 {
-
+#if 0
 	// if the head and tail are equal, the buffer is empty
 	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
 		return (-1);
 
 	// pull character from tail
 	return (_rxBuffer->bytes[_rxBuffer->tail]);
+#else
+  uint8_t c;
+  if (!_open) return (-1);
+  if ( xQueuePeek ( _rxQueue, &c, ( portTickType ) 0 )) {
+    return (int) c;
+  }
+  return (-1);
+#endif
 }
 
 void RTOSSerial::flush(void)
 {
+#if 0
 	// don't reverse this or there may be problems if the RX interrupt
 	// occurs after reading the value of _rxBuffer->head but before writing
 	// the value to _rxBuffer->tail; the previous value of head
@@ -199,6 +242,9 @@ void RTOSSerial::flush(void)
 	// occurs after reading the value of _txBuffer->tail but before writing
 	// the value to _txBuffer->head.
 	_txBuffer->tail = _txBuffer->head;
+#else
+  // TODO
+#endif
 }
 
 void RTOSSerial::write(uint8_t c)
@@ -207,7 +253,7 @@ void RTOSSerial::write(uint8_t c)
 
 	if (!_open) // drop bytes if not open
 		return;
-
+#if 0
 	// wait for room in the tx buffer
 	i = (_txBuffer->head + 1) & _txBuffer->mask;
 	while (i == _txBuffer->tail)
@@ -216,13 +262,15 @@ void RTOSSerial::write(uint8_t c)
 	// add byte to the buffer
 	_txBuffer->bytes[_txBuffer->head] = c;
 	_txBuffer->head = i;
-
+#else
+  xQueueSend( _txQueue, (void *) &c, portMAX_DELAY );
+#endif
 	// enable the data-ready interrupt, as it may be off if the buffer is empty
 	*_ucsrb |= _portTxBits;
 }
 
 // Buffer management ///////////////////////////////////////////////////////////
-
+#if 0
 bool RTOSSerial::_allocBuffer(Buffer *buffer, unsigned int size)
 {
 	uint16_t	mask;
@@ -268,4 +316,5 @@ void RTOSSerial::_freeBuffer(Buffer *buffer)
 		buffer->bytes = NULL;
 	}
 }
+#endif
 

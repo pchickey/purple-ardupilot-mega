@@ -58,6 +58,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include <ArduinoFreeRTOS.h>
 #include "BetterStream.h"
 
 
@@ -147,6 +148,7 @@ public:
 	///
 	virtual void begin(long baud, unsigned int rxSpace, unsigned int txSpace);
 
+#if 0
 	/// Transmit/receive buffer descriptor.
 	///
 	/// Public so the interrupt handlers can see it
@@ -155,6 +157,7 @@ public:
 		uint16_t mask;					///< buffer size mask for pointer wrap
 		uint8_t *bytes;					///< pointer to allocated buffer
 	};
+#endif
 
 	/// Tell if the serial port has been initialized
 	static bool getInitialized(uint8_t port) {
@@ -182,10 +185,14 @@ private:
 	const uint8_t	_portEnableBits;		///< rx, tx and rx interrupt enables
 	const uint8_t	_portTxBits;			///< tx data and completion interrupt enables
 
-
+#if 0
 	// ring buffers
 	Buffer			* const _rxBuffer;
 	Buffer			* const _txBuffer;
+#else
+  xQueueHandle _rxQueue;
+  xQueueHandle _txQueue;
+#endif
 	bool 			_open;
 
 	/// Allocates a buffer of the given size
@@ -195,13 +202,19 @@ private:
 	/// @param	size		The desired buffer size.
 	/// @returns			True if the buffer was allocated successfully.
 	///
+#if 0
 	static bool _allocBuffer(Buffer *buffer, unsigned int size);
+#endif
 
 	/// Frees the allocated buffer in a descriptor
 	///
 	/// @param	buffer		The descriptor whose buffer should be freed.
 	///
+#if 0
 	static void _freeBuffer(Buffer *buffer);
+#endif
+
+  int _txsize;
 
 	/// default receive buffer size
 	static const unsigned int	_default_rx_buffer_size = 128;
@@ -217,8 +230,13 @@ private:
 };
 
 // Used by the per-port interrupt vectors
+#if 0
 extern RTOSSerial::Buffer __RTOSSerial__rxBuffer[];
 extern RTOSSerial::Buffer __RTOSSerial__txBuffer[];
+#else
+extern xQueueHandle __RTOSSerial__rxQueue[];
+extern xQueueHandle __RTOSSerial__txQueue[];
+#endif
 
 /// Generic Rx/Tx vectors for a serial port - needs to know magic numbers
 ///
@@ -226,31 +244,28 @@ extern RTOSSerial::Buffer __RTOSSerial__txBuffer[];
 ISR(_RXVECTOR, ISR_BLOCK)                                               \
 {                                                                       \
         uint8_t c;                                                      \
-        uint16_t i;                                                      \
+        signed portBASE_TYPE yieldWhenComplete = pdFALSE;               \
                                                                         \
         /* read the byte as quickly as possible */                      \
         c = _UDR;                                                       \
-        /* work out where the head will go next */                      \
-        i = (__RTOSSerial__rxBuffer[_PORT].head + 1) & __RTOSSerial__rxBuffer[_PORT].mask; \
-        /* decide whether we have space for another byte */             \
-        if (i != __RTOSSerial__rxBuffer[_PORT].tail) {                  \
-                /* we do, move the head */                              \
-                __RTOSSerial__rxBuffer[_PORT].bytes[__RTOSSerial__rxBuffer[_PORT].head] = c; \
-                __RTOSSerial__rxBuffer[_PORT].head = i;                 \
+        xQueueSendToBackFromISR( __RTOSSerial__rxQueue[_PORT], (void *)&c, &yieldWhenComplete );\
+        if( yieldWhenComplete == pdTRUE ) {                             \
+          taskYIELD();                                                  \
         }                                                               \
 }                                                                       \
 ISR(_TXVECTOR, ISR_BLOCK)                                               \
 {                                                                       \
-        /* if there is another character to send */                     \
-        if (__RTOSSerial__txBuffer[_PORT].tail != __RTOSSerial__txBuffer[_PORT].head) { \
-                _UDR = __RTOSSerial__txBuffer[_PORT].bytes[__RTOSSerial__txBuffer[_PORT].tail]; \
-                /* increment the tail */                                \
-                __RTOSSerial__txBuffer[_PORT].tail =                    \
-                        (__RTOSSerial__txBuffer[_PORT].tail + 1) & __RTOSSerial__txBuffer[_PORT].mask; \
+        uint8_t c;                                                      \
+        signed portBASE_TYPE yieldWhenComplete = pdFALSE;               \
+        if ( xQueueReceiveFromISR( __RTOSSerial__txQueue[_PORT], (void *)&c, &yieldWhenComplete )) { \
+          /* send the character taken from the queue */                 \
+          _UDR = c;                                                     \
         } else {                                                        \
-                /* there are no more bytes to send, disable the interrupt */ \
-                if (__RTOSSerial__txBuffer[_PORT].head == __RTOSSerial__txBuffer[_PORT].tail) \
-                        _UCSRB &= ~_TXBITS;                             \
+          /* there are no more bytes to send, disable the interrupt */  \
+          _UCSRB &= ~_TXBITS;                                            \
+        }                                                               \
+        if( yieldWhenComplete == pdTRUE ) {                             \
+          taskYIELD();                                                  \
         }                                                               \
 }                                                                       \
 struct hack
