@@ -119,7 +119,7 @@ static void output_motors_armed()
 	// this filter slows the acceleration of motors vs the deceleration
 	// Idea by Denny Rowland to help with his Yaw issue
 	for(int8_t m = 0; m <= 6; m++ ) {
-    	int i = ch_of_mot(m);
+    	int i = mot_to_ch(m);
 		if(motor_filtered[i] < motor_out[i]){
 			motor_filtered[i] = (motor_out[i] + motor_filtered[i]) / 2;
 		}else{
