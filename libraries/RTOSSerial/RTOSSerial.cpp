@@ -100,9 +100,10 @@ void RTOSSerial::begin(long baud, unsigned int rxSpace, unsigned int txSpace)
 		return; // couldn't allocate buffers - fatal
 	}
 #else
-  _rxQueue = xQueueCreate( rxSpace, sizeof( uint8_t ));
-  _txQueue = xQueueCreate( txSpace, sizeof( uint8_t ));
   if (_rxQueue == 0 || _txQueue == 0) {
+  *_rxQueue = xQueueCreate( _rxQueueSpace, sizeof( uint8_t ));
+  *_txQueue = xQueueCreate( _txQueueSpace, sizeof( uint8_t ));
+  if (*_rxQueue == NULL || *_txQueue == NULL ) {
     end();
     return; // couldn't allocate queues - fatal
   }
@@ -147,12 +148,12 @@ void RTOSSerial::end()
 {
 	*_ucsrb &= ~(_portEnableBits | _portTxBits);
 
+  vQueueDelete(*_rxQueue);
+  vQueueDelete(*_txQueue);
 #if 0
 	_freeBuffer(_rxBuffer);
 	_freeBuffer(_txBuffer);
 #else
-  vQueueDelete(_rxQueue);
-  vQueueDelete(_txQueue);
 #endif
 	_open = false;
 }
@@ -161,25 +162,23 @@ int RTOSSerial::available(void)
 {
 	if (!_open)
 		return (-1);
+  return uxQueueMessagesWaiting(*_rxQueue );
 #if 0
 	return ((_rxBuffer->head - _rxBuffer->tail) & _rxBuffer->mask);
 #else
-  unsigned portBASE_TYPE avail;
-  avail = uxQueueMessagesWaiting( _rxQueue );
-  return (int) avail;
 #endif
 }
 
 int RTOSSerial::txspace(void)
 {
+  unsigned portBASE_TYPE avail;
 	if (!_open)
 		return (-1);
+  avail = uxQueueMessagesWaiting(*_rxQueue );
+  return (int) (_txQueueSpace - avail);
 #if 0
 	return ((_txBuffer->mask+1) - ((_txBuffer->head - _txBuffer->tail) & _txBuffer->mask));
 #else
-  unsigned portBASE_TYPE avail;
-  avail = uxQueueMessagesWaiting( _rxQueue );
-  return (int) (_txsize - avail);
 #endif
 }
 
@@ -197,7 +196,7 @@ int RTOSSerial::read(void)
 	return (c);
 #else
   if (!_open) return (-1);
-  if ( xQueueReceive( _rxQueue, &c, ( portTickType ) 0 )) {
+  if ( xQueueReceive(*_rxQueue, &c, ( portTickType ) 0 ) != errQUEUE_EMPTY) {
     return (int) c;
   }
   return (-1);
@@ -217,7 +216,7 @@ int RTOSSerial::peek(void)
 #else
   uint8_t c;
   if (!_open) return (-1);
-  if ( xQueuePeek ( _rxQueue, &c, ( portTickType ) 0 )) {
+  if ( xQueuePeek (*_rxQueue, &c, ( portTickType ) 0 ) != errQUEUE_EMPTY) {
     return (int) c;
   }
   return (-1);
@@ -259,11 +258,11 @@ void RTOSSerial::write(uint8_t c)
 	while (i == _txBuffer->tail)
 		;
 
+  xQueueSendToBack(*_txQueue, (void *) &c, portMAX_DELAY );
 	// add byte to the buffer
 	_txBuffer->bytes[_txBuffer->head] = c;
 	_txBuffer->head = i;
 #else
-  xQueueSend( _txQueue, (void *) &c, portMAX_DELAY );
 #endif
 	// enable the data-ready interrupt, as it may be off if the buffer is empty
 	*_ucsrb |= _portTxBits;

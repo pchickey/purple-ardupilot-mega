@@ -190,8 +190,8 @@ private:
 	Buffer			* const _rxBuffer;
 	Buffer			* const _txBuffer;
 #else
-  xQueueHandle _rxQueue;
-  xQueueHandle _txQueue;
+  xQueueHandle * const _rxQueue;
+  xQueueHandle * const _txQueue;
 #endif
 	bool 			_open;
 
