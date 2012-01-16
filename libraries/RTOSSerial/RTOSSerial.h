@@ -148,17 +148,6 @@ public:
 	///
 	virtual void begin(long baud, unsigned int rxSpace, unsigned int txSpace);
 
-#if 0
-	/// Transmit/receive buffer descriptor.
-	///
-	/// Public so the interrupt handlers can see it
-	struct Buffer {
-		volatile uint16_t head, tail;	///< head and tail pointers
-		uint16_t mask;					///< buffer size mask for pointer wrap
-		uint8_t *bytes;					///< pointer to allocated buffer
-	};
-#endif
-
 	/// Tell if the serial port has been initialized
 	static bool getInitialized(uint8_t port) {
 		return (1<<port) & _serialInitialized;
@@ -192,6 +181,8 @@ private:
 #else
   xQueueHandle * const _rxQueue;
   xQueueHandle * const _txQueue;
+  unsigned int _rxQueueSpace;
+  unsigned int _txQueueSpace;
 #endif
 	bool 			_open;
 
@@ -213,8 +204,6 @@ private:
 #if 0
 	static void _freeBuffer(Buffer *buffer);
 #endif
-
-  int _txsize;
 
 	/// default receive buffer size
 	static const unsigned int	_default_rx_buffer_size = 128;

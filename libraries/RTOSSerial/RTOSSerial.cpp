@@ -47,13 +47,8 @@
 # define FS_MAX_PORTS   1
 #endif
 
-#if 0
-RTOSSerial::Buffer __RTOSSerial__rxBuffer[FS_MAX_PORTS];
-RTOSSerial::Buffer __RTOSSerial__txBuffer[FS_MAX_PORTS];
-#else
 xQueueHandle __RTOSSerial__rxQueue[FS_MAX_PORTS];
 xQueueHandle __RTOSSerial__txQueue[FS_MAX_PORTS];
-#endif
 uint8_t RTOSSerial::_serialInitialized = 0;
 
 // Constructor /////////////////////////////////////////////////////////////////
@@ -69,7 +64,8 @@ RTOSSerial::RTOSSerial(const uint8_t portNumber, volatile uint8_t *ubrrh, volati
 					   _portEnableBits(portEnableBits),
 					   _portTxBits(portTxBits),
 					   _rxQueue(&__RTOSSerial__rxQueue[portNumber]),
-					   _txQueue(&__RTOSSerial__txQueue[portNumber])
+					   _txQueue(&__RTOSSerial__txQueue[portNumber]),
+             _txQueueSpace(0)
 {
 	setInitialized(portNumber);
 	begin(57600);
@@ -89,32 +85,23 @@ void RTOSSerial::begin(long baud, unsigned int rxSpace, unsigned int txSpace)
 
 	// if we are currently open...
 	if (_open) {
+    // If the caller wants to preserve the buffer sizing, work out what
+    // it currently is...
+    if (0 == rxSpace)
+      rxSpace = _rxQueueSpace;
+    if (0 == txSpace)
+      txSpace = _txQueueSpace;
 		// close the port in its current configuration, clears _open
 		end();
 	}
-
-	// allocate buffers
-#if 0
-	if (!_allocBuffer(_rxBuffer, rxSpace ? : _default_rx_buffer_size) || !_allocBuffer(_txBuffer, txSpace ?	: _default_tx_buffer_size)) {
-		end();
-		return; // couldn't allocate buffers - fatal
-	}
-#else
-  if (_rxQueue == 0 || _txQueue == 0) {
+  _rxQueueSpace = rxSpace ? : _default_rx_buffer_size ;
+  _txQueueSpace = txSpace ? : _default_tx_buffer_size ;
   *_rxQueue = xQueueCreate( _rxQueueSpace, sizeof( uint8_t ));
   *_txQueue = xQueueCreate( _txQueueSpace, sizeof( uint8_t ));
   if (*_rxQueue == NULL || *_txQueue == NULL ) {
     end();
     return; // couldn't allocate queues - fatal
   }
-  _txsize = txSpace;
-#endif
-
-#if 0
-	// reset buffer pointers
-	_txBuffer->head = _txBuffer->tail = 0;
-	_rxBuffer->head = _rxBuffer->tail = 0;
-#endif
 
 	// mark the port as open
 	_open = true;
@@ -150,11 +137,6 @@ void RTOSSerial::end()
 
   vQueueDelete(*_rxQueue);
   vQueueDelete(*_txQueue);
-#if 0
-	_freeBuffer(_rxBuffer);
-	_freeBuffer(_txBuffer);
-#else
-#endif
 	_open = false;
 }
 
@@ -163,10 +145,6 @@ int RTOSSerial::available(void)
 	if (!_open)
 		return (-1);
   return uxQueueMessagesWaiting(*_rxQueue );
-#if 0
-	return ((_rxBuffer->head - _rxBuffer->tail) & _rxBuffer->mask);
-#else
-#endif
 }
 
 int RTOSSerial::txspace(void)
@@ -176,74 +154,33 @@ int RTOSSerial::txspace(void)
 		return (-1);
   avail = uxQueueMessagesWaiting(*_rxQueue );
   return (int) (_txQueueSpace - avail);
-#if 0
-	return ((_txBuffer->mask+1) - ((_txBuffer->head - _txBuffer->tail) & _txBuffer->mask));
-#else
-#endif
 }
 
 int RTOSSerial::read(void)
 {
 	uint8_t c;
-#if 0
-	// if the head and tail are equal, the buffer is empty
-	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
-		return (-1);
 
-	// pull character from tail
-	c = _rxBuffer->bytes[_rxBuffer->tail];
-	_rxBuffer->tail = (_rxBuffer->tail + 1) & _rxBuffer->mask;
-	return (c);
-#else
   if (!_open) return (-1);
   if ( xQueueReceive(*_rxQueue, &c, ( portTickType ) 0 ) != errQUEUE_EMPTY) {
     return (int) c;
   }
   return (-1);
-  // TODO
-#endif
 }
 
 int RTOSSerial::peek(void)
 {
-#if 0
-	// if the head and tail are equal, the buffer is empty
-	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
-		return (-1);
-
-	// pull character from tail
-	return (_rxBuffer->bytes[_rxBuffer->tail]);
-#else
   uint8_t c;
+
   if (!_open) return (-1);
   if ( xQueuePeek (*_rxQueue, &c, ( portTickType ) 0 ) != errQUEUE_EMPTY) {
     return (int) c;
   }
   return (-1);
-#endif
 }
 
 void RTOSSerial::flush(void)
 {
-#if 0
-	// don't reverse this or there may be problems if the RX interrupt
-	// occurs after reading the value of _rxBuffer->head but before writing
-	// the value to _rxBuffer->tail; the previous value of head
-	// may be written to tail, making it appear as if the buffer
-	// don't reverse this or there may be problems if the RX interrupt
-	// occurs after reading the value of head but before writing
-	// the value to tail; the previous value of rx_buffer_head
-	// may be written to tail, making it appear as if the buffer
-	// were full, not empty.
-	_rxBuffer->head = _rxBuffer->tail;
-
-	// don't reverse this or there may be problems if the TX interrupt
-	// occurs after reading the value of _txBuffer->tail but before writing
-	// the value to _txBuffer->head.
-	_txBuffer->tail = _txBuffer->head;
-#else
-  // TODO
-#endif
+  // Replaced with a no-op. Hopefully this does not cause problems.
 }
 
 void RTOSSerial::write(uint8_t c)
@@ -252,68 +189,10 @@ void RTOSSerial::write(uint8_t c)
 
 	if (!_open) // drop bytes if not open
 		return;
-#if 0
-	// wait for room in the tx buffer
-	i = (_txBuffer->head + 1) & _txBuffer->mask;
-	while (i == _txBuffer->tail)
-		;
 
   xQueueSendToBack(*_txQueue, (void *) &c, portMAX_DELAY );
-	// add byte to the buffer
-	_txBuffer->bytes[_txBuffer->head] = c;
-	_txBuffer->head = i;
-#else
-#endif
+
 	// enable the data-ready interrupt, as it may be off if the buffer is empty
 	*_ucsrb |= _portTxBits;
 }
-
-// Buffer management ///////////////////////////////////////////////////////////
-#if 0
-bool RTOSSerial::_allocBuffer(Buffer *buffer, unsigned int size)
-{
-	uint16_t	mask;
-	uint8_t		shift;
-
-	// init buffer state
-	buffer->head = buffer->tail = 0;
-
-	// Compute the power of 2 greater or equal to the requested buffer size
-	// and then a mask to simplify wrapping operations.  Using __builtin_clz
-	// would seem to make sense, but it uses a 256(!) byte table.
-	// Note that we ignore requests for more than BUFFER_MAX space.
-	for (shift = 1; (1U << shift) < min(_max_buffer_size, size); shift++)
-		;
-	mask = (1 << shift) - 1;
-
-	// If the descriptor already has a buffer allocated we need to take
-	// care of it.
-	if (buffer->bytes) {
-
-		// If the allocated buffer is already the correct size then
-		// we have nothing to do
-		if (buffer->mask == mask)
-			return true;
-
-		// Dispose of the old buffer.
-		free(buffer->bytes);
-	}
-	buffer->mask = mask;
-
-	// allocate memory for the buffer - if this fails, we fail.
-	buffer->bytes = (uint8_t *) malloc(buffer->mask + 1);
-
-	return (buffer->bytes != NULL);
-}
-
-void RTOSSerial::_freeBuffer(Buffer *buffer)
-{
-	buffer->head = buffer->tail = 0;
-	buffer->mask = 0;
-	if (NULL != buffer->bytes) {
-		free(buffer->bytes);
-		buffer->bytes = NULL;
-	}
-}
-#endif
 
