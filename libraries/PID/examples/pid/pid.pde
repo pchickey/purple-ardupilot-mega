@@ -6,6 +6,7 @@
 #include <FastSerial.h>
 #include <avr/pgmspace.h>
 #include <AP_Common.h>
+#include <AP_Param.h>
 #include <AP_Math.h>
 #include <APM_RC.h> // ArduPilot RC Library
 #include <PID.h> // ArduPilot Mega RC Library

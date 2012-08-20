@@ -13,6 +13,7 @@
 #include <AP_ADC.h>
 #include <AP_Math.h>
 #include <AP_Common.h>
+#include <AP_Param.h>
 
 #define A_LED_PIN        27
 #define C_LED_PIN        25

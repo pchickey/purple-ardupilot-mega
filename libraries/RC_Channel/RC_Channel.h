@@ -7,6 +7,7 @@
 #define RC_Channel_h
 
 #include <AP_Common.h>
+#include <AP_Param.h>
 #include <APM_RC.h>
 
 /// @class	RC_Channel

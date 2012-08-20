@@ -18,6 +18,7 @@
 #include <AP_AnalogSource.h>
 #include <AP_AnalogSource_Arduino.h>
 #include <AP_Common.h>
+#include <AP_Param.h>
 #include <AP_Compass.h>
 #include <AP_Airspeed.h>
 #include <AP_Baro.h>

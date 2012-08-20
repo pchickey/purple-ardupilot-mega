@@ -6,6 +6,7 @@
 // includes
 #include <FastSerial.h>
 #include <AP_Common.h>
+#include <AP_Param.h>
 #include <AP_Math.h>
 #include <AP_RangeFinder.h>     // Range finder library
 #include <Arduino_Mega_ISR_Registry.h>
