@@ -10,6 +10,19 @@
 #ifndef __AP_HAL_UTILITY_BETTERSTREAM_H__
 #define __AP_HAL_UTILITY_BETTERSTREAM_H__
 
+#include "../AP_HAL_Namespace.h"
+
+/* prog_char_t: */
+#include <AP_Common.h>
+#include <avr/pgmspace.h>
+
+/* AP_HAL::BetterStream is derived from Michael Smith's FastSerial library for
+ * Arduino. Mike's library has an implementation of _vprintf() for AVR.
+ * Please provide your own platform-specic implementation for this library.
+ *
+ * TODO: Segregate prog_char_t dependent functions to be available on AVR
+ * platform only, with default implementations elsewhere.
+ */
 
 class AP_HAL::BetterStream : public AP_HAL::Stream {
 public:
