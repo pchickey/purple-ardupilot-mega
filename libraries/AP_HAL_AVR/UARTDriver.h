@@ -5,13 +5,14 @@
 #include <stdint.h>
 
 #include <AP_HAL.h>
+#include "AP_HAL_AVR_Namespace.h"
 
 /**
  * AVRUARTDriver is an implementation of UARTDriver for the AVR.
  * It will be a thin wrapper on FastSerial.
  */
 
-class AP_HAL::AVRUARTDriver : public AP_HAL::UARTDriver {
+class AP_HAL_AVR::AVRUARTDriver : public AP_HAL::UARTDriver {
 public:
     AVRUARTDriver(int num) : _num(num) {}
     void init(uint16_t baud) { _baud = baud; }
