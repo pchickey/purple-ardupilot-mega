@@ -15,6 +15,7 @@
 #include "PWMOutput.h"
 
 using namespace AP_HAL;
+using namespace AP_HAL_AVR;
 
 static AVRUARTDriver    avrUart0Driver( 0 );
 static AVRUARTDriver    avrUart1Driver( 1 );
