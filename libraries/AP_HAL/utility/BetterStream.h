@@ -11,6 +11,7 @@
 #define __AP_HAL_UTILITY_BETTERSTREAM_H__
 
 #include "../AP_HAL_Namespace.h"
+#include "Stream.h"
 
 /* prog_char_t: */
 #include <AP_Common.h>
@@ -29,19 +30,19 @@ public:
     BetterStream(void) {}
 
     // Stream extensions
-    void    print_P(const prog_char_t *);
-    void    println_P(const prog_char_t *);
-    void    printf(const char *, ...)
-                __attribute__ ((format(__printf__, 2, 3)));
-    void    _printf_P(const prog_char *, ...)
-                __attribute__ ((format(__printf__, 2, 3)));
+    virtual void print_P(const prog_char_t *);
+    virtual void println_P(const prog_char_t *);
+    virtual void printf(const char *, ...)
+                        __attribute__ ((format(__printf__, 2, 3)));
+    virtual void _printf_P(const prog_char *, ...)
+                        __attribute__ ((format(__printf__, 2, 3)));
 
     virtual int txspace(void);
 
 #define printf_P(fmt, ...) _printf_P((const prog_char *)fmt, ## __VA_ARGS__)
 
 private:
-    void    _vprintf(unsigned char, const char *, va_list)
+    virtual void _vprintf(unsigned char, const char *, va_list)
                 __attribute__ ((format(__printf__, 3, 0)));
 
 
