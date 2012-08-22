@@ -13,13 +13,39 @@
 //
 
 #include <limits.h>
+#include <AP_Common.h>
+#include <avr/pgmspace.h>
 #include <AP_HAL.h>
-using namespace AP_HAL;
 
-// Stream extensions////////////////////////////////////////////////////////////
+#include "UARTDriver.h"
+using namespace AP_HAL_AVR;
 
-void
-BetterStream::print_P(const prog_char_t *s)
+#define FS_MAX_PORTS 4
+AVRUARTDriver::Buffer __AVRUARTDriver__rxBuffer[FS_MAX_PORTS];
+AVRUARTDriver::Buffer __AVRUARTDriver__txBuffer[FS_MAX_PORTS];
+
+AVRUARTDriver::AVRUARTDriver(
+        const uint8_t portNumber, volatile uint8_t *ubrrh,
+        volatile uint8_t *ubrrl, volatile uint8_t *ucsra,
+        volatile uint8_t *ucsrb, const uint8_t u2x,
+		const uint8_t portEnableBits, const uint8_t portTxBits) :
+			_ubrrh(ubrrh),
+			_ubrrl(ubrrl),
+			_ucsra(ucsra),
+			_ucsrb(ucsrb),
+			_u2x(u2x),
+			_portEnableBits(portEnableBits),
+			_portTxBits(portTxBits),
+			_rxBuffer(&__AVRUARTDriver__rxBuffer[portNumber]),
+			_txBuffer(&__AVRUARTDriver__txBuffer[portNumber])
+{
+	_initialized = true;
+	begin(57600);
+}
+/* */
+
+/* BetterStream implementations */
+void AVRUARTDriver::print_P(const prog_char_t *s)
 {
         char    c;
 
@@ -27,15 +53,13 @@ BetterStream::print_P(const prog_char_t *s)
                 write(c);
 }
 
-void
-BetterStream::println_P(const prog_char_t *s)
+void AVRUARTDriver::println_P(const prog_char_t *s)
 {
         print_P(s);
         println();
 }
 
-void
-BetterStream::printf(const char *fmt, ...)
+void AVRUARTDriver::printf(const char *fmt, ...)
 {
         va_list ap;
 
@@ -44,19 +68,11 @@ BetterStream::printf(const char *fmt, ...)
         va_end(ap);
 }
 
-void
-BetterStream::_printf_P(const prog_char *fmt, ...)
+void AVRUARTDriver::_printf_P(const prog_char *fmt, ...)
 {
         va_list ap;
 
         va_start(ap, fmt);
         _vprintf(1, fmt, ap);
         va_end(ap);
-}
-
-int
-BetterStream::txspace(void)
-{
-        // by default claim that there is always space in transmit buffer
-        return(INT_MAX);
 }

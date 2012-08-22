@@ -17,10 +17,15 @@
 using namespace AP_HAL;
 using namespace AP_HAL_AVR;
 
-static AVRUARTDriver    avrUart0Driver( 0 );
-static AVRUARTDriver    avrUart1Driver( 1 );
+AVRUARTDriverISRs(0);
+AVRUARTDriverISRs(1);
+AVRUARTDriverISRs(3);
+
+static AVRUARTDriverInstance(avrUart0Driver, 0);
+static AVRUARTDriverInstance(avrUart1Driver, 1);
 static EmptyUARTDriver  avrUart2Driver;
-static AVRUARTDriver    avrUart3Driver( 3 );
+static AVRUARTDriverInstance(avrUart3Driver, 3);
+
 static AVRI2CDriver     avrI2CDriver;
 static ArduinoSPIDriver arduinoSPIDriver;
 static ArduinoAnalogIn  arduinoAnalogIn;
