@@ -152,6 +152,7 @@ driver is exposed as a public `UARTDriver* uartN`).
 
 The following drivers are public members of `AP_HAL::HAL`. (Each class is in
 the `AP_HAL` namespace, left off for brevity.)
+
     *  `UARTDriver* uart0` : Corresponds to Arduino core Serial object
     *  `UARTDriver* uart1` : Corresponds to Arduino core Serial1 object
     *  `UARTDriver* uart2` : Corresponds to Arduino core Serial2 object
