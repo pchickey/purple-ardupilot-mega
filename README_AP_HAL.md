@@ -1,3 +1,8 @@
+AP\_HAL Readme
+Pat Hickey
+Galois Inc
+11 Sept 2011
+
 Overview
 ========
 
@@ -312,7 +317,71 @@ AP\_HAL::Dataflash
 ------------------
 
 The `AP_HAL::Dataflash` class is pure virtual and can be found in
-`/libraries/AP_HAL/Dataflash.h`.
+`/libraries/AP_HAL/Dataflash.h`. It is based on the existing ArduPilot
+`DataFlash` library found in `/libraries/DataFlash`. The `AP_HAL::Dataflash`
+interface is a cleaned up version of that library's interface. Public member
+variables have been replaced with getter methods, unused public interfaces
+have been removed, and all methods have had their names translated to lowercase
+and underscores for style.
+
+Similar to the problems with the SPI library, the existing `DataFlash` library
+interface is oriented for byte-at-a-time writes to the hardware device. This
+interface may have to be revised to support bulk transfers for efficient use
+in a threaded environment.
+
+
+AP\_HAL Console driver
+----------------------
+
+In the existing ArduPilot code, there is no unified way to send debugging
+messages, warnings, and errors to the user. A dedicated Console driver, exposed
+as an `AP_HAL::BetterStream`, is envisioned as a better way to communicate that
+sort of information.
+
+In the future, I envision extending this driver to support a transport layer
+over a Mavlink connection.
+
+Implementations may either leave the console unimplemented or alias it to one
+of the UARTDriver implementations.
+
+AP\_HAL::RCInput
+--------------
+
+The `AP_HAL::RCInput` class is pure virtual and can be found in
+`/libraries/AP_HAL/RCInput.h`. The RCInput interface is based on the
+input related methods of the existing ArduPilot `APM_RC` class. RCInput methods
+were separated from RCOutput methods for clarity.
+
+The methods `uint8_t valid()` and `uint16_t read(uint8_t)` carry over the exact
+interface found in `APM_RC`, which is to specify the number of valid channels,
+and then read each channel out by number.
+
+Based on the most common use case, which is to read the valid flag and then all
+input channels sequentially, a new interface `uint8_t read(uint16_t* periods,
+uint8_t len)` makes the valid flag available as the return value, and writes
+the periods as an array to the memory specified by the first argument.
+This bulk read interface may be more efficient in a threaded environment.
+
+AP\_HAL::RCOutput
+--------------
+
+The `AP_HAL::RCOutput` class is pure virtual and can be found in
+`/libraries/AP_HAL/RCOutput.h`. The RCOutput interface is based on the
+input related methods of the existing ArduPilot `APM_RC` class. RCOutput methods
+were separated from RCInput methods for clarity.
+
+The output methods from `APM_RC` were reproduced here faithfully, with minor
+differences to naming. As an extension, the `read` and `write` methods are
+overloaded to also have versions which take or give arrays of values, as the
+most common use case is to read or write all channels sequentially, and bulk
+reads and writes may be more efficient in a threaded environment.
+
+AP\_HAL::Scheduler
+--------------
+
+The `AP_HAL::Scheduler` class is pure virtual and can be found in
+`/libraries/AP_HAL/Scheduler.h`. 
+
 
 
 Remaining ArduPilot AVR dependencies
