@@ -1,6 +1,9 @@
 AP\_HAL Readme
+
 Pat Hickey
+
 Galois Inc
+
 11 Sept 2011
 
 --------
