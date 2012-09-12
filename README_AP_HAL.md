@@ -98,7 +98,7 @@ the AP\_HAL interface by declaring an extern reference to `hal`.
     ```
 
 
-Using The AP\_HAL\AVR library
+Using The AP\_HAL\_AVR library
 =============================
 
 The AP\_HAL\_AVR library exports AP\_HAL::HAL instances for the APM1 and APM2. 
@@ -148,15 +148,16 @@ The `AP_HAL::HAL` class is a container for the a complete set of device
 drivers.  The class is defined in `/libraries/AP_HAL/HAL.h`.  It also has a
 virtual (i.e. overridable) method to handle driver initialization.  Each device
 driver is exposed as a pointer an AP\_HAL driver class, (e.g.  each serial
-driver is exposed as a public `UARTDriver* uartN`).  
+driver is exposed as a public `UARTDriver* uartN`).
 
 The following drivers are public members of `AP_HAL::HAL`. (Each class is in
 the `AP_HAL` namespace, left off for brevity.)
 
-*  `UARTDriver* uart0` : Corresponds to Arduino core Serial object
-*  `UARTDriver* uart1` : Corresponds to Arduino core Serial1 object
-*  `UARTDriver* uart2` : Corresponds to Arduino core Serial2 object
-*  `UARTDriver* uart3` : Corresponds to Arduino core Serial3 object
+*  `UARTDriver* uart0` : Corresponds to ArduPilot FastSerial library override
+    of the Arduino core Serial object
+*  `UARTDriver* uart1` : Corresponds to Serial1 object (as above)
+*  `UARTDriver* uart2` : Corresponds to Serial2 object (as above)
+*  `UARTDriver* uart3` : Corresponds to Serial3 object (as above)
 *  `I2CDriver*  i2c` : Corresponds to ArduPilot `/libraries/I2C` driver
 *  `SPIDriver*  spi` : Corresponds to Arduino library SPI object
 *  `AnalogIn*   analogin` : Corresponds to
@@ -218,7 +219,7 @@ The `AP_HAL::BetterStream` class is a pure virtual version of the class by the
 same name from Mike Smith's `FastSerial` library. It exposes the methods
 `int txspace()`, `void print_P()`, `void println_P`, `void printf()`, and
 `void printf_P()`.  As in FastSerial's BetterStream library, function names
-postfixed with \_P take a string in program space as their first argument.
+postfixed with `_P` take a string in program space as their first argument.
 To use the AVR program space types, the `AP_HAL::BetterStream` class depends on 
 the `<avr/pgmspace.h>` and `AP_Common.h` header files. This is the only part of
 the `AP_HAL` library which still depends on an AVR specific library. We will
@@ -228,10 +229,90 @@ into a single header, and then conditionally defining those typedefs and
 macros to innocuous implementations when compiling for other platforms.
 
 
-AP\_HAL
+AP\_HAL::I2CDriver
+------------------
+
+The `AP_HAL::I2CDriver` class is the AP\_HAL replacment for ArduPilot's
+`I2C` library. (ArduPilot's `I2C` library is a replacment for the Arduino
+provided `Wire` library. The `Wire` library is so bad I could cry.)
+
+The `AP_HAL::I2CDriver` class is a pure virtual interface, found in
+`/libraries/AP_HAL/I2CDriver.h.` The methods resemble those in defined by the
+`I2C` class in  `/libraries/I2C/I2C.h`, but to ease future implementations, all
+of the old Arduino `Wire` class compatibility methods have been dropped.
+
+The `I2CDriver` interface supports the timeout features we require to assure
+safe timing properties when polling the hardware I2C peripeheral. It also
+only exposes whole-transaction interfaces to the user, to support more efficient
+implementations in a threaded environment.
 
 
+AP\_HAL::SPIDriver
+------------------
 
+The `AP_HAL::SPIDriver` class is pure virtual and can be found in
+`/libraries/AP_HAL/SPIDriver.h`.
+
+The `AP_HAL::SPIDriver` class is derived from, but only slightly resembles the
+Arduino core's `SPI` library.  Methods we don't use have been removed, as has
+the export of a global `SPI` object. The `begin` method has been swapped for a
+more idiomatic `init` method, and `setClockDivider` has been replaced with a
+more general `setSpeed` method.  In addition, it is not possible to operate the
+SPI device as a slave.  The `uint8_t transfer(uint8_t data)` method remains in
+common.
+
+The `SPIDriver` interface (and the existing AVR implementation) will require
+significant changes to support efficient implementations in a threaded
+environment. Transfers will have to be possible in bulk, and somehow incorporate
+the notion of the target device so that specialized hardware can manage the
+slave device select lines. Currently, device select signals are sent using the
+`AP_HAL::GPIO::write` method, which is the AP\_HAL analog of Arduino's
+`digitalWrite`.
+
+
+AP\_HAL::AnalogIn
+-----------------
+
+The `AP_HAL::AnalogIn` class is pure virtual and can be found in
+`/libraries/AP_HAL/AnalogIn.h`. The pure virtual `AP_HAL::AnalogSource` class
+is also defined in that class.
+
+The `AP_HAL::AnalogSource` interface is based loosely on the `AP_AnalogSource`
+interface in the existing AP\_AnalogSource library. At this time, an
+`AP_HAL::AnalogSource` has a single method `float read()` which returns the
+latest analog measurment. There are no methods for flow control - currently you
+must assume the method will block until a measurment is ready; the timing is
+entirely implementation defined.
+
+The `AP_HAL::AnalogIn` interface does not have a close analog in the existing
+libraries. Consider it to be, loosely, a factory for `AnalogSource` objects.
+There are only two methods: the standard `void init(void*)` initializer and
+a numbered interface to the available analog channels `AP_HAL::AnalogSource*
+channel(int n)`. At this time the significance of each numbered channel is
+determined by the implementation.
+
+Extensions will be made to these interfaces as required to meet the needs of
+other platforms. We will also have to consider making named channels, as
+opposed to numbered channels, available from the  `AP_HAL::AnalogIn` interface
+
+
+AP\_HAL::Storage
+----------------
+
+The `AP_HAL::Storage` class is pure virtual and can be found in
+`/libraries/AP_HAL/Storage.h`. It is the AP\_HAL interface to take the place
+of the AVR EEPROM, possibly with other nonvolatile storage.
+
+The `AP_HAL::Storage` interface very closely resembles the avr-libc eeprom
+interface. The use of `uint8_t*` projections into storage space are subject to
+change - it seems to make more sense to use integer types to designate these
+locations, as there is no valid dereference of a pointer value.
+
+AP\_HAL::Dataflash
+------------------
+
+The `AP_HAL::Dataflash` class is pure virtual and can be found in
+`/libraries/AP_HAL/Dataflash.h`.
 
 
 Remaining ArduPilot AVR dependencies
