@@ -3,6 +3,7 @@ Pat Hickey
 Galois Inc
 11 Sept 2011
 
+--------
 Overview
 ========
 
@@ -20,8 +21,9 @@ Currently, the AP\_HAL\_AVR library , found in /libraries/AP\_HAL\_AVR/, is an
 implementation of AP\_HAL for the ArduPilot hardware platforms.
 
 AP\_HAL\_AVR exports two HAL instances, `AP_HAL_AVR_APM1` and `AP_HAL_AVR_APM2`,
-which provide the 
+which provide the instances for APM1 and APM2 hardware.
 
+-----------
 Requirments
 ===========
 
@@ -78,7 +80,7 @@ Consequences of Coreless Arduino
   as Serial, Serial1, etc. no longer exist. This is by design - all of those
   hardware interfaces should be accessed through the HAL.
 
-
+-------------------------
 Using The AP\_HAL Library
 =========================
 
@@ -102,7 +104,7 @@ the AP\_HAL interface by declaring an extern reference to `hal`.
     extern const AP_HAL::HAL& hal;
     ```
 
-
+-----------------------------
 Using The AP\_HAL\_AVR library
 =============================
 
@@ -130,7 +132,7 @@ and then declare one of the following hal lines depending on your platform:
     ```
     const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
     ```
-
+-----------------------
 AP\_HAL Library Contents
 ========================
 
