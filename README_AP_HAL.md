@@ -135,6 +135,7 @@ and then declare one of the following hal lines depending on your platform:
     ```
     const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
     ```
+
 -----------------------
 AP\_HAL Library Contents
 ========================
