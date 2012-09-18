@@ -16,6 +16,10 @@
 #include "quaternion.h"
 #include "polygon.h"
 
+#define PI 3.141592653589793
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define RAD_TO_DEG 57.295779513082320876798154814105
+
 // define AP_Param types AP_Vector3f and Ap_Matrix3f
 AP_PARAMDEFV(Matrix3f, Matrix3f, AP_PARAM_MATRIX3F);
 AP_PARAMDEFV(Vector3f, Vector3f, AP_PARAM_VECTOR3F);

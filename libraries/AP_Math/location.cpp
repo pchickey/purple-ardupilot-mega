@@ -20,9 +20,21 @@
 /*
  *  this module deals with calculations involving struct Location
  */
-
-#include <FastSerial.h>
+#include <stdlib.h>
 #include "AP_Math.h"
+
+/* The following three functions used to be arduino core macros */
+static inline float radians(float deg) {
+    return deg * DEG_TO_RAD;
+}
+
+static inline float degrees(float rad) {
+    return rad * RAD_TO_DEG;
+}
+
+static inline float sq(float a) {
+    return a*a;
+}
 
 // radius of earth in meters
 #define RADIUS_OF_EARTH 6378100
