@@ -15,6 +15,7 @@
 #include "simplegcs.h"
 #include "downstream.h"
 #include "upstream.h"
+#include "userinput.h"
 
 const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
 
@@ -22,7 +23,6 @@ mavlink_channel_t upstream_channel = MAVLINK_COMM_1;
 mavlink_channel_t downstream_channel = MAVLINK_COMM_0;
 
 GPS* gps;
-bool gps_found = false;
 
 void console_loopback() {
     int a = hal.console->available();
@@ -52,7 +52,7 @@ void setup(void) {
     hal.console->backend_open();
     hal.console->println_P(PSTR("Hello hal.console"));
 
-    gps_found = gps_init(hal.uart0, gps);
+    bool gps_found = gps_init(hal.uart0, gps);
   
     /* Debug - make sure i setup the gps auto stuff correctly*/
     if (gps_found && gps == NULL) {
@@ -60,12 +60,17 @@ void setup(void) {
       gcs_console_send(downstream_channel);
       for(;;);
     }
+
+    UserInput::init(0, 2, 3, 4);
 }
 
-int i = 0;
 void loop(void) {
     hal.console->printf_P(PSTR("FM GPS lat %ld lon %ld"), 
           gps->latitude, gps->longitude);
+    gcs_console_send(downstream_channel);
+
+    UserInput::print(hal.console);
+    gcs_console_send(downstream_channel);
 
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(downstream_channel, upstream_handler);
