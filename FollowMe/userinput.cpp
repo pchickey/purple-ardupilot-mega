@@ -12,10 +12,10 @@ AP_HAL::DigitalSource* UserInput::_joy_btn;
 void UserInput::init( int side_btn_ch, int joy_x_ch,
                       int joy_y_ch, int joy_btn_ch) {
 
-  _side_btn = hal.gpio->channel(side_btn_ch);
-  _joy_btn = hal.gpio->channel(joy_btn_ch);
   _joy_x = hal.analogin->channel(joy_x_ch);
   _joy_y = hal.analogin->channel(joy_y_ch);
+  _side_btn = hal.gpio->channel(side_btn_ch);
+  _joy_btn = hal.gpio->channel(joy_btn_ch);
 }
 
 void UserInput::print(AP_HAL::BetterStream* s) {
@@ -23,6 +23,6 @@ void UserInput::print(AP_HAL::BetterStream* s) {
       (int) _side_btn->read(), 
       _joy_x->read(),
       _joy_y->read(),
-      _joy_btn->read());
+      (int) _joy_btn->read());
 }
 
