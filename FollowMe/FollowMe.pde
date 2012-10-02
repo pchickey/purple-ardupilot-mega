@@ -58,7 +58,7 @@ void setup(void) {
     hal.scheduler->delay(1000);
     hal.console->println_P(PSTR("Hello hal.console"));
 
-    UserInput::init(54, 4, 1, 0);
+    UserInput::init(54, 0, 1, 57);
 
     bool gps_found = gps_init(hal.uart1, gps);
 
@@ -66,7 +66,6 @@ void setup(void) {
     if (gps_found && gps == NULL) {
       hal.console->println_P(PSTR("Fail: No gps object - serious error"));
     }
-
 }
 
 void loop(void) {
@@ -74,7 +73,9 @@ void loop(void) {
       hal.console->printf_P(PSTR("FM GPS lat %ld lon %ld\r\n"), 
             gps->latitude, gps->longitude);
     }
-//    UserInput::print(hal.console);
+#if DEBUG_USERINPUT
+    UserInput::print(hal.console);
+#endif
 
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(downstream_channel, upstream_handler);
