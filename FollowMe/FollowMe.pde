@@ -11,7 +11,6 @@
 
 #include <AP_GPS.h>
 
-#include "gps.h"
 #include "simplegcs.h"
 #include "downstream.h"
 #include "upstream.h"
@@ -23,19 +22,7 @@ mavlink_channel_t upstream_channel = MAVLINK_COMM_1;
 mavlink_channel_t downstream_channel = MAVLINK_COMM_0;
 
 GPS* gps;
-
-void console_loopback() {
-    int a = hal.console->available();
-    if (a > 0) {
-        hal.console->print("Console loopback:");
-        int r = hal.console->read();
-        while (r > 0) {
-            hal.console->write( (uint8_t) r );
-            r = hal.console->read();
-        }
-        hal.console->println();
-    }   
-}
+AP_GPS_Auto auto_gps(hal.uart1, &gps);
 
 void setup(void) {
     /* Allocate large enough buffers on uart0 to support mavlink */
@@ -58,21 +45,30 @@ void setup(void) {
     hal.scheduler->delay(1000);
     hal.console->println_P(PSTR("Hello hal.console"));
 
+    hal.console->println_P(PSTR("User input init"));
     UserInput::init(54, 0, 1, 57);
 
-    bool gps_found = gps_init(hal.uart1, gps);
-
-    /* Debug - make sure i setup the gps auto stuff correctly*/
-    if (gps_found && gps == NULL) {
-      hal.console->println_P(PSTR("Fail: No gps object - serious error"));
-    }
+    hal.console->println_P(PSTR("GPS start init"));
+    auto_gps.init(GPS::GPS_ENGINE_PEDESTRIAN);
 }
 
 void loop(void) {
     if (gps != NULL) {
-      hal.console->printf_P(PSTR("FM GPS lat %ld lon %ld\r\n"), 
-            gps->latitude, gps->longitude);
+        gps->update();
+        if (gps->new_data) {
+            if (gps->fix) {
+                hal.console->printf_P(PSTR("GPS lat %ld lon %ld alt %.2f\r\n"), 
+                    gps->latitude, gps->longitude,
+                    (float) gps->altitude / 100.0);
+            } else {
+                hal.console->println_P(PSTR("GPS nofix"));
+            }
+            gps->new_data = false;
+        }
+    } else {
+        auto_gps.update();
     }
+
 #if DEBUG_USERINPUT
     UserInput::print(hal.console);
 #endif
@@ -82,7 +78,6 @@ void loop(void) {
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(upstream_channel, downstream_handler);
 
-    console_loopback();
     hal.scheduler->delay(100);
 }
 
