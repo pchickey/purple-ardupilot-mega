@@ -9,8 +9,7 @@
 
 class FMStateMachine {
 public:
-  FMStateMachine(GPS* gps) :
-    _gps(gps),
+  FMStateMachine() :
     _last_run_millis(0),
     _loop_period(500),
     _last_vehicle_hb_millis(0),
@@ -28,7 +27,7 @@ public:
   void on_upstream_command_long(mavlink_command_long_t *pkt);
   void on_upstream_set_mode(mavlink_set_mode_t* pkt);
 
-  void on_loop();
+  void on_loop(GPS* gps);
 
   void on_button_activate();
   void on_button_cancel();
@@ -45,7 +44,7 @@ private:
 
   /* _update_local_gps: Get device's current GPS status and location. Called
    * periodically. Can activate _on_fault_cancel(); */
-  void _update_local_gps();
+  void _update_local_gps(GPS* gps);
 
   void _on_user_override();
   void _on_fault_cancel();
@@ -55,8 +54,6 @@ private:
   /* Set once a start guide mode packet has been sent.
    * Unset whenever we stop guiding. */
   bool _guiding;
-  /* */
-  GPS* _gps;
 
   /* Scheduling the on_loop periodic updater. */
   uint32_t _last_run_millis;

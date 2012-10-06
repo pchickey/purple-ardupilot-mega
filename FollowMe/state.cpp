@@ -62,12 +62,20 @@ void FMStateMachine::on_button_activate() {
   }
 }
 
-void FMStateMachine::on_loop() {
+void FMStateMachine::on_button_cancel() {
+  if (!_guiding) return;
+  _send_loiter();
+  _guiding = false;
+}
+
+void FMStateMachine::on_loop(GPS* gps) {
   uint32_t now = hal.scheduler->millis();
   if (_last_run_millis + _loop_period < now) return;
   _last_run_millis = now;
 
-  _update_local_gps();
+  if (gps != NULL) {
+    _update_local_gps(gps);
+  }
 
   if (_guiding) {
     _send_guide();
@@ -92,19 +100,19 @@ bool FMStateMachine::_check_guide_valid() {
       && vehicle_mode_valid;
 }
 
-void FMStateMachine::_update_local_gps() {
+void FMStateMachine::_update_local_gps(GPS* gps) {
   /* Cause an on_fault_cancel if when local gps has transitioned form 
    * valid to invalid. */
-  if (_local_gps_valid && !(_gps->status() == GPS::GPS_OK)) {
+  if (_local_gps_valid && !(gps->status() == GPS::GPS_OK)) {
     _on_fault_cancel();
   } 
 
-  _local_gps_valid = (_gps->status() == GPS::GPS_OK);
-  if (_gps->new_data) {
-    _local_gps_lat      = _gps->latitude;
-    _local_gps_lat      = _gps->longitude;
-    _local_gps_altitude = _gps->altitude;
-
+  _local_gps_valid = (gps->status() == GPS::GPS_OK);
+  if (gps->new_data) {
+    _local_gps_lat      = gps->latitude;
+    _local_gps_lat      = gps->longitude;
+    _local_gps_altitude = gps->altitude;
+    gps->new_data = false;
   }
 }
 
