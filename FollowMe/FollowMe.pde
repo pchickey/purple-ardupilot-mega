@@ -15,6 +15,7 @@
 #include "downstream.h"
 #include "upstream.h"
 #include "userinput.h"
+#include "state.h"
 
 const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
 
@@ -23,6 +24,20 @@ mavlink_channel_t downstream_channel = MAVLINK_COMM_0;
 
 GPS* gps;
 AP_GPS_Auto auto_gps(hal.uart1, &gps);
+FMStateMachine sm;
+UserInput input;
+
+static void sm_on_button_activate(int event) {
+  if (event == DigitalDebounce::BUTTON_DOWN) {
+    sm.on_button_activate();
+  }
+}
+
+static void sm_on_button_cancel(int event) {
+  if (event == DigitalDebounce::BUTTON_DOWN) {
+    sm.on_button_cancel();
+  }
+}
 
 void setup(void) {
     /* Allocate large enough buffers on uart0 to support mavlink */
@@ -46,18 +61,22 @@ void setup(void) {
     hal.console->println_P(PSTR("Hello hal.console"));
 
     hal.console->println_P(PSTR("User input init"));
-    UserInput::init(54, 0, 1, 57);
+    input.init(57, 0, 1, 51);
+    input.side_btn_event_callback(sm_on_button_activate);
+    input.joy_btn_event_callback(sm_on_button_cancel);
 
     hal.console->println_P(PSTR("GPS start init"));
     auto_gps.init(GPS::GPS_ENGINE_PEDESTRIAN);
 }
 
 void loop(void) {
+    sm.on_loop(gps); 
     if (gps != NULL) {
         gps->update();
         if (gps->new_data) {
             if (gps->fix) {
-                hal.console->printf_P(PSTR("GPS lat %ld lon %ld alt %.2f\r\n"), 
+                hal.console->printf_P(
+                    PSTR("GPS lat %ld lon %ld alt %.2f\r\n"), 
                     gps->latitude, gps->longitude,
                     (float) gps->altitude / 100.0);
             } else {
@@ -70,9 +89,8 @@ void loop(void) {
     }
 
 #if DEBUG_USERINPUT
-    UserInput::print(hal.console);
+    input.print(hal.console);
 #endif
-
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(downstream_channel, upstream_handler);
     /* Receive messages off the downstream, send them upstream: */

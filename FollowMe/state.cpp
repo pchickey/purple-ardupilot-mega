@@ -57,7 +57,7 @@ void FMStateMachine::on_button_activate() {
     _guiding = true;
     hal.console->println_P(PSTR("Button activated, entering guided mode"));
   } else {
-    hal.console->println_P(PSTR("Button activated but insufficient conditions"
+    hal.console->println_P(PSTR("Button activated but insufficient conditions "
           "for entering guided mode"));
   }
 }
