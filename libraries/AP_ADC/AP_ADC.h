@@ -25,7 +25,7 @@ class AP_ADC
 public:
     AP_ADC() {
     };                // Constructor
-    virtual void            Init(AP_PeriodicProcess * scheduler = NULL) = 0;
+    virtual void            Init() = 0;
 
     /* read one channel value */
     virtual float           Ch(uint8_t ch_num) = 0;
