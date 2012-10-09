@@ -44,20 +44,28 @@
  *       Channel 7 : Differential pressure sensor port
  *
  */
-#include "AP_ADC_ADS7844.h"
-
-extern "C" {
 // AVR LibC Includes
 #include <inttypes.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
-}
-#if defined(ARDUINO) && ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WConstants.h"
-#endif
 
+#include <AP_HAL.h>
+
+#include "AP_ADC_ADS7844.h"
+
+extern const AP_HAL::HAL& hal;
+
+#define bit_set(p,m)   ((p) |= ( 1<<m))
+#define bit_clear(p,m) ((p) &= ~(1<<m))
+
+// We use Serial Port 2 in SPI Mode
+#define ADC_DATAOUT     51    // MOSI
+#define ADC_DATAIN      50    // MISO
+#define ADC_SPICLOCK    52    // SCK
+#define ADC_CHIP_SELECT 33    // PC4   9 // PH6  Puerto:0x08 Bit mask : 0x40
+
+// DO NOT CHANGE FROM 8!!
+#define ADC_ACCEL_FILTER_SIZE 8
 // Commands for reading ADC channels on ADS7844
 static const unsigned char adc_cmd[9]              = { 0x87, 0xC7, 0x97, 0xD7, 0xA7, 0xE7, 0xB7, 0xF7, 0x00 };
 
@@ -125,7 +133,7 @@ void AP_ADC_ADS7844::read(uint32_t tnow)
     bit_set(PORTC, 4);                                          // Disable Chip Select (PIN PC4)
 
     // record time of this sample
-    _ch6_last_sample_time_micros = micros();
+    _ch6_last_sample_time_micros = hal.scheduler->micros();
 }
 
 
@@ -135,12 +143,12 @@ AP_ADC_ADS7844::AP_ADC_ADS7844()
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-void AP_ADC_ADS7844::Init( AP_PeriodicProcess * scheduler )
+void AP_ADC_ADS7844::Init()
 {
-    scheduler->suspend_timer();
-    pinMode(ADC_CHIP_SELECT, OUTPUT);
+    hal.scheduler->suspend_timer_procs();
+    hal.gpio->pinMode(ADC_CHIP_SELECT, GPIO_OUTPUT);
 
-    digitalWrite(ADC_CHIP_SELECT, HIGH);      // Disable device (Chip select is active low)
+    hal.gpio->write(ADC_CHIP_SELECT, 1);      // Disable device (Chip select is active low)
 
     // Setup Serial Port2 in SPI mode
     UBRR2 = 0;
@@ -162,10 +170,10 @@ void AP_ADC_ADS7844::Init( AP_PeriodicProcess * scheduler )
         _sum[i]   = adc_tmp;
     }
 
-    _ch6_last_sample_time_micros = micros();
+    _ch6_last_sample_time_micros = hal.scheduler->micros();
 
-    scheduler->resume_timer();
-    scheduler->register_process( AP_ADC_ADS7844::read );
+    hal.scheduler->resume_timer_procs();
+    hal.scheduler->register_timer_process( AP_ADC_ADS7844::read, 1, 0);
 
 }
 
