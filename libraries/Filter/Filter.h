@@ -10,8 +10,8 @@
 /// @brief	A base class from which various filters classes should inherit
 ///
 
-#ifndef Filter_h
-#define Filter_h
+#ifndef __FILTER_H__
+#define __FILTER_H__
 
 #include <inttypes.h>
 #include <AP_Common.h>
@@ -43,7 +43,5 @@ typedef Filter<uint16_t> FilterUInt16;
 typedef Filter<int32_t> FilterInt32;
 typedef Filter<uint32_t> FilterUInt32;
 
-#endif
-
-
+#endif // __FILTER_H__
 

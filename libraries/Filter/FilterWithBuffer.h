@@ -12,8 +12,8 @@
 ///         restrictions caused by the use of templates which makes different sizes essentially
 ///         completely different classes
 
-#ifndef FilterWithBuffer_h
-#define FilterWithBuffer_h
+#ifndef __FILTER_WITH_BUFFER_H__
+#define __FILTER_WITH_BUFFER_H__
 
 #include <inttypes.h>
 #include <AP_Common.h>
