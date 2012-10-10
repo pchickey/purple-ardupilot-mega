@@ -3,16 +3,15 @@
  *       Code by Randy Mackay. DIYDrones.com
  */
 
-#include <FastSerial.h>
 #include <AP_Common.h>
+#include <AP_HAL.h>
+#include <AP_HAL_AVR.h>
+#include <AP_Param.h>
 #include <AP_Math.h>            // ArduPilot Mega Vector/Matrix math Library
 #include <Filter.h>                     // Filter library
 #include <LowPassFilter.h>      // LowPassFilter class (inherits from Filter class)
 
-////////////////////////////////////////////////////////////////////////////////
-// Serial ports
-////////////////////////////////////////////////////////////////////////////////
-FastSerialPort0(Serial);        // FTDI/console
+const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
 
 // create a global instance of the class instead of local to avoid memory fragmentation
 LowPassFilterInt16 low_pass_filter(0.02);  // simple low pass filter which applies 2% of new data to old data
@@ -21,13 +20,13 @@ LowPassFilterInt16 low_pass_filter(0.02);  // simple low pass filter which appli
 void setup()
 {
     // Open up a serial connection
-    Serial.begin(115200);
+    hal.uart0->begin(115200);
 
     // introduction
-    Serial.printf("ArduPilot LowPassFilter test ver 1.0\n\n");
+    hal.console->printf("ArduPilot LowPassFilter test ver 1.0\n\n");
 
     // Wait for the serial connection
-    delay(500);
+    hal.scheduler->delay(500);
 }
 
 //Main loop where the action takes place
@@ -46,15 +45,25 @@ void loop()
         new_value = 105;
 
         // output to user
-        Serial.printf("applying: %d",(int)new_value);
+        hal.console->printf("applying: %d",(int)new_value);
 
         // apply new value and retrieved filtered result
         filtered_value = low_pass_filter.apply(new_value);
 
         // display results
-        Serial.printf("\toutput: %d\n\n",(int)filtered_value);
+        hal.console->printf("\toutput: %d\n\n",(int)filtered_value);
+
+        hal.scheduler->delay(10);
     }
-    delay(10000);
+    hal.scheduler->delay(10000);
 }
 
+extern "C" {
+int main (void) {
+    hal.init(NULL);
+    setup();
+    for(;;) loop();
+    return 0;
+}
+}
 
