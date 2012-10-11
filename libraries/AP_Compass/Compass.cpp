@@ -1,6 +1,10 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #include "Compass.h"
 
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define deg2radians(deg) ((deg)*DEG_TO_RAD)
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+
 const AP_Param::GroupInfo Compass::var_info[] PROGMEM = {
     // index 0 was used for the old orientation matrix
     AP_GROUPINFO("OFS",    1, Compass, _offset, 0),
@@ -61,7 +65,10 @@ Compass::set_initial_location(int32_t latitude, int32_t longitude)
     // the declination based on the initial GPS fix
     if (_auto_declination) {
         // Set the declination based on the lat/lng from GPS
-        _declination.set(radians(AP_Declination::get_declination((float)latitude / 10000000, (float)longitude / 10000000)));
+        _declination.set(deg2radians(
+                AP_Declination::get_declination(
+                    (float)latitude / 10000000,
+                    (float)longitude / 10000000)));
     }
 }
 
