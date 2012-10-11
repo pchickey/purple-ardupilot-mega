@@ -19,9 +19,6 @@ LowPassFilterInt16 low_pass_filter(0.02);  // simple low pass filter which appli
 // setup routine
 void setup()
 {
-    // Open up a serial connection
-    hal.uart0->begin(115200);
-
     // introduction
     hal.console->printf("ArduPilot LowPassFilter test ver 1.0\n\n");
 
