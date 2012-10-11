@@ -1,31 +1,14 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-// AVR runtime
-#include <FastSerial.h>
 #include <AP_Common.h>
+#include <AP_Param.h>
+#include <AP_HAL.h>
+#include <AP_HAL_AVR.h>
 #include <AP_Math.h>
 #include <AP_Declination.h>
 #include <Filter.h>
-#include <I2C.h>
-#include <SPI.h>
 
-#ifdef DESKTOP_BUILD
-// all of this is needed to build with SITL
- #include <DataFlash.h>
- #include <APM_RC.h>
- #include <GCS_MAVLink.h>
- #include <Arduino_Mega_ISR_Registry.h>
- #include <AP_PeriodicProcess.h>
- #include <AP_ADC.h>
- #include <AP_Baro.h>
- #include <AP_Compass.h>
- #include <AP_GPS.h>
-Arduino_Mega_ISR_Registry isr_registry;
-AP_Baro_BMP085_HIL barometer;
-AP_Compass_HIL compass;
-#endif
-
-FastSerialPort(Serial, 0);
+const AP_HAL::HAL& hal = AP_HAL_AVR_APM2;
 
 static const int16_t dec_tbl[37][73] = \
 { \
@@ -74,6 +57,8 @@ static float get_declination(float lat, float lon)
     float decmin, decmax;
     uint8_t latmin_index, lonmin_index;
 
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+
     // Validate input values
     lat = constrain(lat, -90, 90);
     lon = constrain(lon, -180, 180);
@@ -100,16 +85,15 @@ void setup(void)
     uint16_t pass = 0, fail = 0;
     uint32_t total_time=0;
 
-    Serial.begin(115200);
-    Serial.print("Beginning Test. Please wait...\n");
+    hal.console->print("Beginning Test. Please wait...\n");
 
     for(int16_t i = -90; i <= 90; i+=5)
     {
         for(int16_t j = -180; j <= 180; j+=5)
         {
-            uint32_t t1 = micros();
+            uint32_t t1 = hal.scheduler->micros();
             declination = AP_Declination::get_declination(i, j);
-            total_time += micros() - t1;
+            total_time += hal.scheduler->micros() - t1;
             declination_test = get_declination(i, j);
             if(declination == declination_test)
             {
@@ -118,15 +102,15 @@ void setup(void)
             }
             else
             {
-                Serial.printf("FAIL: %i, %i : %f, %f\n", i, j, declination, declination_test);
+                hal.console->printf("FAIL: %i, %i : %f, %f\n", i, j, declination, declination_test);
                 fail++;
             }
         }
     }
-    Serial.print("Ending Test.\n\n");
-    Serial.printf("Total Pass: %i\n", pass);
-    Serial.printf("Total Fail: %i\n", fail);
-    Serial.printf("Average time per call: %.1f usec\n",
+    hal.console->print("Ending Test.\n\n");
+    hal.console->printf("Total Pass: %i\n", pass);
+    hal.console->printf("Total Fail: %i\n", fail);
+    hal.console->printf("Average time per call: %.1f usec\n",
                   total_time/(float)(pass+fail));
 }
 
@@ -134,3 +118,11 @@ void loop(void)
 {
 }
 
+extern "C" {
+int main (void) {
+    hal.init(NULL);
+    setup();
+    for(;;) loop();
+    return 0;
+}
+}

@@ -14,12 +14,10 @@
  * of the License, or (at your option) any later version.
  */
 
-#include <FastSerial.h>
 #include <AP_Common.h>
 #include <AP_Declination.h>
 #include <avr/pgmspace.h>
 #include <math.h>
-
 
 // 1 byte - 4 bits for value + 1 bit for sign + 3 bits for repeats => 8 bits
 struct row_value {
@@ -113,6 +111,8 @@ AP_Declination::get_declination(float lat, float lon)
     int16_t decSW, decSE, decNW, decNE, lonmin, latmin;
     uint8_t latmin_index,lonmin_index;
     float decmin, decmax;
+
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
     // Constrain to valid inputs
     lat = constrain(lat, -90, 90);
