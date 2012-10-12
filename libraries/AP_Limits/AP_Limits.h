@@ -1,13 +1,15 @@
 // -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: t -*-
 
-/// @brief	Imposes limits on location (geofence), altitude and other parameters.
-///         Each breach will trigger an action or set of actions to recover. Adapted from geofence.
+/// @brief Imposes limits on location (geofence), altitude and other parameters.
+/// Each breach will trigger an action or set of actions to recover.
+/// dapted from geofence.
 /// @author Andrew Tridgell
 ///         Andreas Antonopoulos
 
-#ifndef AP_LIMITS_H
-#define AP_LIMITS_H
+#ifndef __AP_LIMITS_H__
+#define __AP_LIMITS_H__
 
+// XXX this isn't where enabled/disabled goes.
 #ifndef AP_LIMITS
  #define AP_LIMITS ENABLED
 #endif
@@ -114,4 +116,4 @@ private:
 };
 
 
-#endif // AP_LIMITS_H
+#endif // __AP_LIMITS_H__
