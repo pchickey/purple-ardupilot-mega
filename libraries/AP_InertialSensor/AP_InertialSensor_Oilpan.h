@@ -3,11 +3,10 @@
 #ifndef __AP_INERTIAL_SENSOR_OILPAN_H__
 #define __AP_INERTIAL_SENSOR_OILPAN_H__
 
-#include <string.h>
 #include <stdint.h>
 
-#include "../AP_ADC/AP_ADC.h"
-#include "../AP_Math/AP_Math.h"
+#include <AP_ADC.h>
+#include <AP_Math.h>
 #include "AP_InertialSensor.h"
 
 class AP_InertialSensor_Oilpan : public AP_InertialSensor
@@ -17,7 +16,7 @@ public:
     AP_InertialSensor_Oilpan( AP_ADC * adc );
 
     /* Concrete implementation of AP_InertialSensor functions: */
-    uint16_t        init(AP_PeriodicProcess * scheduler);
+    uint16_t        init();
     bool            update();
     bool            new_data_available();
     float           gx();
