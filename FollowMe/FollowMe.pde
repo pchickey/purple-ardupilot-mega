@@ -42,7 +42,10 @@ static void sm_on_button_cancel(int event) {
 void setup(void) {
     /* Allocate large enough buffers on uart0 to support mavlink */
     hal.uart0->begin(115200, 256, 256);
-    hal.uart2->begin(115200, 256, 256);
+
+    /* Incoming from radio */
+    hal.uart2->begin(57600, 256, 256);
+
     /* Don't need such big buffers for GPS */
     hal.uart1->begin(57600, 256, 16);
 
@@ -52,10 +55,12 @@ void setup(void) {
     /* Setup GCS_Mavlink library's comm 1 port to UART2 (accessible on APM2) */
     mavlink_comm_1_port = hal.uart2;
     
+#if FOLLOWME_SENDS_HEARTBEAT
     simplegcs_send_heartbeat(downstream_channel);
+    hal.scheduler->register_timer_process(simplegcs_send_heartbeat_async, 1, 0);
+#endif
 
     hal.scheduler->register_timer_process(simplegcs_send_console_async, 1, 0);
-    hal.scheduler->register_timer_process(simplegcs_send_heartbeat_async, 1, 0);
     hal.console->backend_open();
     hal.scheduler->delay(1000);
     hal.console->println_P(PSTR("Hello hal.console"));
