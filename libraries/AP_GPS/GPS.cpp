@@ -110,7 +110,7 @@ struct progstr_queue {
 };
 
 static struct {
-    FastSerial *fs;
+  AP_HAL::UARTDriver *fs;
 	uint8_t queue_size;
 	uint8_t idx, next_idx;
 	struct progstr_queue queue[PROGSTR_QUEUE_SIZE];
