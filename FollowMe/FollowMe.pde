@@ -75,33 +75,19 @@ void setup(void) {
 }
 
 void loop(void) {
-    sm.on_loop(gps); 
     if (gps != NULL) {
         gps->update();
-        if (gps->new_data) {
-            if (gps->fix) {
-                hal.console->printf_P(
-                    PSTR("GPS lat %ld lon %ld alt %.2f\r\n"), 
-                    gps->latitude, gps->longitude,
-                    (float) gps->altitude / 100.0);
-            } else {
-                hal.console->println_P(PSTR("GPS nofix"));
-            }
-            gps->new_data = false;
-        }
     } else {
         auto_gps.update();
     }
 
-#if DEBUG_USERINPUT
-    input.print(hal.console);
-#endif
+    sm.on_loop(gps); 
+
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(downstream_channel, upstream_handler);
+
     /* Receive messages off the downstream, send them upstream: */
     simplegcs_update(upstream_channel, downstream_handler);
-
-    hal.scheduler->delay(100);
 }
 
 
