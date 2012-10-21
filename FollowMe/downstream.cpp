@@ -19,9 +19,9 @@ static void downstream_handle_heartbeat(mavlink_message_t* msg) {
 
 static void downstream_handle_gps(mavlink_message_t* msg) __attribute__((noinline));
 static void downstream_handle_gps(mavlink_message_t* msg) {
-    mavlink_global_position_int_t pkt;
-    mavlink_msg_global_position_int_decode(msg, &pkt);
-    sm.on_downstream_global_position_int(&pkt);
+    mavlink_gps_raw_int_t pkt;
+    mavlink_msg_gps_raw_int_decode(msg, &pkt);
+    sm.on_downstream_gps_raw_int(&pkt);
 }
 
 void downstream_handler(mavlink_channel_t from, mavlink_message_t* msg) {
@@ -30,7 +30,7 @@ void downstream_handler(mavlink_channel_t from, mavlink_message_t* msg) {
         downstream_handle_heartbeat(msg); 
         _mavlink_resend_uart(downstream_channel, msg);
         break;
-      case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+      case MAVLINK_MSG_ID_GPS_RAW_INT:
         downstream_handle_gps(msg);
         _mavlink_resend_uart(downstream_channel, msg);
         break;
