@@ -18,11 +18,15 @@ public:
     _vehicle_gps_fix(0),
     _vehicle_lat(0),
     _vehicle_lon(0),
-    _vehicle_altitude(0)
+    _vehicle_altitude(0),
+    /* Don't exactly know what these defaults for target system
+     * and target component mean - they're derived from mavproxy */
+    _target_system(1),
+    _target_component(1)
   {}
   
   void on_downstream_heartbeat(mavlink_heartbeat_t *pkt);
-  void on_downstream_global_position_int(mavlink_global_position_int_t* pkt);
+  void on_downstream_gps_raw_int(mavlink_gps_raw_int_t* pkt);
 
   void on_upstream_command_long(mavlink_command_long_t *pkt);
   void on_upstream_set_mode(mavlink_set_mode_t* pkt);
@@ -67,12 +71,17 @@ private:
   int32_t _vehicle_lon;
   int32_t _vehicle_altitude;
 
-  /* If local gps becomes non-valid, and we're guiding, put the vehicle into
-   * loiter. */
+  uint8_t _target_system;
+  uint8_t _target_component;
+
   bool _local_gps_valid;
   int32_t _local_gps_lat;
   int32_t _local_gps_lon;
   int32_t _local_gps_altitude;
+
+  int32_t _offs_lat;
+  int32_t _offs_lon;
+  int32_t _offs_altitude;
 };
 
 #endif // __FOLLOWME_STATE_H__
