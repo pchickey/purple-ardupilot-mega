@@ -23,7 +23,6 @@ static void upstream_handle_set_mode(mavlink_message_t* msg) {
 }
 
 void upstream_handler(mavlink_channel_t from, mavlink_message_t* msg) {
-    hal.console->printf_P(PSTR("Upstream Message %d\r\n"), msg->msgid);
     switch (msg->msgid) {
       case MAVLINK_MSG_ID_COMMAND_LONG:
         upstream_handle_command_long(msg);
