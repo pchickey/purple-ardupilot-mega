@@ -33,9 +33,7 @@ void FMStateMachine::on_downstream_heartbeat(mavlink_heartbeat_t* pkt) {
   /* if mode has changed from last set_mode, the user has triggered a change
    * via RC switch.
    * clear out FM control of vehicle */
-  // XXX bench testing: just assume armed
-  // bool pktarmed = ((pkt->base_mode & MAV_MODE_FLAG_SAFETY_ARMED) > 0);
-  bool pktarmed = true;
+  bool pktarmed = ((pkt->base_mode & MAV_MODE_FLAG_SAFETY_ARMED) > 0);
   int8_t pktmode = (int8_t) pkt->custom_mode;
   if ((pktarmed != _vehicle_armed) || (pktmode != _vehicle_mode)) {
     _on_user_override();
@@ -62,6 +60,7 @@ void FMStateMachine::on_button_activate() {
     _set_guide_offset();
     _send_guide();
     _guiding = true;
+    _vehicle_mode = MODE_GUIDED;
     hal.console->println_P(PSTR("Button activated, entering guided mode"));
   } else {
     hal.console->println_P(PSTR("Button activated but insufficient conditions "
@@ -99,6 +98,7 @@ bool FMStateMachine::_check_guide_valid() {
                           && ( (_vehicle_mode == MODE_LOITER)
                              ||(_vehicle_mode == MODE_ALT_HOLD)
                              ||(_vehicle_mode == MODE_AUTO)
+                             ||(_vehicle_mode == MODE_GUIDED)
                              );
 #define DEBUG 1
 #if DEBUG
