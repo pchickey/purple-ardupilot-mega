@@ -41,7 +41,7 @@ static void sm_on_button_cancel(int event) {
 
 void setup(void) {
     /* Allocate large enough buffers on uart0 to support mavlink */
-    hal.uart0->begin(115200, 256, 256);
+    hal.uart0->begin(57600, 256, 256);
 
     /* Incoming from radio */
     hal.uart2->begin(57600, 256, 256);
