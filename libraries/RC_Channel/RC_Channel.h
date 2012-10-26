@@ -3,12 +3,15 @@
 /// @file	RC_Channel.h
 /// @brief	RC_Channel manager, with EEPROM-backed storage of constants.
 
-#ifndef RC_Channel_h
-#define RC_Channel_h
+#ifndef __RC_CHANNEL_H__
+#define __RC_CHANNEL_H__
 
 #include <AP_Common.h>
 #include <AP_Param.h>
-#include <APM_RC.h>
+
+#define RC_CHANNEL_TYPE_ANGLE 0
+#define RC_CHANNEL_TYPE_RANGE 1
+#define RC_CHANNEL_TYPE_ANGLE_RAW 2
 
 /// @class	RC_Channel
 /// @brief	Object managing one RC channel
@@ -90,10 +93,8 @@ public:
     int16_t                                         range_to_pwm();
 
     float                                           scale_output;
-    static void                                     set_apm_rc(APM_RC_Class * apm_rc);
     void                                            output();
     void                                            enable_out();
-    static APM_RC_Class *                           _apm_rc;
 
     static const struct AP_Param::GroupInfo         var_info[];
 

@@ -9,24 +9,25 @@
  *
  */
 
+#include <stdlib.h>
 #include <math.h>
-#include <avr/eeprom.h>
-#if defined(ARDUINO) && ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
+
+#include <AP_HAL.h>
+extern const AP_HAL::HAL& hal;
+
 #include "RC_Channel.h"
 
-#define RC_CHANNEL_ANGLE 0
-#define RC_CHANNEL_RANGE 1
-#define RC_CHANNEL_ANGLE_RAW 2
+#define NUM_CHANNELS 8
+
+
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
 
 /// global array with pointers to all APM RC channels, will be used by AP_Mount and AP_Camera classes
 /// It points to RC input channels, both APM1 and APM2 only have 8 input channels.
 RC_Channel* rc_ch[NUM_CHANNELS];
-
-APM_RC_Class *RC_Channel::_apm_rc;
 
 const AP_Param::GroupInfo RC_Channel::var_info[] PROGMEM = {
     // @Param: MIN
@@ -75,7 +76,7 @@ const AP_Param::GroupInfo RC_Channel::var_info[] PROGMEM = {
 void
 RC_Channel::set_range(int16_t low, int16_t high)
 {
-    _type           = RC_CHANNEL_RANGE;
+    _type           = RC_CHANNEL_TYPE_RANGE;
     _high           = high;
     _low            = low;
     _high_out       = high;
@@ -92,7 +93,7 @@ RC_Channel::set_range_out(int16_t low, int16_t high)
 void
 RC_Channel::set_angle(int16_t angle)
 {
-    _type   = RC_CHANNEL_ANGLE;
+    _type   = RC_CHANNEL_TYPE_ANGLE;
     _high   = angle;
 }
 
@@ -151,7 +152,7 @@ RC_Channel::set_pwm(int16_t pwm)
 
     radio_in = pwm;
 
-    if(_type == RC_CHANNEL_RANGE) {
+    if(_type == RC_CHANNEL_TYPE_RANGE) {
         control_in = pwm_to_range();
         //control_in = constrain(control_in, _low, _high);
         //control_in = min(control_in, _high);
@@ -163,7 +164,7 @@ RC_Channel::set_pwm(int16_t pwm)
 
     }else{
 
-        //RC_CHANNEL_ANGLE, RC_CHANNEL_ANGLE_RAW
+        //RC_CHANNEL_TYPE_ANGLE, RC_CHANNEL_TYPE_ANGLE_RAW
         control_in = pwm_to_angle();
 
 
@@ -198,15 +199,15 @@ RC_Channel::get_failsafe(void)
 void
 RC_Channel::calc_pwm(void)
 {
-    if(_type == RC_CHANNEL_RANGE) {
+    if(_type == RC_CHANNEL_TYPE_RANGE) {
         pwm_out         = range_to_pwm();
         radio_out       = (_reverse >= 0) ? (radio_min + pwm_out) : (radio_max - pwm_out);
 
-    }else if(_type == RC_CHANNEL_ANGLE_RAW) {
+    }else if(_type == RC_CHANNEL_TYPE_ANGLE_RAW) {
         pwm_out         = (float)servo_out * .1;
         radio_out       = (pwm_out * _reverse) + radio_trim;
 
-    }else{     // RC_CHANNEL_ANGLE
+    }else{     // RC_CHANNEL_TYPE_ANGLE
         pwm_out         = angle_to_pwm();
         radio_out       = pwm_out + radio_trim;
     }
@@ -335,19 +336,12 @@ RC_Channel::norm_output()
     return ret;
 }
 
-void RC_Channel::set_apm_rc( APM_RC_Class * apm_rc )
+void RC_Channel::output()
 {
-    _apm_rc = apm_rc;
+    hal.rcout->write(_ch_out, radio_out);
 }
 
-void
-RC_Channel::output()
+void RC_Channel::enable_out()
 {
-    _apm_rc->OutputCh(_ch_out, radio_out);
-}
-
-void
-RC_Channel::enable_out()
-{
-    _apm_rc->enable_out(_ch_out);
+    hal.rcout->enable_ch(_ch_out);
 }
