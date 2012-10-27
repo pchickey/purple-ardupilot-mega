@@ -100,7 +100,7 @@ bool AP_Motors::setup_throttle_curve()
     // disable throttle curve if not set-up corrrectly
     if( !retval ) {
         _throttle_curve_enabled = false;
-        hal.console->printf_P(PSTR("AP_Motors: failed to create throttle curve"));
+        hal.console->println_P(PSTR("AP_Motors: failed to create throttle curve"));
     }
 
     return retval;
