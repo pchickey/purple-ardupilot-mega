@@ -64,7 +64,7 @@ void AP_Motors::throttle_pass_through()
     if( armed() ) {
         // XXX
         for( int16_t i=0; i < AP_MOTORS_MAX_NUM_MOTORS; i++ ) {
-            _rc->OutputCh(_motor_to_channel_map[i], _rc_throttle->radio_in);
+            hal.rcout->write(_motor_to_channel_map[i], _rc_throttle->radio_in);
         }
     }
 }

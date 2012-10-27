@@ -7,8 +7,11 @@
  *   License as published by the Free Software Foundation; either
  *   version 2.1 of the License, or (at your option) any later version.
  */
-
+#include <stdlib.h>
+#include <AP_HAL.h>
 #include "AP_MotorsHeli.h"
+
+extern const AP_HAL::HAL& hal;
 
 const AP_Param::GroupInfo AP_MotorsHeli::var_info[] PROGMEM = {
 
@@ -177,19 +180,22 @@ void AP_MotorsHeli::set_update_rate( uint16_t speed_hz )
     _speed_hz = speed_hz;
 
     // setup fast channels
-    _rc->SetFastOutputChannels(_BV(_motor_to_channel_map[AP_MOTORS_MOT_1]) | _BV(_motor_to_channel_map[AP_MOTORS_MOT_2]) | _BV(_motor_to_channel_map[AP_MOTORS_MOT_3]) | _BV(_motor_to_channel_map[AP_MOTORS_MOT_4]), _speed_hz);
+    hal.rcout->set_freq(_motor_to_channel_map[AP_MOTORS_MOT_1], _speed_hz);
+    hal.rcout->set_freq(_motor_to_channel_map[AP_MOTORS_MOT_2], _speed_hz);
+    hal.rcout->set_freq(_motor_to_channel_map[AP_MOTORS_MOT_3], _speed_hz);
+    hal.rcout->set_freq(_motor_to_channel_map[AP_MOTORS_MOT_4], _speed_hz);
 }
 
 // enable - starts allowing signals to be sent to motors
 void AP_MotorsHeli::enable()
 {
     // enable output channels
-    _rc->enable_out(_motor_to_channel_map[AP_MOTORS_MOT_1]);            // swash servo 1
-    _rc->enable_out(_motor_to_channel_map[AP_MOTORS_MOT_2]);            // swash servo 2
-    _rc->enable_out(_motor_to_channel_map[AP_MOTORS_MOT_3]);            // swash servo 3
-    _rc->enable_out(_motor_to_channel_map[AP_MOTORS_MOT_4]);            // yaw
-    _rc->enable_out(AP_MOTORS_HELI_EXT_GYRO);           // for external gyro
-    _rc->enable_out(AP_MOTORS_HELI_EXT_RSC);            // for external RSC
+    hal.rcout->enable_ch(_motor_to_channel_map[AP_MOTORS_MOT_1]);            // swash servo 1
+    hal.rcout->enable_ch(_motor_to_channel_map[AP_MOTORS_MOT_2]);            // swash servo 2
+    hal.rcout->enable_ch(_motor_to_channel_map[AP_MOTORS_MOT_3]);            // swash servo 3
+    hal.rcout->enable_ch(_motor_to_channel_map[AP_MOTORS_MOT_4]);            // yaw
+    hal.rcout->enable_ch(AP_MOTORS_HELI_EXT_GYRO);           // for external gyro
+    hal.rcout->enable_ch(AP_MOTORS_HELI_EXT_RSC);            // for external RSC
 }
 
 // output_min - sends minimum values out to the motors
@@ -243,47 +249,47 @@ void AP_MotorsHeli::output_test()
 
     // servo 1
     for( i=0; i<5; i++ ) {
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim + 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim - 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim + 0);
-        delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim + 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim - 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_trim + 0);
+        hal.scheduler->delay(300);
     }
 
     // servo 2
     for( i=0; i<5; i++ ) {
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim + 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim - 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim + 0);
-        delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim + 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim - 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_trim + 0);
+        hal.scheduler->delay(300);
     }
 
     // servo 3
     for( i=0; i<5; i++ ) {
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim + 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim - 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim + 0);
-        delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim + 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim - 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_trim + 0);
+        hal.scheduler->delay(300);
     }
 
     // external gyro
     if( ext_gyro_enabled ) {
-        _rc->OutputCh(AP_MOTORS_HELI_EXT_GYRO, ext_gyro_gain);
+        hal.rcout->write(AP_MOTORS_HELI_EXT_GYRO, ext_gyro_gain);
     }
 
     // servo 4
     for( i=0; i<5; i++ ) {
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim + 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim - 100);
-        delay(300);
-        _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim + 0);
-        delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim + 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim - 100);
+        hal.scheduler->delay(300);
+        hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_trim + 0);
+        hal.scheduler->delay(300);
     }
 
     // Send minimum values to all motors
@@ -360,6 +366,8 @@ void AP_MotorsHeli::init_swash()
         collective_min = 1000;
         collective_max = 2000;
     }
+
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
     collective_mid = constrain(collective_mid, collective_min, collective_max);
 
     // calculate throttle mid point
@@ -481,10 +489,10 @@ void AP_MotorsHeli::move_swash(int16_t roll_out, int16_t pitch_out, int16_t coll
     _servo_4->calc_pwm();
 
     // actually move the servos
-    _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_out);
-    _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_out);
-    _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_out);
-    _rc->OutputCh(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_out);
+    hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_1], _servo_1->radio_out);
+    hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_2], _servo_2->radio_out);
+    hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_3], _servo_3->radio_out);
+    hal.rcout->write(_motor_to_channel_map[AP_MOTORS_MOT_4], _servo_4->radio_out);
 
     // to be compatible with other frame types
     motor_out[AP_MOTORS_MOT_1] = _servo_1->radio_out;
@@ -494,13 +502,17 @@ void AP_MotorsHeli::move_swash(int16_t roll_out, int16_t pitch_out, int16_t coll
 
     // output gyro value
     if( ext_gyro_enabled ) {
-        _rc->OutputCh(AP_MOTORS_HELI_EXT_GYRO, ext_gyro_gain);
+        hal.rcout->write(AP_MOTORS_HELI_EXT_GYRO, ext_gyro_gain);
     }
 }
 
-void AP_MotorsHeli::rsc_control()
-
+static long map(long x, long in_min, long in_max, long out_min, long out_max)
 {
+      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
+void AP_MotorsHeli::rsc_control() {
     switch ( rsc_mode ) {
 
     case AP_MOTORSHELI_RSC_MODE_CH8_PASSTHROUGH:
@@ -512,7 +524,7 @@ void AP_MotorsHeli::rsc_control()
                 rsc_output = _rc_8->control_in;
             }
         } else if( !armed() ) {
-            _rc->OutputCh(AP_MOTORS_HELI_EXT_RSC, _rc_8->radio_min);
+            hal.rcout->write(AP_MOTORS_HELI_EXT_RSC, _rc_8->radio_min);
             rsc_ramp = 0;                       //Return RSC Ramp to 0
         }
         break;
@@ -533,7 +545,7 @@ void AP_MotorsHeli::rsc_control()
             }
             rsc_output = 1000;                                  //Just to be sure RSC output is 0
         }
-        _rc->OutputCh(AP_MOTORS_HELI_EXT_RSC, rsc_output);
+        hal.rcout->write(AP_MOTORS_HELI_EXT_RSC, rsc_output);
         break;
 
     //	case 3:																		// Open Loop ESC Control
@@ -556,7 +568,7 @@ void AP_MotorsHeli::rsc_control()
     //			ext_esc_ramp = 0;	//Return ESC Ramp to 0
     //			ext_esc_output = 1000; //Just to be sure ESC output is 0
     //}
-    //		_rc->OutputCh(AP_MOTORS_HELI_EXT_ESC, ext_esc_output);
+    //		hal.rcout->write(AP_MOTORS_HELI_EXT_ESC, ext_esc_output);
     //	break;
 
 

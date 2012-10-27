@@ -56,7 +56,7 @@ class AP_Motors {
 public:
 
     // Constructor
-    AP_Motors( uint8_t APM_version, APM_RC_Class* rc_out, RC_Channel* rc_roll, RC_Channel* rc_pitch, RC_Channel* rc_throttle, RC_Channel* rc_yaw, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT);
+    AP_Motors( uint8_t APM_version, RC_Channel* rc_roll, RC_Channel* rc_pitch, RC_Channel* rc_throttle, RC_Channel* rc_yaw, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT);
 
     // init
     virtual void        Init();
@@ -162,7 +162,6 @@ protected:
     virtual void        output_disarmed() {
     };
 
-    APM_RC_Class*       _rc;                            // APM_RC class used to send updates to ESCs/Servos
     RC_Channel*         _rc_roll, *_rc_pitch, *_rc_throttle, *_rc_yaw;  // input in from users
     uint8_t             _motor_to_channel_map[AP_MOTORS_MAX_NUM_MOTORS];        // mapping of motor number (as received from upper APM code) to RC channel output - used to account for differences between APM1 and APM2
     uint16_t            _speed_hz;                      // speed in hz to send updates to motors
