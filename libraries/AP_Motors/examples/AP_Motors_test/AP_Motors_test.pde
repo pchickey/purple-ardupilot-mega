@@ -39,6 +39,15 @@ void setup()
     motors.set_max_throttle(850);
     motors.Init();      // initialise motors
 
+    if (rc3.radio_min == 0) {
+	    // cope with AP_Param not being loaded
+	    rc3.radio_min = 1000;
+    }
+    if (rc3.radio_max == 0) {
+	    // cope with AP_Param not being loaded
+	    rc3.radio_max = 2000;
+    }
+
     motors.enable();
     motors.output_min();
 
@@ -51,7 +60,7 @@ void loop()
     int value;
 
     // display help
-    hal.console->println("Press 't' to test motors.  Becareful they will spin!");
+    hal.console->println("Press 't' to test motors.  Be careful they will spin!");
 
     // wait for user to enter something
     while( !hal.console->available() ) {
