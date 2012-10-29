@@ -1,6 +1,7 @@
 // -*- Mode: C++; c-basic-offset: 8; indent-tabs-mode: nil -*-
 
 #include <AP_Common.h>
+#include <AP_Progmem.h>
 #include <AP_HAL.h>
 #include <AP_HAL_AVR.h>
 
@@ -57,10 +58,10 @@ void setup(void) {
     
 #if FOLLOWME_SENDS_HEARTBEAT
     simplegcs_send_heartbeat(downstream_channel);
-    hal.scheduler->register_timer_process(simplegcs_send_heartbeat_async, 1, 0);
+    hal.scheduler->register_timer_process(simplegcs_send_heartbeat_async);
 #endif
 
-    hal.scheduler->register_timer_process(simplegcs_send_console_async, 1, 0);
+    hal.scheduler->register_timer_process(simplegcs_send_console_async);
     hal.console->backend_open();
     hal.scheduler->delay(1000);
     hal.console->println_P(PSTR("Hello hal.console"));

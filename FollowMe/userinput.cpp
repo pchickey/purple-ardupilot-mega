@@ -29,7 +29,7 @@ void UserInput::init( int side_btn_ch, int joy_x_ch,
   _side_btn = new DigitalDebounce(
                 new DigitalInvert(hal.gpio->channel(side_btn_ch)), 100);
   _joy_btn = new DigitalDebounce(hal.gpio->channel(joy_btn_ch), 100);
-  hal.scheduler->register_timer_process(_periodic, 1, 0);
+  hal.scheduler->register_timer_process(_periodic);
 }
 
 void UserInput::print(AP_HAL::BetterStream* s) {
